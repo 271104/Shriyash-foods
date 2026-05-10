@@ -17,7 +17,7 @@ const Header = () => {
         <div className="container">
           <div className="header-content">
             <Link to="/" className="logo">
-              <img src="/logo.png" alt="Shriyash Foods" className="logo-image" />
+              <img src="/Logo.png" alt="Shriyash Foods" className="logo-image" />
               <div className="logo-text">
                 <span className="logo-name">SHRIYASH FOODS</span>
                 <span className="logo-tagline">Pure by Nature, Nourished by Choice</span>

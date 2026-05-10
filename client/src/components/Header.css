@@ -39,10 +39,9 @@
 }
 
 .logo-image {
-  height: 50px;
+  height: 55px;
   width: auto;
   object-fit: contain;
-  transform: scale(2.0) translate(-40px, -10px);
 }
 
 .logo-icon {
@@ -62,7 +61,6 @@
 .logo-text {
   display: flex;
   flex-direction: column;
-  margin-left: -70px;
 }
 
 .logo-name {
@@ -296,7 +294,6 @@
 @media (max-width: 480px) {
   .logo-image {
     height: 40px;
-    transform: scale(1.2);
   }
   
   .logo-name {

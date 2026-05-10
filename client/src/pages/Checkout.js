@@ -10,7 +10,6 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { cart, cartTotal, clearCart } = useContext(CartContext);
   
-  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [pincodeChecking, setPincodeChecking] = useState(false);
   const [serviceable, setServiceable] = useState(null);

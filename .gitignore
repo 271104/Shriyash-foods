@@ -5,3 +5,11 @@ client/build/
 uploads/
 *.log
 .DS_Store
+
+# Documentation files
+BUGS_FOUND_AND_FIXED.md
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_STATUS.md
+MONGODB_ATLAS_SETUP.md
+QUICK_DEPLOY_RENDER.md
+TWILIO_SETUP_GUIDE.md

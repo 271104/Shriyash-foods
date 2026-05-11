@@ -80,14 +80,16 @@ const Checkout = () => {
     try {
       // Create order
       const orderData = {
-        items: cart.items.map(item => ({
-          product: item.product._id,
-          name: item.product.name,
-          variant: item.variant,
-          price: item.price,
-          quantity: item.quantity,
-          sku: item.product.variants.find(v => v.weight === item.variant)?.sku
-        })),
+        items: cart.items
+          .filter(item => item.product) // Filter out items with null products
+          .map(item => ({
+            product: item.product._id,
+            name: item.product.name,
+            variant: item.variant,
+            price: item.price,
+            quantity: item.quantity,
+            sku: item.product.variants.find(v => v.weight === item.variant)?.sku
+          })),
         shippingAddress: {
           fullName: formData.fullName,
           phone: formData.phone,
@@ -403,12 +405,14 @@ const Checkout = () => {
           <div className="order-summary">
             <h2>📦 Order Summary</h2>
             
-            {cart.items.map(item => (
-              <div key={item._id} className="summary-item">
-                <span>{item.product.name} ({item.variant})</span>
-                <span>₹{item.price} × {item.quantity}</span>
-              </div>
-            ))}
+            {cart.items
+              .filter(item => item.product) // Filter out null products
+              .map(item => (
+                <div key={item._id} className="summary-item">
+                  <span>{item.product.name} ({item.variant})</span>
+                  <span>₹{item.price} × {item.quantity}</span>
+                </div>
+              ))}
 
             <div className="summary-divider"></div>
 

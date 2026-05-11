@@ -3,8 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { FiMail, FiLock, FiUser, FiPhone } from 'react-icons/fi';
-import OTPVerification from '../components/OTPVerification';
-import axios from 'axios';
 import './Auth.css';
 
 const Login = () => {
@@ -13,8 +11,6 @@ const Login = () => {
   
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -65,26 +61,8 @@ const Login = () => {
     }
   };
 
-  const handleOTPVerified = () => {
-    setIsPhoneVerified(true);
-    setShowOTP(false);
-    toast.success('Phone verified! Please complete registration.');
-  };
-
-  const handleOTPCancel = () => {
-    setShowOTP(false);
-    setFormData({ ...formData, phone: '' });
-  };
-
   return (
     <div className="auth-page">
-      {showOTP && (
-        <OTPVerification
-          phone={formData.phone}
-          onVerified={handleOTPVerified}
-          onCancel={handleOTPCancel}
-        />
-      )}
       <div className="auth-container">
         <div className="auth-left">
           <div className="auth-brand">

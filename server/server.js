@@ -33,6 +33,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/shipping', require('./routes/shippingRoutes'));
 app.use('/api/otp', require('./routes/otp'));
+app.use('/api/seed', require('./routes/seedRoutes'));
 
 // Health Check
 app.get('/api/health', (req, res) => {

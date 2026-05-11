@@ -29,28 +29,35 @@ const Cart = () => {
 
         <div className="cart-grid">
           <div className="cart-items">
-            {cart.items.map(item => (
-              <div key={item._id} className="cart-item">
-                <img 
-                  src={item.product.images[0]?.url || '/placeholder.jpg'} 
-                  alt={item.product.name}
-                />
-                <div className="item-details">
-                  <h3>{item.product.name}</h3>
-                  <p>Variant: {item.variant}</p>
-                  <p className="item-price">₹{item.price} × {item.quantity}</p>
+            {cart.items.map(item => {
+              // Skip items with missing product data
+              if (!item.product) {
+                return null;
+              }
+              
+              return (
+                <div key={item._id} className="cart-item">
+                  <img 
+                    src={item.product.images?.[0]?.url || '/placeholder.jpg'} 
+                    alt={item.product.name || 'Product'}
+                  />
+                  <div className="item-details">
+                    <h3>{item.product.name}</h3>
+                    <p>Variant: {item.variant}</p>
+                    <p className="item-price">₹{item.price} × {item.quantity}</p>
+                  </div>
+                  <div className="item-actions">
+                    <span className="item-total">₹{item.price * item.quantity}</span>
+                    <button 
+                      onClick={() => removeFromCart(item._id)}
+                      className="btn-remove"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
                 </div>
-                <div className="item-actions">
-                  <span className="item-total">₹{item.price * item.quantity}</span>
-                  <button 
-                    onClick={() => removeFromCart(item._id)}
-                    className="btn-remove"
-                  >
-                    <FiTrash2 />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="cart-summary">

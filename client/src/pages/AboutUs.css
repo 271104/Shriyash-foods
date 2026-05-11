@@ -1,0 +1,355 @@
+.about-page {
+  background: white;
+}
+
+/* Hero Section */
+.about-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 100px 0;
+  text-align: center;
+  color: white;
+}
+
+.about-hero h1 {
+  font-size: 52px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.hero-subtitle {
+  font-size: 24px;
+  opacity: 0.95;
+  font-style: italic;
+}
+
+/* Our Story */
+.our-story {
+  padding: 100px 0;
+  background: white;
+}
+
+.story-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.story-text h2 {
+  font-size: 42px;
+  color: var(--dark);
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+.story-text p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--gray);
+  margin-bottom: 20px;
+}
+
+.story-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.story-image img {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.15));
+}
+
+/* Mission & Vision */
+.mission-vision {
+  padding: 80px 0;
+  background: var(--cream);
+}
+
+.mv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.mv-card {
+  background: white;
+  padding: 50px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s;
+}
+
+.mv-card:hover {
+  transform: translateY(-8px);
+}
+
+.mv-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: white;
+  font-size: 36px;
+}
+
+.mv-card h3 {
+  font-size: 28px;
+  color: var(--dark);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.mv-card p {
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--gray);
+}
+
+/* Our Values */
+.our-values {
+  padding: 100px 0;
+  background: white;
+}
+
+.our-values h2 {
+  text-align: center;
+  font-size: 42px;
+  color: var(--dark);
+  margin-bottom: 60px;
+  font-weight: 700;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.value-card {
+  background: var(--cream);
+  padding: 40px 30px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.value-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(212, 165, 116, 0.2);
+}
+
+.value-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.value-card h3 {
+  font-size: 22px;
+  color: var(--dark);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.value-card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gray);
+}
+
+/* Why Choose Us */
+.why-choose {
+  padding: 80px 0;
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+
+.why-choose h2 {
+  text-align: center;
+  font-size: 42px;
+  margin-bottom: 60px;
+  font-weight: 700;
+}
+
+.choose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.choose-item {
+  text-align: center;
+}
+
+.choose-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.choose-item h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.choose-item p {
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Our Products Section */
+.our-products-section {
+  padding: 100px 0;
+  background: white;
+}
+
+.our-products-section h2 {
+  text-align: center;
+  font-size: 42px;
+  color: var(--dark);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 20px;
+  color: var(--gray);
+  margin-bottom: 60px;
+  font-style: italic;
+}
+
+.products-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.product-category {
+  background: var(--cream);
+  padding: 40px;
+  border-radius: 16px;
+  border-top: 4px solid var(--primary);
+}
+
+.product-category h3 {
+  font-size: 24px;
+  color: var(--dark);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.product-category ul {
+  list-style: none;
+  padding: 0;
+}
+
+.product-category ul li {
+  padding: 10px 0;
+  padding-left: 24px;
+  position: relative;
+  color: var(--gray);
+  font-size: 16px;
+}
+
+.product-category ul li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* CTA Section */
+.about-cta {
+  padding: 100px 0;
+  background: var(--cream);
+  text-align: center;
+}
+
+.about-cta h2 {
+  font-size: 42px;
+  color: var(--dark);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.about-cta p {
+  font-size: 20px;
+  color: var(--gray);
+  margin-bottom: 40px;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .about-hero h1 {
+    font-size: 38px;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+  }
+
+  .story-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .story-text h2,
+  .our-values h2,
+  .why-choose h2,
+  .our-products-section h2,
+  .about-cta h2 {
+    font-size: 32px;
+  }
+
+  .mv-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-hero {
+    padding: 60px 0;
+  }
+
+  .about-hero h1 {
+    font-size: 32px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+  }
+
+  .our-story,
+  .our-values,
+  .our-products-section,
+  .about-cta {
+    padding: 60px 0;
+  }
+
+  .mission-vision,
+  .why-choose {
+    padding: 50px 0;
+  }
+
+  .mv-card {
+    padding: 30px;
+  }
+
+  .story-text h2,
+  .our-values h2,
+  .why-choose h2,
+  .our-products-section h2,
+  .about-cta h2 {
+    font-size: 28px;
+  }
+}

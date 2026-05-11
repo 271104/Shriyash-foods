@@ -28,8 +28,10 @@ const Footer = () => {
           <div className="footer-section">
             <h4>Quick Links</h4>
             <a href="/products">Products</a>
-            <a href="/about">About Us</a>
-            <a href="/contact">Contact</a>
+            <a href="/contact">Contact Us</a>
+            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/terms-conditions">Terms & Conditions</a>
+            <a href="/refund-policy">Refund Policy</a>
           </div>
         </div>
         

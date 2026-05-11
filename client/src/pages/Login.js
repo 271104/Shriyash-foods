@@ -29,23 +29,23 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // For registration, check if phone is verified
-    if (!isLogin && !isPhoneVerified) {
-      // Send OTP
-      setLoading(true);
-      try {
-        const { data } = await axios.post('/api/otp/send', { phone: formData.phone });
-        if (data.success) {
-          toast.success('OTP sent to your WhatsApp!');
-          setShowOTP(true);
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to send OTP');
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
+    // OTP verification disabled - direct registration/login
+    // if (!isLogin && !isPhoneVerified) {
+    //   // Send OTP
+    //   setLoading(true);
+    //   try {
+    //     const { data } = await axios.post('/api/otp/send', { phone: formData.phone });
+    //     if (data.success) {
+    //       toast.success('OTP sent to your WhatsApp!');
+    //       setShowOTP(true);
+    //     }
+    //   } catch (error) {
+    //     toast.error(error.response?.data?.message || 'Failed to send OTP');
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    //   return;
+    // }
 
     setLoading(true);
 
@@ -188,7 +188,7 @@ const Login = () => {
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                {loading ? 'Please wait...' : (isLogin ? 'Login' : (isPhoneVerified ? 'Create Account' : 'Send OTP'))}
+                {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
               </button>
             </form>
 

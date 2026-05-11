@@ -8,7 +8,7 @@ import './Auth.css';
 const Login = () => {
   const navigate = useNavigate();
   const { login, register } = useContext(AuthContext);
-  
+
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,12 +24,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
 
     try {
       if (isLogin) {
-        await login(formData.phone, formData.password);
+        await login(formData.email, formData.password);
         toast.success('Welcome back!');
       } else {
         await register(formData);
@@ -71,14 +70,14 @@ const Login = () => {
         <div className="auth-right">
           <div className="auth-form-container">
             <div className="auth-tabs">
-              <button 
-                className={isLogin ? 'active' : ''} 
+              <button
+                className={isLogin ? 'active' : ''}
                 onClick={() => setIsLogin(true)}
               >
                 Login
               </button>
-              <button 
-                className={!isLogin ? 'active' : ''} 
+              <button
+                className={!isLogin ? 'active' : ''}
                 onClick={() => setIsLogin(false)}
               >
                 Register
@@ -104,15 +103,14 @@ const Login = () => {
 
               <div className="form-group">
                 <label>
-                  <FiPhone /> Phone Number
+                  <FiMail /> Email Address
                 </label>
                 <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="10-digit mobile number"
-                  pattern="[0-9]{10}"
+                  placeholder="your@email.com"
                   required
                 />
               </div>
@@ -120,14 +118,15 @@ const Login = () => {
               {!isLogin && (
                 <div className="form-group">
                   <label>
-                    <FiMail /> Email (Optional)
+                    <FiPhone /> Phone Number (Optional)
                   </label>
                   <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
                     onChange={handleChange}
-                    placeholder="your@email.com"
+                    placeholder="10-digit mobile number"
+                    pattern="[0-9]{10}"
                   />
                 </div>
               )}

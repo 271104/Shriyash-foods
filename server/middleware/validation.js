@@ -6,7 +6,7 @@ const validatePhone = (phone) => {
 };
 
 const validateEmail = (email) => {
-  if (!email) return true; // Email is optional
+  if (!email) return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
@@ -91,26 +91,26 @@ const validateOrderData = (req, res, next) => {
 };
 
 const validateRegistration = (req, res, next) => {
-  const { name, phone, password } = req.body;
+  const { name, email, password } = req.body;
 
   if (!name || name.trim().length < 2) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Please provide a valid name (minimum 2 characters)' 
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid name (minimum 2 characters)'
     });
   }
 
-  if (!validatePhone(phone)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Please provide a valid 10-digit phone number' 
+  if (!validateEmail(email)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid email address'
     });
   }
 
   if (!password || password.length < 6) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Password must be at least 6 characters long' 
+    return res.status(400).json({
+      success: false,
+      message: 'Password must be at least 6 characters long'
     });
   }
 
@@ -118,19 +118,19 @@ const validateRegistration = (req, res, next) => {
 };
 
 const validateLogin = (req, res, next) => {
-  const { phone, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!validatePhone(phone)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Please provide a valid 10-digit phone number' 
+  if (!validateEmail(email)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid email address'
     });
   }
 
   if (!password) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Password is required' 
+    return res.status(400).json({
+      success: false,
+      message: 'Password is required'
     });
   }
 

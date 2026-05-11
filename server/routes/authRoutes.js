@@ -15,12 +15,12 @@ const generateToken = (id) => {
 router.post('/register', validateRegistration, async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
-    
-    const userExists = await User.findOne({ phone });
+
+    const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ success: false, message: 'Phone number already registered' });
+      return res.status(400).json({ success: false, message: 'Email already registered' });
     }
-    
+
     const user = await User.create({ name, phone, email, password });
     
     res.status(201).json({
@@ -42,9 +42,9 @@ router.post('/register', validateRegistration, async (req, res) => {
 // @desc    Login user
 router.post('/login', validateLogin, async (req, res) => {
   try {
-    const { phone, password } = req.body;
-    
-    const user = await User.findOne({ phone });
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }

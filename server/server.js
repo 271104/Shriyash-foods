@@ -11,6 +11,7 @@ const app = express();
 // CORS Configuration
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://127.0.0.1:3000',
   'https://shriyash-foods.vercel.app',
   process.env.CLIENT_URL
 ].filter(Boolean);
@@ -20,9 +21,15 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     
+    // In development, allow all localhost origins
+    if (process.env.NODE_ENV !== 'production' && origin && origin.includes('localhost')) {
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('❌ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },

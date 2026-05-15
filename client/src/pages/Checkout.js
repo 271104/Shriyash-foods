@@ -140,17 +140,11 @@ const Checkout = () => {
             contact: formData.phone
           },
           theme: { color: '#D4A574' },
-          method: {
-            upi: true,
-            card: true,
-            netbanking: true,
-            wallet: true,
-            paylater: true
-          },
+          method: 'upi',
           config: {
             display: {
               blocks: {
-                upi: {
+                upiPreferred: {
                   name: 'Pay using UPI',
                   instruments: [
                     {
@@ -184,9 +178,9 @@ const Checkout = () => {
                   ]
                 }
               },
-              sequence: ['block.upi', 'block.card', 'block.netbanking', 'block.wallet'],
+              sequence: ['block.upiPreferred', 'block.card', 'block.netbanking', 'block.wallet'],
               preferences: {
-                show_default_blocks: true
+                show_default_blocks: false
               }
             }
           },

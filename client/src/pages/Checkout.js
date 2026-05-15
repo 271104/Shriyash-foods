@@ -71,7 +71,16 @@ const Checkout = () => {
     e.preventDefault();
     
     if (!serviceable) {
-      toast.error('Please check pincode serviceability first');
+      toast.error('⚠️ Please click the CHECK button next to pincode first!', {
+        position: 'top-center',
+        autoClose: 5000,
+        style: { fontSize: '16px', fontWeight: 'bold' }
+      });
+      // Scroll to pincode field
+      document.querySelector('input[name="pincode"]')?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
       return;
     }
 
@@ -386,10 +395,25 @@ const Checkout = () => {
                 </div>
               </div>
 
+              {!serviceable && (
+                <div style={{
+                  padding: '12px',
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '8px',
+                  marginBottom: '16px',
+                  textAlign: 'center',
+                  color: '#856404'
+                }}>
+                  ⚠️ Please click the <strong>CHECK</strong> button next to pincode before placing order
+                </div>
+              )}
+
               <button 
                 type="submit" 
                 className="btn btn-primary btn-block"
                 disabled={loading || !serviceable}
+                title={!serviceable ? 'Please check pincode serviceability first' : ''}
               >
                 {loading ? 'Processing...' : 'Place Order'}
               </button>
@@ -427,8 +451,15 @@ const Checkout = () => {
             </div>
 
             {discount > 0 && (
-              <div className="summary-row discount">
-                <span>Prepaid Discount</span>
+              <div className="summary-row discount" style={{
+                color: '#28a745',
+                fontWeight: '600',
+                backgroundColor: '#d4edda',
+                padding: '8px',
+                borderRadius: '4px',
+                margin: '8px 0'
+              }}>
+                <span>💰 Prepaid Discount</span>
                 <span>-₹{discount}</span>
               </div>
             )}

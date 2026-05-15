@@ -143,43 +143,9 @@ const Checkout = () => {
           method: 'upi',
           config: {
             display: {
-              blocks: {
-                upiPreferred: {
-                  name: 'Pay using UPI',
-                  instruments: [
-                    {
-                      method: 'upi'
-                    }
-                  ]
-                },
-                card: {
-                  name: 'Credit/Debit Card',
-                  instruments: [
-                    {
-                      method: 'card'
-                    }
-                  ]
-                },
-                netbanking: {
-                  name: 'Netbanking',
-                  instruments: [
-                    {
-                      method: 'netbanking'
-                    }
-                  ]
-                },
-                wallet: {
-                  name: 'Wallets',
-                  instruments: [
-                    {
-                      method: 'wallet'
-                    }
-                  ]
-                }
-              },
-              sequence: ['block.upiPreferred', 'block.card', 'block.netbanking', 'block.wallet'],
+              sequence: ['upi', 'card', 'netbanking', 'wallet'],
               preferences: {
-                show_default_blocks: false
+                show_default_blocks: true
               }
             }
           },

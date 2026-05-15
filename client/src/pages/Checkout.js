@@ -148,8 +148,7 @@ const Checkout = () => {
                   name: 'Pay using UPI',
                   instruments: [
                     {
-                      method: 'upi',
-                      flows: ['qr', 'collect', 'intent']
+                      method: 'upi'
                     }
                   ]
                 },

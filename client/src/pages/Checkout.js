@@ -140,15 +140,6 @@ const Checkout = () => {
             contact: formData.phone
           },
           theme: { color: '#D4A574' },
-          method: 'upi',
-          config: {
-            display: {
-              sequence: ['upi', 'card', 'netbanking', 'wallet'],
-              preferences: {
-                show_default_blocks: true
-              }
-            }
-          },
           handler: async function (response) {
             try {
               await axios.post('/api/payment/verify', {

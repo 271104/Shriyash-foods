@@ -10,10 +10,12 @@ const { validateOrderData } = require('../middleware/validation');
 // @desc    Create new order
 router.post('/create', optional, validateOrderData, async (req, res) => {
   try {
+    console.log('📦 Order creation request received');
     const { items, shippingAddress, paymentMethod, guestDetails } = req.body;
     
     // Validate order value for COD
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    console.log('💰 Order subtotal:', subtotal);
     
     let isFirstOrder = true;
     if (req.user) {
@@ -44,6 +46,7 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     
     // Generate order ID
     const orderId = 'SHR' + Date.now();
+    console.log('🆔 Generated order ID:', orderId);
     
     // Calculate pricing
     const shipping = subtotal >= 500 ? 0 : 40;
@@ -67,6 +70,8 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
       }]
     });
     
+    console.log('✅ Order created successfully:', orderId);
+    
     // Clear cart
     if (req.user) {
       await Cart.findOneAndDelete({ user: req.user._id });
@@ -81,6 +86,7 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
       requiresOTP: paymentMethod === 'COD' && (subtotal > 500 || isFirstOrder)
     });
   } catch (error) {
+    console.error('❌ Order creation error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

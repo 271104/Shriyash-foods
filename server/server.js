@@ -13,6 +13,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'https://shriyash-foods.vercel.app',
+  'https://www.shriyashfoods.com',
+  'https://shriyashfoods.com',
   process.env.CLIENT_URL
 ].filter(Boolean);
 

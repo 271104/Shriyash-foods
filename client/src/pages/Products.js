@@ -3,6 +3,57 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './Products.css';
 
+const fallbackProducts = [
+  {
+    _id: 'tomato-powder',
+    name: 'Tomato Powder',
+    slug: 'tomato-powder',
+    description: 'Premium tomato powder rich in lycopene and antioxidants. Perfect for cooking, sauces, and adding authentic tomato flavor.',
+    images: [{ url: '/tomato-removebg-preview.png' }],
+    variants: [{ price: 199, mrp: 249 }],
+  },
+  {
+    _id: 'beetroot-powder',
+    name: 'Beetroot Powder',
+    slug: 'beetroot-powder',
+    description: 'Natural beetroot powder for healthy circulation, stamina, smoothies, juices, and everyday wellness.',
+    images: [{ url: '/beetroot-removebg-preview.png' }],
+    variants: [{ price: 199, mrp: 249 }],
+  },
+  {
+    _id: 'banana-powder',
+    name: 'Banana Powder',
+    slug: 'banana-powder',
+    description: 'Natural banana powder rich in potassium and energy. Great for smoothies, desserts, and baby food.',
+    images: [{ url: '/banana-removebg-preview.png' }],
+    variants: [{ price: 199, mrp: 249 }],
+  },
+  {
+    _id: 'moringa-powder',
+    name: 'Moringa Powder',
+    slug: 'moringa-powder',
+    description: 'Pure moringa powder packed with vitamins, minerals, antioxidants, and natural daily nutrition.',
+    images: [{ url: '/moringa-removebg-preview.png' }],
+    variants: [{ price: 249, mrp: 299 }],
+  },
+  {
+    _id: 'onion-powder',
+    name: 'Onion Powder',
+    slug: 'onion-powder',
+    description: 'Premium onion powder for cooking, seasoning, marinades, soups, and authentic home-style flavor.',
+    images: [{ url: '/onion-removebg-preview.png' }],
+    variants: [{ price: 199, mrp: 249 }],
+  },
+  {
+    _id: 'abc-powder',
+    name: 'ABC Powder',
+    slug: 'abc-powder',
+    description: 'Amla, Beetroot, and Carrot powder blend crafted for everyday nourishment and wellness routines.',
+    images: [{ url: '/abc-removebg-preview.png' }],
+    variants: [{ price: 249, mrp: 299 }],
+  },
+];
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +85,10 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get('/api/products');
-      setProducts(data.products);
+      setProducts(data.products?.length ? data.products : fallbackProducts);
     } catch (error) {
       console.error('Error fetching products:', error);
+      setProducts(fallbackProducts);
     } finally {
       setLoading(false);
     }

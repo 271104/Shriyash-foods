@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiUser, FiMenu, FiX } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiCheckCircle, FiDroplet, FiShield, FiHeadphones, FiHelpCircle, FiPhone } from 'react-icons/fi';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import './Header.css';
@@ -13,6 +13,22 @@ const Header = () => {
 
   return (
     <header className="header">
+      <div className="header-top">
+        <div className="container">
+          <div className="header-top-content">
+            <div className="header-top-group">
+              <span><FiCheckCircle /> 100% Natural</span>
+              <span><FiDroplet /> No Additives</span>
+              <span><FiShield /> No Preservatives</span>
+            </div>
+            <div className="header-top-group">
+              <Link to="/orders"><FiHeadphones /> Track Order</Link>
+              <Link to="/contact"><FiHelpCircle /> Help</Link>
+              <a href="tel:+919876543210"><FiPhone /> +91 98765 43210</a>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="header-main">
         <div className="container">
           <div className="header-content">

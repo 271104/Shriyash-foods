@@ -1,7 +1,84 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShield, FiAward, FiHeart, FiStar } from 'react-icons/fi';
+import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap, FiShoppingCart } from 'react-icons/fi';
 import './Home.css';
+
+const categories = [
+  {
+    title: 'Vegetable Powders',
+    images: ['/shop_by_Category/vegetable_powder.png'],
+  },
+  {
+    title: 'Fruit Powders',
+    images: ['/shop_by_Category/fruit_powder.png'],
+  },
+  {
+    title: 'Green Powders',
+    images: ['/shop_by_Category/green_powder.png'],
+  },
+  {
+    title: 'Spice Powders',
+    images: ['/shop_by_Category/spice_powder.png'],
+  },
+  {
+    title: 'Superfood Powders',
+    images: ['/shop_by_Category/superfood_powder.png'],
+  },
+  {
+    title: 'Powder Mixes',
+    images: ['/shop_by_Category/powder_mixes.png'],
+  },
+];
+
+const bestsellers = [
+  { name: 'Tomato Powder', image: '/tomato-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
+  { name: 'Beetroot Powder', image: '/beetroot-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
+  { name: 'Banana Powder', image: '/banana-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
+  { name: 'Moringa Powder', image: '/moringa-removebg-preview.png', oldPrice: 'Rs. 299.00', price: 'Rs. 249.00' },
+  { name: 'Onion Powder', image: '/onion-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
+  { name: 'ABC Powder', image: '/abc-removebg-preview.png', oldPrice: 'Rs. 299.00', price: 'Rs. 249.00' },
+];
+
+const testimonials = [
+  {
+    quote: 'The quality is amazing! I use Moringa powder daily in my smoothies. Highly recommended!',
+    name: 'Neha P.',
+  },
+  {
+    quote: 'Pure, natural and great taste. Beetroot powder is my favorite!',
+    name: 'Amit S.',
+  },
+  {
+    quote: 'No additives or preservatives. Shriyash Foods is now a part of our lifestyle.',
+    name: 'Riya M.',
+  },
+];
+
+const blogPosts = [
+  {
+    category: 'Nutrition',
+    title: 'Benefits of Moringa Powder for a Healthy Lifestyle',
+    image: '/moringa-removebg-preview.png',
+  },
+  {
+    category: 'Wellness',
+    title: '5 Easy Ways to Add Superfood Powders to Your Diet',
+    image: '/carrot-removebg-preview.png',
+  },
+  {
+    category: 'Recipes',
+    title: 'Healthy Recipes Using Fruit & Vegetable Powders',
+    image: '/abc-removebg-preview.png',
+  },
+];
+
+const RatingStars = () => (
+  <span className="rating-stars" aria-label="5 star rating">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <FiStar key={star} />
+    ))}
+  </span>
+);
 
 const Home = () => {
   useEffect(() => {
@@ -18,7 +95,7 @@ const Home = () => {
       });
     }, observerOptions);
 
-    const animateElements = document.querySelectorAll('.feature-box, .tagline-section h2, .tagline-section p, .cta-content h2, .cta-content p, .cta-content .btn, .trust-item');
+    const animateElements = document.querySelectorAll('.category-item, .why-card, .bestseller-card, .testimonial-card, .blog-card');
     animateElements.forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
@@ -42,77 +119,164 @@ const Home = () => {
         <img src="/shade.png" alt="Shade" className="hero-shade-image" />
       </section>
 
-      {/* Features Section */}
-      <section className="features-section">
+      {/* Shop By Category */}
+      <section className="category-section">
         <div className="container">
-          <div className="features-grid">
-            <div className="feature-box">
-              <div className="feature-icon">
-                <FiShield />
-              </div>
-              <h3>Premium Quality</h3>
-              <p>Handpicked from the farm, ensuring pure, rich nutrition</p>
+          <div className="section-heading">
+            <h2>Shop by Category</h2>
+            <span aria-hidden="true"></span>
+          </div>
+
+          <div className="category-row">
+            <button className="category-arrow" aria-label="Previous category">
+              <FiChevronLeft />
+            </button>
+
+            <div className="category-grid">
+              {categories.map((category) => (
+                <article className={`category-item ${category.title === 'Powder Mixes' ? 'category-item-powder-mixes' : ''}`} key={category.title}>
+                  <Link to="/products" className="category-image-wrap">
+                    {category.images.map((src, index) => (
+                      <img
+                        src={src}
+                        alt=""
+                        className={`category-image category-image-${index + 1}`}
+                        key={src}
+                      />
+                    ))}
+                  </Link>
+                  <h3>{category.title}</h3>
+                  <Link to="/products" className="category-link">Shop Now -></Link>
+                </article>
+              ))}
             </div>
-            
-            <div className="feature-box">
-              <div className="feature-icon">
-                <FiAward />
-              </div>
-              <h3>FSSAI Certified</h3>
-              <p>Sourced directly from nature, delivering authentic taste</p>
+
+            <button className="category-arrow" aria-label="Next category">
+              <FiChevronRight />
+            </button>
+          </div>
+
+          <div className="why-card">
+            <div className="why-image-wrap">
+              <img src="/moringa-removebg-preview.png" alt="Moringa powder" />
             </div>
-            
-            <div className="feature-box">
-              <div className="feature-icon">
-                <FiHeart />
+            <div className="why-content">
+              <h2>Why Choose Shriyash Foods?</h2>
+              <div className="why-grid">
+                <div className="why-item">
+                  <FiFeather />
+                  <h3>100% Natural</h3>
+                  <p>Made from premium fruits & vegetables.</p>
+                </div>
+                <div className="why-item">
+                  <FiDroplet />
+                  <h3>No Additives</h3>
+                  <p>Absolutely no artificial colors or additives.</p>
+                </div>
+                <div className="why-item">
+                  <FiZap />
+                  <h3>Nutrient Rich</h3>
+                  <p>Retains natural goodness & nutrients.</p>
+                </div>
+                <div className="why-item">
+                  <FiShield />
+                  <h3>Easy to Use</h3>
+                  <p>Just mix & use in your daily recipes.</p>
+                </div>
               </div>
-              <h3>100% Natural</h3>
-              <p>No additives, just pure, farm-fresh powders in every packet</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Tagline Section */}
-      <section className="tagline-section">
-        <div className="container">
-          <h2>"Wellness Begins in the Kitchen"</h2>
-          <p>Discover the magic of clean, powerful health powders with Shriyash Foods – for kitchens that crave quality.</p>
-        </div>
-      </section>
+      {/* Bestsellers */}
+      <section className="bestseller-section">
+        <div className="section-shell">
+          <div className="section-title-row">
+            <div className="section-heading compact">
+              <h2>Our Bestsellers</h2>
+              <span aria-hidden="true"></span>
+            </div>
+            <Link to="/products" className="view-all-btn">View All Products -></Link>
+          </div>
 
-      {/* CTA Section */}
-      <section className="cta-section">
-        <div className="container">
-          <div className="cta-content">
-            <h2>Start Your Health Journey Today</h2>
-            <p>Experience the difference of premium, natural health powders</p>
-            <Link to="/products" className="btn btn-secondary btn-large">
-              Shop Now
-            </Link>
+          <div className="bestseller-grid">
+            {bestsellers.map((product) => (
+              <article className="bestseller-card" key={product.name}>
+                <Link to="/products" className="bestseller-image">
+                  <img src={product.image} alt={product.name} />
+                </Link>
+                <h3>{product.name}</h3>
+                <RatingStars />
+                <p className="product-price">
+                  <span>{product.oldPrice}</span>
+                  {product.price}
+                </p>
+                <button className="add-cart-btn">
+                  <FiShoppingCart /> Add to Cart
+                </button>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="trust-section">
-        <div className="container">
-          <div className="trust-grid">
-            <div className="trust-item">
-              <FiStar className="trust-icon" />
-              <h4>Premium Quality</h4>
-              <p>Handpicked ingredients</p>
+      {/* Testimonials */}
+      <section className="testimonial-section">
+        <div className="section-shell">
+          <div className="section-heading compact">
+            <h2>What Our Customers Say</h2>
+            <span aria-hidden="true"></span>
+          </div>
+
+          <div className="testimonial-row">
+            <button className="category-arrow" aria-label="Previous testimonial">
+              <FiChevronLeft />
+            </button>
+            <div className="testimonial-grid">
+              {testimonials.map((testimonial) => (
+                <article className="testimonial-card" key={testimonial.name}>
+                  <span className="quote-mark">"</span>
+                  <p>{testimonial.quote}</p>
+                  <div className="testimonial-footer">
+                    <strong>- {testimonial.name}</strong>
+                    <RatingStars />
+                  </div>
+                </article>
+              ))}
             </div>
-            <div className="trust-item">
-              <FiShield className="trust-icon" />
-              <h4>100% Safe</h4>
-              <p>FSSAI certified products</p>
+            <button className="category-arrow" aria-label="Next testimonial">
+              <FiChevronRight />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Preview */}
+      <section className="blog-preview-section">
+        <div className="section-shell">
+          <div className="section-title-row">
+            <div className="section-heading compact">
+              <h2>Latest from Our Blog</h2>
+              <span aria-hidden="true"></span>
             </div>
-            <div className="trust-item">
-              <FiHeart className="trust-icon" />
-              <h4>Customer Love</h4>
-              <p>Trusted by thousands</p>
-            </div>
+            <Link to="/blogs" className="view-all-link">View All Posts -></Link>
+          </div>
+
+          <div className="blog-preview-grid">
+            {blogPosts.map((post) => (
+              <article className="blog-card" key={post.title}>
+                <div className="blog-image">
+                  <img src={post.image} alt={post.title} />
+                </div>
+                <div className="blog-content">
+                  <span>{post.category}</span>
+                  <h3>{post.title}</h3>
+                  <p>May 10, 2026 - 5 min read</p>
+                  <Link to="/blogs">Read More -></Link>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>

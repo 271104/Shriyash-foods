@@ -24,7 +24,7 @@ const Header = () => {
             <div className="header-top-group">
               <Link to="/orders"><FiHeadphones /> Track Order</Link>
               <Link to="/contact"><FiHelpCircle /> Help</Link>
-              <a href="tel:+919876543210"><FiPhone /> +91 98765 43210</a>
+              <a href="tel:+919960243593"><FiPhone /> +91 9960243593</a>
             </div>
           </div>
         </div>

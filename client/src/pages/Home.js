@@ -39,21 +39,6 @@ const bestsellers = [
   { name: 'ABC Powder', image: '/abc-removebg-preview.png', oldPrice: 'Rs. 299.00', price: 'Rs. 249.00' },
 ];
 
-const testimonials = [
-  {
-    quote: 'The quality is amazing! I use Moringa powder daily in my smoothies. Highly recommended!',
-    name: 'Neha P.',
-  },
-  {
-    quote: 'Pure, natural and great taste. Beetroot powder is my favorite!',
-    name: 'Amit S.',
-  },
-  {
-    quote: 'No additives or preservatives. Shriyash Foods is now a part of our lifestyle.',
-    name: 'Riya M.',
-  },
-];
-
 const blogPosts = [
   {
     category: 'Nutrition',
@@ -217,37 +202,6 @@ const Home = () => {
                 </button>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="testimonial-section">
-        <div className="section-shell">
-          <div className="section-heading compact">
-            <h2>What Our Customers Say</h2>
-            <span aria-hidden="true"></span>
-          </div>
-
-          <div className="testimonial-row">
-            <button className="category-arrow" aria-label="Previous testimonial">
-              <FiChevronLeft />
-            </button>
-            <div className="testimonial-grid">
-              {testimonials.map((testimonial) => (
-                <article className="testimonial-card" key={testimonial.name}>
-                  <span className="quote-mark">"</span>
-                  <p>{testimonial.quote}</p>
-                  <div className="testimonial-footer">
-                    <strong>- {testimonial.name}</strong>
-                    <RatingStars />
-                  </div>
-                </article>
-              ))}
-            </div>
-            <button className="category-arrow" aria-label="Next testimonial">
-              <FiChevronRight />
-            </button>
           </div>
         </div>
       </section>

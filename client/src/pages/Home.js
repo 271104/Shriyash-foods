@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap, FiShoppingCart } from 'react-icons/fi';
+import { CartContext } from '../context/CartContext';
 import './Home.css';
 
 const categories = [
@@ -54,6 +55,14 @@ const RatingStars = () => (
 );
 
 const Home = () => {
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
+
+  const handleAddToCart = (product) => {
+    // Navigate to products page where they can see full product details and add to cart
+    navigate('/products');
+  };
+
   useEffect(() => {
     const observerOptions = {
       threshold: 0.2,
@@ -246,7 +255,7 @@ const Home = () => {
                   <span>{product.oldPrice}</span>
                   {product.price}
                 </p>
-                <button className="add-cart-btn">
+                <button className="add-cart-btn" onClick={() => handleAddToCart(product)}>
                   <FiShoppingCart /> Add to Cart
                 </button>
               </article>

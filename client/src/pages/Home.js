@@ -16,18 +16,6 @@ const categories = [
     title: 'Green Powders',
     images: ['/shop_by_Category/green_powder.png'],
   },
-  {
-    title: 'Spice Powders',
-    images: ['/shop_by_Category/spice_powder.png'],
-  },
-  {
-    title: 'Superfood Powders',
-    images: ['/shop_by_Category/superfood_powder.png'],
-  },
-  {
-    title: 'Powder Mixes',
-    images: ['/shop_by_Category/powder_mixes.png'],
-  },
 ];
 
 const bestsellers = [
@@ -89,19 +77,80 @@ const Home = () => {
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <section className="hero" style={{ backgroundImage: 'url(/heroPageBg.png)' }}>
+      <section className="hero">
         <div className="hero-content-left">
-          <p className="hero-subtitle">Nature's Purity. Everyday Wellness.</p>
-          <h1 className="hero-title">The Shriyash Promise</h1>
-          <p className="hero-description">
-            ShriYash Foods brings you pure, nutrient-rich vegetable and superfood powders crafted from carefully selected natural ingredients. Designed to support everyday wellness, our products deliver authentic nutrition, rich flavor, and trusted quality — helping you nourish your body the natural way.
-          </p>
-          <Link to="/products" className="hero-shop-btn">
-            SHOP NOW
-          </Link>
+          <h1 className="hero-title">
+            FROM FARMS TO<br />
+            <span className="hero-title-orange">THE FUTURE</span>
+          </h1>
+          
+          <div className="hero-value-props">
+            <div className="value-prop">
+              <div className="value-icon">👥</div>
+              <p>At Shriyash Foods, we are building a bridge between hardworking farmers and health-conscious families across the world.</p>
+            </div>
+            
+            <div className="value-prop">
+              <div className="value-icon">🌾</div>
+              <p>By transforming fresh farm produce into premium dehydrated products, we help preserve nature's nutrition with quality and care.</p>
+            </div>
+            
+            <div className="value-prop">
+              <div className="value-icon">🌍</div>
+              <p>Our vision is to create sustainable food solutions that support farmers, reduce wastage, and promote healthier lifestyles globally.</p>
+            </div>
+            
+            <div className="value-prop">
+              <div className="value-icon">✓</div>
+              <p>With innovation, hygiene, and authenticity at our core, we are shaping the future of natural food - one product at a time.</p>
+            </div>
+          </div>
+          
+          <div className="hero-buttons">
+            <Link to="/products" className="hero-btn hero-btn-green">
+              Explore Products →
+            </Link>
+            <Link to="/about" className="hero-btn hero-btn-orange">
+              Our Journey →
+            </Link>
+          </div>
         </div>
-        <img src="/combined-removebg-preview.png" alt="Products" className="hero-combined-image" />
-        <img src="/shade.png" alt="Shade" className="hero-shade-image" />
+        
+        <div className="hero-image-right">
+          <img src="/hero.png" alt="Shriyash Foods Products and Manufacturing" className="hero-showcase-image" />
+        </div>
+      </section>
+      
+      {/* Trust Badges */}
+      <section className="trust-badges">
+        <div className="trust-badge">
+          <div className="trust-icon">🍃</div>
+          <div className="trust-text">
+            <strong>100% Natural</strong>
+            <span>Ingredients</span>
+          </div>
+        </div>
+        <div className="trust-badge">
+          <div className="trust-icon">🤝</div>
+          <div className="trust-text">
+            <strong>Supporting</strong>
+            <span>Farmers</span>
+          </div>
+        </div>
+        <div className="trust-badge">
+          <div className="trust-icon">✨</div>
+          <div className="trust-text">
+            <strong>Hygienically</strong>
+            <span>Processed</span>
+          </div>
+        </div>
+        <div className="trust-badge">
+          <div className="trust-icon">🌱</div>
+          <div className="trust-text">
+            <strong>Sustainable</strong>
+            <span>Food Vision</span>
+          </div>
+        </div>
       </section>
 
       {/* Shop By Category */}

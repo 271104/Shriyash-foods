@@ -124,7 +124,7 @@ const Home = () => {
         </div>
         
         <div className="hero-image-right">
-          <img src="/hero.png" alt="Shriyash Foods Products and Manufacturing" className="hero-showcase-image" />
+          <img src="/hero.png?v=20260519" alt="Shriyash Foods Products and Manufacturing" className="hero-showcase-image" />
         </div>
       </section>
       

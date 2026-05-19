@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "installCommand": "npm install && npm run install-client",
+  "buildCommand": "npm run build --prefix client",
+  "outputDirectory": "client/build",
+  "env": {
+    "NODE_OPTIONS": "--max_old_space_size=4096"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

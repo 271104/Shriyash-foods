@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -66,12 +67,29 @@ app.get('/api/health', (req, res) => {
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  const clientBuildPath = path.join(__dirname, '../client/build');
+  const clientIndexPath = path.join(clientBuildPath, 'index.html');
+
+  if (!fs.existsSync(clientIndexPath)) {
+    console.warn(
+      `Client build not found at ${clientIndexPath}. Run "npm run build" before starting the production server.`
+    );
+  }
+
+  app.use(express.static(clientBuildPath));
 
   // Serve index.html for any route not matching API
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  app.get('*', (req, res, next) => {
+    if (!fs.existsSync(clientIndexPath)) {
+      return res.status(503).json({
+        success: false,
+        message: 'Client build is missing. Run "npm run build" before starting the production server.'
+      });
+    }
+
+    res.sendFile(clientIndexPath, (err) => {
+      if (err) next(err);
+    });
   });
 }
 

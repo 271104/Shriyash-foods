@@ -1,7 +1,6 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap, FiShoppingCart } from 'react-icons/fi';
-import { CartContext } from '../context/CartContext';
 import './Home.css';
 
 const categories = [
@@ -55,7 +54,6 @@ const RatingStars = () => (
 );
 
 const Home = () => {
-  const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
 
   const handleAddToCart = (product) => {

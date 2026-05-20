@@ -122,27 +122,49 @@ const ProductDetail = () => {
               <FiShoppingCart />
               {adding ? 'Adding...' : 'Add to Cart'}
             </button>
-
-            {product.benefits && product.benefits.length > 0 && (
-              <div className="benefits-section">
-                <h3>Benefits:</h3>
-                <ul>
-                  {product.benefits.map((benefit, index) => (
-                    <li key={index}>
-                      <FiCheck /> {benefit}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {product.usage && (
-              <div className="usage-section">
-                <h3>How to Use:</h3>
-                <p>{product.usage}</p>
-              </div>
-            )}
           </div>
+        </div>
+
+        {/* Three sections in one row */}
+        <div className="product-info-row">
+          {product.howToConsume && product.howToConsume.length > 0 && (
+            <div className="how-to-consume-section">
+              <h3>🥤 How to Consume</h3>
+              <ul>
+                {product.howToConsume.map((method, index) => (
+                  <li key={index}>
+                    <FiCheck /> {method}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {product.benefits && product.benefits.length > 0 && (
+            <div className="benefits-section">
+              <h3>✨ Benefits</h3>
+              <ul>
+                {product.benefits.map((benefit, index) => (
+                  <li key={index}>
+                    <FiCheck /> {benefit}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {product.precautions && product.precautions.length > 0 && (
+            <div className="precautions-section">
+              <h3>⚠️ Precautions</h3>
+              <ul>
+                {product.precautions.map((precaution, index) => (
+                  <li key={index}>
+                    <span className="precaution-icon">•</span> {precaution}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>

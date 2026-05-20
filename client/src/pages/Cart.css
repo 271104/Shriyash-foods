@@ -204,6 +204,10 @@
 }
 
 @media (max-width: 480px) {
+  .cart-page {
+    padding: 30px 0;
+  }
+
   .cart-page h1 {
     font-size: 24px;
   }
@@ -215,5 +219,14 @@
   
   .item-details h3 {
     font-size: 16px;
+  }
+
+  .cart-item {
+    padding: 16px;
+  }
+
+  .summary-total,
+  .item-total {
+    font-size: 18px;
   }
 }

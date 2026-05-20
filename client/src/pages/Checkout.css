@@ -199,8 +199,22 @@
 }
 
 @media (max-width: 480px) {
+  .checkout-page {
+    padding: 30px 0;
+  }
+
   .checkout-page h1 {
     font-size: 24px;
+  }
+
+  .checkout-form,
+  .order-summary {
+    padding: 20px;
+  }
+
+  .pincode-check,
+  .trust-badges {
+    flex-direction: column;
   }
   
   .checkout-form h2,

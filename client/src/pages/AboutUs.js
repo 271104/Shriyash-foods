@@ -1,11 +1,46 @@
-import React from 'react';
-import { FiHeart, FiAward, FiUsers, FiTrendingUp } from 'react-icons/fi';
+import React, { useEffect } from 'react';
+import { FiAward, FiHeart, FiTrendingUp, FiUsers } from 'react-icons/fi';
 import './AboutUs.css';
 
+const beliefs = [
+  {
+    number: '01',
+    title: 'Empowering Farmers & Rural Communities',
+    text: 'We create better opportunities for farmers by adding value to fresh farm produce.',
+  },
+  {
+    number: '02',
+    title: 'Sustainable & Responsible Food Processing',
+    text: 'We work to reduce food wastage and make natural nutrition more accessible.',
+  },
+  {
+    number: '03',
+    title: 'Hygienic Manufacturing Standards',
+    text: 'Every product is processed with care, cleanliness, and consistent quality controls.',
+  },
+  {
+    number: '04',
+    title: 'Natural Nutrition for Modern Lifestyles',
+    text: 'We craft convenient food solutions for families seeking pure and trustworthy nutrition.',
+  },
+  {
+    number: '05',
+    title: 'Innovation with Purpose',
+    text: 'Our innovation is focused on real impact for farmers, consumers, and the future of food.',
+  },
+];
+
 const AboutUs = () => {
+  useEffect(() => {
+    document.body.classList.add('about-page-active');
+
+    return () => {
+      document.body.classList.remove('about-page-active');
+    };
+  }, []);
+
   return (
     <div className="about-page">
-      {/* Hero Section */}
       <section className="about-hero">
         <div className="container">
           <h1>About Shriyash Foods</h1>
@@ -13,24 +48,28 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Our Story */}
       <section className="our-story">
         <div className="container">
           <div className="story-content">
             <div className="story-text">
-              <h2>Our Story</h2>
-              <p>Shriyash Foods was born from a simple belief: that nature provides everything we need for a healthy life. In a world filled with processed foods and artificial additives, we saw the need for pure, natural nutrition that people could trust.</p>
-              <p>What started as a passion for healthy living has grown into a mission to bring farm-fresh, nutrient-rich vegetable and superfood powders to every household. Each product we create is a testament to our commitment to quality, purity, and your well-being.</p>
-              <p>Today, Shriyash Foods stands as a trusted name in natural health products, serving thousands of families who choose wellness the natural way.</p>
+              <h2>Our Journey</h2>
+              <h3>From Farms to the Future</h3>
+              <p>Shriyash Foods was founded in Solapur, Maharashtra with a vision to create sustainable food solutions while supporting the hardworking farmers who are the true strength of our country.</p>
+              <p>Started by a passionate young entrepreneur at the age of 20, Shriyash Foods is not just a business. It is a mission driven by innovation, purpose, and the dream of creating real impact in the agricultural and food industry.</p>
+              <p>Coming from a region deeply connected to farming, we closely witnessed the challenges faced by farmers, including crop wastage, unstable market prices, and limited opportunities to increase the value of their produce.</p>
+              <p>With the aim of solving these problems, Shriyash Foods began transforming fresh farm produce into premium dehydrated products that help preserve nutrition, increase shelf life, and create better opportunities for farmers.</p>
+              <p>At Shriyash Foods, we carefully source natural ingredients and process them hygienically using modern dehydration techniques to maintain authentic taste, natural quality, and essential nutrients.</p>
+              <p>Our products are crafted for health-conscious families looking for pure, convenient, and trustworthy food solutions.</p>
+              <p>Our vision goes beyond building a brand. We aim to create a strong bridge between farmers and consumers by promoting sustainable agriculture, reducing food wastage, and bringing high-quality natural products from Indian farms to homes across the country and around the world.</p>
+              <p>With quality, innovation, and authenticity at our core, we are committed to shaping the future of natural nutrition, one product at a time.</p>
             </div>
             <div className="story-image">
-              <img src="/combined-removebg-preview.png" alt="Shriyash Foods Products" />
+              <img src="/about-journey-shriyash.png" alt="Shriyash Foods journey from farms to natural nutrition" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Mission & Vision */}
       <section className="mission-vision">
         <div className="container">
           <div className="mv-grid">
@@ -39,49 +78,34 @@ const AboutUs = () => {
                 <FiHeart />
               </div>
               <h3>Our Mission</h3>
-              <p>To provide pure, natural, and nutrient-rich food products that empower people to lead healthier lives. We believe in bringing the goodness of nature directly to your kitchen.</p>
+              <p>To support farmers by creating value-added natural food products that promote healthy living, sustainability, and long-term agricultural growth.</p>
             </div>
             <div className="mv-card">
               <div className="mv-icon">
                 <FiTrendingUp />
               </div>
               <h3>Our Vision</h3>
-              <p>To become India's most trusted brand for natural health powders, making wellness accessible and affordable for every family while promoting sustainable farming practices.</p>
+              <p>To build a globally trusted food brand from Solapur, Maharashtra that connects farmers to the future through innovation, sustainability, and natural nutrition.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Values */}
       <section className="our-values">
         <div className="container">
-          <h2>What We Stand For</h2>
-          <div className="values-grid">
-            <div className="value-card">
-              <div className="value-icon">🌱</div>
-              <h3>100% Natural</h3>
-              <p>No artificial colors, flavors, or preservatives. Just pure, natural goodness from farm to packet.</p>
-            </div>
-            <div className="value-card">
-              <div className="value-icon">✓</div>
-              <h3>Quality Assured</h3>
-              <p>FSSAI certified products that meet the highest standards of quality and safety.</p>
-            </div>
-            <div className="value-card">
-              <div className="value-icon">🤝</div>
-              <h3>Customer First</h3>
-              <p>Your health and satisfaction are our top priorities. We're here to support your wellness journey.</p>
-            </div>
-            <div className="value-card">
-              <div className="value-icon">🌾</div>
-              <h3>Farm Fresh</h3>
-              <p>Sourced directly from trusted farmers who share our commitment to quality and sustainability.</p>
-            </div>
+          <h2>What We Believe In</h2>
+          <div className="values-grid values-grid-beliefs">
+            {beliefs.map((belief) => (
+              <div className="value-card" key={belief.title}>
+                <div className="value-icon">{belief.number}</div>
+                <h3>{belief.title}</h3>
+                <p>{belief.text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
       <section className="why-choose">
         <div className="container">
           <h2>Why Choose Shriyash Foods?</h2>
@@ -93,19 +117,18 @@ const AboutUs = () => {
             </div>
             <div className="choose-item">
               <FiUsers className="choose-icon" />
-              <h3>Trusted by Thousands</h3>
-              <p>Join our growing family of health-conscious customers who trust us for their daily nutrition.</p>
+              <h3>Farmer-Focused Purpose</h3>
+              <p>Every product supports our larger mission of creating value for farmers and rural communities.</p>
             </div>
             <div className="choose-item">
               <FiHeart className="choose-icon" />
-              <h3>Made with Love</h3>
-              <p>Every product is crafted with care, as if we're making it for our own family.</p>
+              <h3>Made with Care</h3>
+              <p>Our natural powders are crafted for families who want pure, convenient, and trustworthy nutrition.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Products */}
       <section className="our-products-section">
         <div className="container">
           <h2>Our Product Range</h2>
@@ -138,7 +161,6 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="about-cta">
         <div className="container">
           <h2>Join the Wellness Revolution</h2>

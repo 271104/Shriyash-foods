@@ -28,6 +28,12 @@ body {
   background: var(--cream);
   color: var(--dark);
   line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img,
+svg {
+  max-width: 100%;
 }
 
 .container {
@@ -134,5 +140,17 @@ input:focus, select:focus, textarea:focus {
   .btn {
     padding: 10px 20px;
     font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 14px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
   }
 }

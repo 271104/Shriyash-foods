@@ -156,6 +156,11 @@
 }
 
 @media (max-width: 576px) {
+  .policy-header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+  }
+
   .policy-header h1 {
     font-size: 28px;
   }
@@ -171,5 +176,13 @@
 
   .policy-content h2 {
     font-size: 22px;
+  }
+
+  .policy-content ul li {
+    padding-left: 22px;
+  }
+
+  .policy-content ul li::before {
+    left: 4px;
   }
 }

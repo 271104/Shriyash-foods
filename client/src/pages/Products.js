@@ -8,7 +8,7 @@ const fallbackProducts = [
     _id: 'tomato-powder',
     name: 'Tomato Powder',
     slug: 'tomato-powder',
-    description: 'Premium tomato powder rich in lycopene and antioxidants. Perfect for cooking, sauces, and adding authentic tomato flavor.',
+    description: 'Premium Tomato Powder - Rich in lycopene & antioxidants that supports immunity, enhances flavor naturally, and serves as a convenient replacement for fresh tomato.',
     images: [{ url: '/tomato-removebg-preview.png' }],
     variants: [{ price: 199, mrp: 249 }],
   },
@@ -16,7 +16,7 @@ const fallbackProducts = [
     _id: 'beetroot-powder',
     name: 'Beetroot Powder',
     slug: 'beetroot-powder',
-    description: 'Natural beetroot powder for healthy circulation, stamina, smoothies, juices, and everyday wellness.',
+    description: 'Natural Beetroot Powder - Rich in iron & antioxidants that helps boost immunity, supports stamina & blood circulation, and increases energy naturally.',
     images: [{ url: '/beetroot-removebg-preview.png' }],
     variants: [{ price: 199, mrp: 249 }],
   },
@@ -24,7 +24,7 @@ const fallbackProducts = [
     _id: 'banana-powder',
     name: 'Banana Powder',
     slug: 'banana-powder',
-    description: 'Natural banana powder rich in potassium and energy. Great for smoothies, desserts, and baby food.',
+    description: 'Natural Banana Powder - A rich source of natural energy and potassium that supports digestion, helps in healthy weight management, and is naturally sweet & nutritious.',
     images: [{ url: '/banana-removebg-preview.png' }],
     variants: [{ price: 199, mrp: 249 }],
   },
@@ -32,7 +32,7 @@ const fallbackProducts = [
     _id: 'moringa-powder',
     name: 'Moringa Powder',
     slug: 'moringa-powder',
-    description: 'Pure moringa powder packed with vitamins, minerals, antioxidants, and natural daily nutrition.',
+    description: 'Pure Moringa Powder - A nutrient-rich superfood packed with vitamins & minerals that supports overall wellness, improves energy naturally, and boosts immunity.',
     images: [{ url: '/moringa-removebg-preview.png' }],
     variants: [{ price: 249, mrp: 299 }],
   },
@@ -40,7 +40,7 @@ const fallbackProducts = [
     _id: 'onion-powder',
     name: 'Onion Powder',
     slug: 'onion-powder',
-    description: 'Premium onion powder for cooking, seasoning, marinades, soups, and authentic home-style flavor.',
+    description: 'Premium Onion Powder - Enhances flavor naturally, rich in antioxidants, supports heart health, and serves as a convenient substitute for fresh onion.',
     images: [{ url: '/onion-removebg-preview.png' }],
     variants: [{ price: 199, mrp: 249 }],
   },
@@ -48,7 +48,7 @@ const fallbackProducts = [
     _id: 'abc-powder',
     name: 'ABC Powder',
     slug: 'abc-powder',
-    description: 'Amla, Beetroot, and Carrot powder blend crafted for everyday nourishment and wellness routines.',
+    description: 'ABC Powder (Apple + Beetroot + Carrot) - A powerful blend rich in antioxidants & vitamins that supports immunity, improves energy levels, and promotes overall wellness.',
     images: [{ url: '/abc-removebg-preview.png' }],
     variants: [{ price: 249, mrp: 299 }],
   },
@@ -109,16 +109,21 @@ const Products = () => {
   return (
     <div className="products-page">
       <div className="container">
-        <h1>Our Premium Products</h1>
-        <p className="subtitle">Handpicked health powders for your wellness journey</p>
+        <div className="products-header">
+          <h1>Our Premium Products</h1>
+          <p className="subtitle">Handpicked health powders for your wellness journey</p>
+        </div>
 
         <div className="products-grid">
-          {products.map(product => {
+          {products.map((product, index) => {
             const variant = product.variants[0];
             const discount = variant.mrp > variant.price ? calculateDiscount(variant.mrp, variant.price) : 0;
             
             return (
               <Link to={`/products/${product.slug}`} key={product._id} className="product-card">
+                {discount > 0 && (
+                  <div className="product-badge">{discount}% OFF</div>
+                )}
                 <div className="product-image">
                   <img 
                     src={product.images[0]?.url || '/placeholder.jpg'} 
@@ -127,17 +132,17 @@ const Products = () => {
                 </div>
                 <div className="product-info">
                   <h3>{product.name}</h3>
-                  <p className="product-desc">{product.description.substring(0, 80)}...</p>
+                  <p className="product-desc">{product.description}</p>
                   <div className="product-price">
                     <span className="price">₹{variant.price}</span>
                     {variant.mrp > variant.price && (
                       <>
                         <span className="mrp">₹{variant.mrp}</span>
-                        <span className="discount-badge">{discount}% OFF</span>
+                        <span className="discount-badge">SAVE ₹{variant.mrp - variant.price}</span>
                       </>
                     )}
                   </div>
-                  <button className="btn btn-primary btn-block">View Details</button>
+                  <button className="btn btn-primary btn-block">View Details →</button>
                 </div>
               </Link>
             );

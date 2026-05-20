@@ -32,6 +32,8 @@ const productSchema = new mongoose.Schema({
     public_id: String
   }],
   benefits: [String],
+  howToConsume: [String],
+  precautions: [String],
   ingredients: String,
   usage: String,
   shelfLife: String,

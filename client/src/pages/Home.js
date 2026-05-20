@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap, FiShoppingCart } from 'react-icons/fi';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap } from 'react-icons/fi';
 import './Home.css';
 
 const categories = [
@@ -27,24 +27,6 @@ const bestsellers = [
   { name: 'ABC Powder', image: '/abc-removebg-preview.png', oldPrice: 'Rs. 299.00', price: 'Rs. 249.00' },
 ];
 
-const blogPosts = [
-  {
-    category: 'Nutrition',
-    title: 'Benefits of Moringa Powder for a Healthy Lifestyle',
-    image: '/moringa-removebg-preview.png',
-  },
-  {
-    category: 'Wellness',
-    title: '5 Easy Ways to Add Superfood Powders to Your Diet',
-    image: '/carrot-removebg-preview.png',
-  },
-  {
-    category: 'Recipes',
-    title: 'Healthy Recipes Using Fruit & Vegetable Powders',
-    image: '/abc-removebg-preview.png',
-  },
-];
-
 const RatingStars = () => (
   <span className="rating-stars" aria-label="5 star rating">
     {[1, 2, 3, 4, 5].map((star) => (
@@ -54,11 +36,39 @@ const RatingStars = () => (
 );
 
 const Home = () => {
-  const navigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState(0);
+  const [activeBestseller, setActiveBestseller] = useState(0);
 
-  const handleAddToCart = (product) => {
-    // Navigate to products page where they can see full product details and add to cart
-    navigate('/products');
+  const orderedCategories = useMemo(
+    () => categories.map((_, index) => categories[(activeCategory + index) % categories.length]),
+    [activeCategory]
+  );
+
+  const featuredBestsellers = useMemo(() => {
+    const previous = (activeBestseller - 1 + bestsellers.length) % bestsellers.length;
+    const next = (activeBestseller + 1) % bestsellers.length;
+
+    return [
+      { ...bestsellers[previous], position: 'side' },
+      { ...bestsellers[activeBestseller], position: 'center' },
+      { ...bestsellers[next], position: 'side' },
+    ];
+  }, [activeBestseller]);
+
+  const showPreviousCategory = () => {
+    setActiveCategory((current) => (current - 1 + categories.length) % categories.length);
+  };
+
+  const showNextCategory = () => {
+    setActiveCategory((current) => (current + 1) % categories.length);
+  };
+
+  const showPreviousBestseller = () => {
+    setActiveBestseller((current) => (current - 1 + bestsellers.length) % bestsellers.length);
+  };
+
+  const showNextBestseller = () => {
+    setActiveBestseller((current) => (current + 1) % bestsellers.length);
   };
 
   useEffect(() => {
@@ -75,10 +85,26 @@ const Home = () => {
       });
     }, observerOptions);
 
-    const animateElements = document.querySelectorAll('.category-item, .why-card, .bestseller-card, .testimonial-card, .blog-card');
+    const animateElements = document.querySelectorAll('.category-item, .why-card, .bestseller-card, .testimonial-card');
     animateElements.forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const categoryTimer = window.setInterval(() => {
+      setActiveCategory((current) => (current + 1) % categories.length);
+    }, 3500);
+
+    return () => window.clearInterval(categoryTimer);
+  }, []);
+
+  useEffect(() => {
+    const bestsellerTimer = window.setInterval(() => {
+      setActiveBestseller((current) => (current + 1) % bestsellers.length);
+    }, 3800);
+
+    return () => window.clearInterval(bestsellerTimer);
   }, []);
 
   return (
@@ -169,13 +195,16 @@ const Home = () => {
           </div>
 
           <div className="category-row">
-            <button className="category-arrow" aria-label="Previous category">
+            <button className="category-arrow" aria-label="Previous category" onClick={showPreviousCategory}>
               <FiChevronLeft />
             </button>
 
-            <div className="category-grid">
-              {categories.map((category) => (
-                <article className={`category-item ${category.title === 'Powder Mixes' ? 'category-item-powder-mixes' : ''}`} key={category.title}>
+            <div className="category-grid category-slider" aria-live="polite">
+              {orderedCategories.map((category, index) => (
+                <article
+                  className={`category-item category-slide-${index} ${index === 0 ? 'category-item-active' : ''}`}
+                  key={`${category.title}-${activeCategory}`}
+                >
                   <Link to="/products" className="category-image-wrap">
                     {category.images.map((src, index) => (
                       <img
@@ -192,15 +221,24 @@ const Home = () => {
               ))}
             </div>
 
-            <button className="category-arrow" aria-label="Next category">
+            <button className="category-arrow" aria-label="Next category" onClick={showNextCategory}>
               <FiChevronRight />
             </button>
           </div>
 
+          <div className="category-dots" aria-label="Category slides">
+            {categories.map((category, index) => (
+              <button
+                className={`category-dot ${index === activeCategory ? 'category-dot-active' : ''}`}
+                aria-label={`Show ${category.title}`}
+                aria-current={index === activeCategory}
+                key={category.title}
+                onClick={() => setActiveCategory(index)}
+              />
+            ))}
+          </div>
+
           <div className="why-card">
-            <div className="why-image-wrap">
-              <img src="/moringa-removebg-preview.png" alt="Moringa powder" />
-            </div>
             <div className="why-content">
               <h2>Why Choose Shriyash Foods?</h2>
               <div className="why-grid">
@@ -241,51 +279,45 @@ const Home = () => {
             <Link to="/products" className="view-all-btn">View All Products -></Link>
           </div>
 
-          <div className="bestseller-grid">
-            {bestsellers.map((product) => (
-              <article className="bestseller-card" key={product.name}>
-                <Link to="/products" className="bestseller-image">
-                  <img src={product.image} alt={product.name} />
-                </Link>
-                <h3>{product.name}</h3>
-                <RatingStars />
-                <p className="product-price">
-                  <span>{product.oldPrice}</span>
-                  {product.price}
-                </p>
-                <button className="add-cart-btn" onClick={() => handleAddToCart(product)}>
-                  <FiShoppingCart /> Add to Cart
-                </button>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+          <div className="bestseller-carousel">
+            <button className="bestseller-arrow" aria-label="Previous bestseller" onClick={showPreviousBestseller}>
+              <FiChevronLeft />
+            </button>
 
-      {/* Blog Preview */}
-      <section className="blog-preview-section">
-        <div className="section-shell">
-          <div className="section-title-row">
-            <div className="section-heading compact">
-              <h2>Latest from Our Blog</h2>
-              <span aria-hidden="true"></span>
+            <div className="bestseller-track" aria-live="polite">
+              {featuredBestsellers.map((product, index) => (
+                <article
+                  className={`bestseller-card bestseller-card-${product.position}`}
+                  key={`${product.name}-${activeBestseller}-${index}`}
+                >
+                  <Link to="/products" className="bestseller-image">
+                    <img src={product.image} alt={product.name} />
+                  </Link>
+                  <h3>{product.name}</h3>
+                  <RatingStars />
+                  <p className="product-price">
+                    <span>{product.oldPrice}</span>
+                    {product.price}
+                  </p>
+                  <Link to="/products" className="add-cart-btn">Shop Now</Link>
+                </article>
+              ))}
             </div>
-            <Link to="/blogs" className="view-all-link">View All Posts -></Link>
+
+            <button className="bestseller-arrow" aria-label="Next bestseller" onClick={showNextBestseller}>
+              <FiChevronRight />
+            </button>
           </div>
 
-          <div className="blog-preview-grid">
-            {blogPosts.map((post) => (
-              <article className="blog-card" key={post.title}>
-                <div className="blog-image">
-                  <img src={post.image} alt={post.title} />
-                </div>
-                <div className="blog-content">
-                  <span>{post.category}</span>
-                  <h3>{post.title}</h3>
-                  <p>May 10, 2026 - 5 min read</p>
-                  <Link to="/blogs">Read More -></Link>
-                </div>
-              </article>
+          <div className="bestseller-dots" aria-label="Bestseller slides">
+            {bestsellers.map((product, index) => (
+              <button
+                className={`bestseller-dot ${index === activeBestseller ? 'bestseller-dot-active' : ''}`}
+                aria-label={`Show ${product.name}`}
+                aria-current={index === activeBestseller}
+                key={product.name}
+                onClick={() => setActiveBestseller(index)}
+              />
             ))}
           </div>
         </div>

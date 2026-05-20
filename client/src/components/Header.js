@@ -48,7 +48,6 @@ const Header = () => {
               <Link to="/" onClick={() => setShowMenu(false)}>Home</Link>
               <Link to="/products" onClick={() => setShowMenu(false)}>Products</Link>
               <Link to="/about" onClick={() => setShowMenu(false)}>About Us</Link>
-              <Link to="/blogs" onClick={() => setShowMenu(false)}>Blogs</Link>
               <Link to="/contact" onClick={() => setShowMenu(false)}>Contact Us</Link>
               
               <div className="nav-icons">

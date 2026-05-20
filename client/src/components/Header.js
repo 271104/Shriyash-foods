@@ -39,6 +39,44 @@ const Header = () => {
                 <span className="logo-tagline">Pure by Nature, Nourished by Choice</span>
               </div>
             </Link>
+
+            {/* Mobile Cart and Login Icons */}
+            <div className="mobile-nav-icons">
+              <Link to="/cart" className="mobile-cart-icon">
+                <FiShoppingCart size={20} />
+                {cartCount > 0 && <span className="mobile-cart-badge">{cartCount}</span>}
+              </Link>
+
+              {user ? (
+                <div className="user-menu">
+                  <button 
+                    className="mobile-login-icon" 
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    style={{ background: 'var(--primary)', color: 'white' }}
+                  >
+                    <FiUser size={20} />
+                  </button>
+                  {showUserMenu && (
+                    <div className="user-dropdown">
+                      <div className="user-info">
+                        <strong>{user.name}</strong>
+                        <span>{user.phone}</span>
+                      </div>
+                      <Link to="/orders" onClick={() => { setShowUserMenu(false); }}>
+                        My Orders
+                      </Link>
+                      <button onClick={() => { logout(); setShowUserMenu(false); }}>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link to="/login" className="mobile-login-icon">
+                  <FiUser size={20} />
+                </Link>
+              )}
+            </div>
             
             <button className="mobile-menu-btn" onClick={() => setShowMenu(!showMenu)}>
               {showMenu ? <FiX size={24} /> : <FiMenu size={24} />}

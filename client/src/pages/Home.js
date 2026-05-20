@@ -143,7 +143,7 @@ const Home = () => {
             <Link to="/products" className="hero-btn hero-btn-green">
               Explore Products →
             </Link>
-            <Link to="/about" className="hero-btn hero-btn-orange">
+            <Link to="/our-journey" className="hero-btn hero-btn-orange">
               Our Journey →
             </Link>
           </div>

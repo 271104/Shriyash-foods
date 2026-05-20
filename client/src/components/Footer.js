@@ -41,9 +41,6 @@ const Footer = () => {
             <a href="/products">Vegetable Powders</a>
             <a href="/products">Fruit Powders</a>
             <a href="/products">Green Powders</a>
-            <a href="/products">Spice Powders</a>
-            <a href="/products">Superfood Powders</a>
-            <a href="/products">Powder Mixes</a>
           </div>
 
           <div className="footer-newsletter">

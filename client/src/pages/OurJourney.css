@@ -1,0 +1,292 @@
+.journey-page {
+  background: white;
+}
+
+/* Hero Section */
+.journey-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 180px 0 120px;
+  margin: 0;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.journey-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('../../public/banner_our_journey.png');
+  background-position: center;
+  background-size: cover;
+  opacity: 1;
+  z-index: 0;
+}
+
+.journey-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(74, 44, 12, 0.35);
+  z-index: 1;
+}
+
+.journey-hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-subtitle {
+  font-size: 28px;
+  color: white;
+  opacity: 1;
+  font-style: italic;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+/* Journey Story */
+.journey-story {
+  padding: 100px 0;
+  background: white;
+}
+
+.story-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(400px, 1fr);
+  gap: 54px;
+  align-items: start;
+}
+
+.story-text h2 {
+  font-size: 42px;
+  color: var(--dark);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.story-text h3 {
+  font-size: 24px;
+  color: var(--primary);
+  margin-bottom: 22px;
+  font-weight: 700;
+}
+
+.story-text p {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--gray);
+  margin-bottom: 16px;
+}
+
+.journey-tagline {
+  background: var(--cream);
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+  margin-top: 24px;
+  text-align: center;
+}
+
+.journey-tagline strong {
+  font-size: 20px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.story-image {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: sticky;
+  top: 118px;
+}
+
+.story-image img {
+  width: 100%;
+  max-width: 650px; /* Increased from 500px */
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
+}
+
+/* Journey Values */
+.journey-values {
+  padding: 100px 0;
+  background: var(--cream);
+}
+
+.journey-values h2 {
+  text-align: center;
+  font-size: 42px;
+  color: var(--dark);
+  margin-bottom: 60px;
+  font-weight: 700;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.value-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+}
+
+.value-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(212, 165, 116, 0.2);
+}
+
+.value-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: white;
+  font-size: 36px;
+}
+
+.value-card h3 {
+  font-size: 22px;
+  color: var(--dark);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.value-card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gray);
+}
+
+/* CTA Section */
+.journey-cta {
+  padding: 100px 0;
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 100%);
+  text-align: center;
+  color: white;
+}
+
+.journey-cta h2 {
+  font-size: 42px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.journey-cta p {
+  font-size: 20px;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .journey-hero {
+    font-size: 38px;
+    padding: 200px 0 80px; /* Adjusted for mobile */
+    margin-top: -100px;
+    padding-top: 200px;
+  }
+
+  .journey-hero h1 {
+    font-size: 38px;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+  }
+
+  .story-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .story-image {
+    position: static;
+  }
+
+  .story-image img {
+    max-width: 700px; /* Increased for tablet */
+    margin: 0 auto;
+    display: block;
+  }
+
+  .story-text h2,
+  .journey-values h2,
+  .journey-cta h2 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 576px) {
+  .journey-hero {
+    padding: 180px 0 60px; /* Adjusted for mobile */
+    margin-top: -80px;
+    padding-top: 180px;
+  }
+
+  .journey-hero h1 {
+    font-size: 32px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+  }
+
+  .journey-story,
+  .journey-values,
+  .journey-cta {
+    padding: 60px 0;
+  }
+
+  .value-card {
+    padding: 28px 20px;
+  }
+
+  .story-text p {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .story-text h2,
+  .journey-values h2,
+  .journey-cta h2 {
+    font-size: 28px;
+  }
+
+  .journey-tagline strong {
+    font-size: 18px;
+  }
+
+  .story-image img {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .journey-hero h1 {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+}

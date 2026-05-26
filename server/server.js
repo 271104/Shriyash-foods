@@ -5,7 +5,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 
-dotenv.config();
+// Load environment variables from the root directory
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const app = express();
 
@@ -56,7 +57,8 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
-app.use('/api/shipping', require('./routes/shippingRoutes'));
+app.use('/api/shipping', require('./routes/shipping.routes'));
+app.use('/api/webhooks', require('./routes/webhook.routes'));
 app.use('/api/otp', require('./routes/otp'));
 app.use('/api/seed', require('./routes/seedRoutes'));
 

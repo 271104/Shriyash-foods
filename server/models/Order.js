@@ -61,10 +61,32 @@ const orderSchema = new mongoose.Schema({
     enum: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RTO'],
     default: 'PENDING'
   },
+  // Shiprocket Integration Fields
   shiprocketOrderId: String,
   shiprocketShipmentId: String,
   awbCode: String,
+  courierName: String,
   trackingUrl: String,
+  labelUrl: String,
+  invoiceUrl: String,
+  pickupReference: String,
+  shippingStatus: {
+    type: String,
+    enum: [
+      'PENDING',
+      'SHIPMENT_CREATED',
+      'AWB_ASSIGNED',
+      'PICKUP_GENERATED',
+      'PICKED_UP',
+      'IN_TRANSIT',
+      'OUT_FOR_DELIVERY',
+      'DELIVERED',
+      'FAILED_ATTEMPT',
+      'CANCELLED',
+      'RTO'
+    ],
+    default: 'PENDING'
+  },
   isOTPVerified: {
     type: Boolean,
     default: false

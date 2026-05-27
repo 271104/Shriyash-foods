@@ -74,6 +74,7 @@ class ShippingService {
 
       return {
         success: true,
+        serviceable: couriers.length > 0,
         couriers: couriers.map(courier => ({
           id: courier.id,
           name: courier.name,

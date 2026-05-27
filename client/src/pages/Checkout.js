@@ -16,6 +16,8 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [pincodeChecking, setPincodeChecking] = useState(false);
   const [serviceable, setServiceable] = useState(null);
+  const [shippingQuote, setShippingQuote] = useState(null);
+  const [selectedCourier, setSelectedCourier] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isGuestCheckout, setIsGuestCheckout] = useState(false);
   const [guestVerificationToken, setGuestVerificationToken] = useState('');
@@ -33,9 +35,25 @@ const Checkout = () => {
     paymentMethod: 'COD'
   });
 
-  const shipping = cartTotal >= 500 ? 0 : 40;
+  const fallbackShipping = 40;
+  const shipping = cartTotal >= 500 ? 0 : (shippingQuote ?? fallbackShipping);
   const discount = formData.paymentMethod === 'PREPAID' ? 25 : 0;
   const total = cartTotal + shipping - discount;
+
+  const getCartWeight = () => {
+    const weight = cart.items.reduce((sum, item) => {
+      const match = String(item.variant || '').match(/(\d+(?:\.\d+)?)\s*(kg|g)/i);
+      if (!match) return sum;
+
+      const value = parseFloat(match[1]);
+      const unit = match[2].toLowerCase();
+      const weightInKg = unit === 'kg' ? value : value / 1000;
+
+      return sum + (weightInKg * (item.quantity || 1));
+    }, 0);
+
+    return Math.max(weight, 0.5);
+  };
 
   useEffect(() => {
     if (cart.items.length === 0) {
@@ -62,7 +80,16 @@ const Checkout = () => {
   }, [user]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const nextValue = name === 'pincode' ? value.replace(/\D/g, '').slice(0, 6) : value;
+
+    setFormData({ ...formData, [name]: nextValue });
+
+    if (name === 'pincode' || name === 'paymentMethod') {
+      setServiceable(null);
+      setShippingQuote(null);
+      setSelectedCourier(null);
+    }
   };
 
   const checkPincode = async () => {
@@ -77,14 +104,29 @@ const Checkout = () => {
         params: {
           pickup_postcode: '413005',
           delivery_postcode: formData.pincode,
-          weight: 0.5,
-          cod: 1
+          weight: getCartWeight(),
+          cod: formData.paymentMethod === 'COD' ? 1 : 0
         }
       });
 
       const isServiceable = data.serviceable ?? (data.couriers?.length > 0);
+      const getCourierCharge = (courier) => {
+        const freight = Number(courier.freightCharges) || 0;
+        const codCharge = formData.paymentMethod === 'COD' ? Number(courier.codCharges) || 0 : 0;
+
+        return freight + codCharge;
+      };
+      const cheapestCourier = data.couriers
+        ?.filter(courier => Number.isFinite(Number(courier.freightCharges)))
+        .sort((a, b) => getCourierCharge(a) - getCourierCharge(b))[0];
 
       setServiceable(isServiceable);
+      setSelectedCourier(cheapestCourier || null);
+      setShippingQuote(
+        isServiceable && cartTotal < 500
+          ? Math.ceil(cheapestCourier ? getCourierCharge(cheapestCourier) : fallbackShipping)
+          : null
+      );
 
       if (isServiceable) {
         toast.success('✓ Delivery available in 3-5 days');
@@ -189,7 +231,7 @@ const Checkout = () => {
         // Initiate Razorpay payment
         const paymentData = await axios.post('/api/payment/create-order', {
           orderId: data.order.orderId,
-          amount: total
+          amount: data.order.pricing.total
         });
 
         const options = {
@@ -500,6 +542,13 @@ const Checkout = () => {
               <span>Shipping</span>
               <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
             </div>
+
+            {selectedCourier && cartTotal < 500 && (
+              <div className="summary-row">
+                <span>Courier</span>
+                <span>{selectedCourier.name || 'Shiprocket'}</span>
+              </div>
+            )}
 
             {discount > 0 && (
               <div className="summary-row discount" style={{

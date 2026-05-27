@@ -59,9 +59,20 @@ exports.checkServiceability = async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Serviceability check error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Failed to check serviceability'
+    res.json({
+      success: true,
+      serviceable: true,
+      couriers: [{
+        id: 'fallback',
+        name: 'Standard Shipping',
+        freightCharges: 40,
+        codCharges: 0,
+        etd: '3-5 business days',
+        etaDeliveryDays: '3-5 business days'
+      }],
+      codAvailable: true,
+      estimatedDays: '3-5 business days',
+      note: 'Using fallback shipping charge because Shiprocket is unavailable'
     });
   }
 };

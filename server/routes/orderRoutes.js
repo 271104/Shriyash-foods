@@ -3,8 +3,59 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
+const shippingService = require('../services/shipping.service');
 const { optional, protect } = require('../middleware/auth');
 const { validateOrderData } = require('../middleware/validation');
+
+const FALLBACK_SHIPPING_CHARGE = 40;
+const FREE_SHIPPING_THRESHOLD = 500;
+const PICKUP_POSTCODE = '413005';
+
+const getItemWeightKg = (variant) => {
+  const match = String(variant || '').match(/(\d+(?:\.\d+)?)\s*(kg|g)/i);
+  if (!match) return 0;
+
+  const value = parseFloat(match[1]);
+  return match[2].toLowerCase() === 'kg' ? value : value / 1000;
+};
+
+const getOrderWeightKg = (items) => {
+  const weight = items.reduce((sum, item) => {
+    return sum + (getItemWeightKg(item.variant) * (item.quantity || 1));
+  }, 0);
+
+  return Math.max(weight, 0.5);
+};
+
+const getShiprocketShippingCharge = async (shippingAddress, items, paymentMethod) => {
+  const cod = paymentMethod === 'COD' ? 1 : 0;
+  const result = await shippingService.checkServiceability(
+    PICKUP_POSTCODE,
+    shippingAddress.pincode,
+    getOrderWeightKg(items),
+    cod
+  );
+
+  if (!result.serviceable || !result.couriers?.length) {
+    const error = new Error('Delivery is not available for this pincode');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const cheapestCourier = result.couriers
+    .filter(courier => Number.isFinite(Number(courier.freightCharges)))
+    .sort((a, b) => {
+      const chargeA = Number(a.freightCharges) + (cod === 1 ? Number(a.codCharges) || 0 : 0);
+      const chargeB = Number(b.freightCharges) + (cod === 1 ? Number(b.codCharges) || 0 : 0);
+
+      return chargeA - chargeB;
+    })[0];
+
+  const freightCharge = Number(cheapestCourier?.freightCharges) || FALLBACK_SHIPPING_CHARGE;
+  const codCharge = cod === 1 ? Number(cheapestCourier?.codCharges) || 0 : 0;
+
+  return Math.ceil(freightCharge + codCharge);
+};
 
 // @route   POST /api/orders/create
 // @desc    Create new order
@@ -83,7 +134,19 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     console.log('🆔 Generated order ID:', orderId);
     
     // Calculate pricing
-    const shipping = subtotal >= 500 ? 0 : 40;
+    let shipping = 0;
+    if (subtotal < FREE_SHIPPING_THRESHOLD) {
+      try {
+        shipping = await getShiprocketShippingCharge(shippingAddress, items, paymentMethod);
+      } catch (error) {
+        if (error.statusCode === 400) {
+          return res.status(400).json({ success: false, message: error.message });
+        }
+
+        console.warn('Shiprocket shipping charge failed, using fallback charge:', error.message);
+        shipping = FALLBACK_SHIPPING_CHARGE;
+      }
+    }
     const discount = paymentMethod === 'PREPAID' ? 25 : 0;
     const total = subtotal + shipping - discount;
     

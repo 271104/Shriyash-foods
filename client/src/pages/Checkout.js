@@ -73,13 +73,20 @@ const Checkout = () => {
 
     setPincodeChecking(true);
     try {
-      const { data } = await axios.post('/api/shipping/check-serviceability', {
-        pincode: formData.pincode
+      const { data } = await axios.get('/api/shipping/serviceability', {
+        params: {
+          pickup_postcode: '413005',
+          delivery_postcode: formData.pincode,
+          weight: 0.5,
+          cod: 1
+        }
       });
-      
-      setServiceable(data.serviceable);
-      
-      if (data.serviceable) {
+
+      const isServiceable = data.serviceable ?? (data.couriers?.length > 0);
+
+      setServiceable(isServiceable);
+
+      if (isServiceable) {
         toast.success('✓ Delivery available in 3-5 days');
       } else {
         toast.error('Sorry, we don\'t deliver to this pincode yet');

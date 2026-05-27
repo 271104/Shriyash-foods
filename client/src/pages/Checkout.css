@@ -2,6 +2,36 @@
   padding: 40px 0;
 }
 
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.checkout-header h1 {
+  margin: 0;
+  color: var(--dark);
+}
+
+.user-info,
+.guest-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #e8f5e8;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #24470b;
+  font-weight: 500;
+}
+
+.guest-info {
+  background: #fff3cd;
+  color: #856404;
+}
+
 .checkout-page h1 {
   margin-bottom: 32px;
   color: var(--dark);
@@ -30,25 +60,229 @@
   color: var(--dark);
 }
 
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(36, 71, 11, 0.1);
+}
+
 .pincode-check {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-top: 8px;
+  align-items: stretch;
 }
 
 .pincode-check input {
   flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s;
+  margin: 0;
+}
+
+.pincode-check input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(36, 71, 11, 0.1);
+}
+
+.pincode-check input.valid {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}
+
+.pincode-check input.invalid {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.pincode-check .btn {
+  padding: 12px 20px;
+  font-weight: 600;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.pincode-check .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .checkout-form {
+    padding: 20px;
+  }
+
+  .form-section h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .pincode-check {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pincode-check .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .serviceable-msg,
+  .not-serviceable-msg {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .order-summary {
+    order: -1;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-form {
+    padding: 16px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .pincode-check input {
+    padding: 10px 12px;
+  }
+
+  .pincode-check .btn {
+    padding: 10px 16px;
+    min-width: 80px;
+  }
 }
 
 .serviceable-msg {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
-  background: #D1FAE5;
+  padding: 16px;
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
   color: #065F46;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  border-radius: 12px;
+  margin-top: 12px;
+  border: 1px solid #10b981;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+.serviceable-msg svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.not-serviceable-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #991B1B;
+  border-radius: 12px;
+  margin-top: 12px;
+  border: 1px solid #ef4444;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
+
+.not-serviceable-msg svg {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+/* Pincode section highlight */
+.pincode-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.pincode-section label {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  margin-bottom: 12px !important;
 }
 
 .form-row {

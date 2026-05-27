@@ -1,45 +1,52 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { AuthContext } from '../context/AuthContext';
-import { FiMail, FiLock, FiUser, FiPhone } from 'react-icons/fi';
+import { FiMail, FiUser, FiPhone } from 'react-icons/fi';
+import OTPModal from '../components/OTPModal';
 import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, register } = useContext(AuthContext);
-
   const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    email: '',
-    password: ''
+    email: ''
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value
+    });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      if (isLogin) {
-        await login(formData.email, formData.password);
-        toast.success('Welcome back!');
-      } else {
-        await register(formData);
-        toast.success('Account created successfully!');
-      }
-      navigate('/products');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Authentication failed');
-    } finally {
-      setLoading(false);
+    if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
     }
+
+    if (!isLogin && formData.name.trim().length < 2) {
+      toast.error('Please enter your full name');
+      return;
+    }
+
+    setShowOTPModal(true);
+  };
+
+  const handleOTPSuccess = () => {
+    toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
+    navigate('/products');
+  };
+
+  const switchMode = () => {
+    setIsLogin(prev => !prev);
+    setFormData({ name: '', phone: '', email: '' });
   };
 
   return (
@@ -52,16 +59,16 @@ const Login = () => {
             <p>Pure & Natural Health Powders</p>
             <div className="auth-features">
               <div className="feature-item">
-                <span className="feature-check">✓</span>
+                <span className="feature-check">OK</span>
                 <span>100% Natural Products</span>
               </div>
               <div className="feature-item">
-                <span className="feature-check">✓</span>
+                <span className="feature-check">OK</span>
                 <span>FSSAI Certified</span>
               </div>
               <div className="feature-item">
-                <span className="feature-check">✓</span>
-                <span>Free Shipping Above ₹500</span>
+                <span className="feature-check">OK</span>
+                <span>Free Shipping Above Rs. 500</span>
               </div>
             </div>
           </div>
@@ -73,12 +80,14 @@ const Login = () => {
               <button
                 className={isLogin ? 'active' : ''}
                 onClick={() => setIsLogin(true)}
+                type="button"
               >
                 Login
               </button>
               <button
                 className={!isLogin ? 'active' : ''}
                 onClick={() => setIsLogin(false)}
+                type="button"
               >
                 Register
               </button>
@@ -96,21 +105,22 @@ const Login = () => {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Enter your name"
-                    required={!isLogin}
+                    required
                   />
                 </div>
               )}
 
               <div className="form-group">
                 <label>
-                  <FiMail /> Email Address
+                  <FiPhone /> WhatsApp Number
                 </label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
                   onChange={handleChange}
-                  placeholder="your@email.com"
+                  placeholder="10-digit mobile number"
+                  pattern="[6-9][0-9]{9}"
                   required
                 />
               </div>
@@ -118,53 +128,48 @@ const Login = () => {
               {!isLogin && (
                 <div className="form-group">
                   <label>
-                    <FiPhone /> Phone Number (Optional)
+                    <FiMail /> Email Address
                   </label>
                   <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
+                    type="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleChange}
-                    placeholder="10-digit mobile number"
-                    pattern="[0-9]{10}"
+                    placeholder="your@email.com"
                   />
                 </div>
               )}
 
-              <div className="form-group">
-                <label>
-                  <FiLock /> Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter password"
-                  minLength="6"
-                  required
-                />
-              </div>
-
-              <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
+              <button type="submit" className="btn btn-primary btn-block">
+                {isLogin ? 'Send Login OTP' : 'Send Registration OTP'}
               </button>
             </form>
 
             <div className="auth-footer">
               <p>
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button onClick={() => setIsLogin(!isLogin)} className="link-btn">
+                <button onClick={switchMode} className="link-btn" type="button">
                   {isLogin ? 'Register' : 'Login'}
                 </button>
               </p>
               <Link to="/products" className="guest-link">
-                Continue as Guest →
+                Continue as Guest ->
               </Link>
             </div>
           </div>
         </div>
       </div>
+
+      <OTPModal
+        isOpen={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        phone={formData.phone}
+        setPhone={(phone) => setFormData(prev => ({ ...prev, phone }))}
+        purpose={isLogin ? 'login' : 'register'}
+        onSuccess={handleOTPSuccess}
+        userData={!isLogin ? { name: formData.name, email: formData.email } : null}
+        title={isLogin ? 'Login with WhatsApp OTP' : 'Verify and Create Account'}
+      />
     </div>
   );
 };

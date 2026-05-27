@@ -1,23 +1,29 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { CartContext } from '../context/CartContext';
-import { FiLock, FiTruck, FiCheckCircle } from 'react-icons/fi';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import CheckoutAuthModal from '../components/CheckoutAuthModal';
+import { FiLock, FiTruck, FiCheckCircle, FiUser, FiX } from 'react-icons/fi';
 import './Checkout.css';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { cart, cartTotal, clearCart } = useContext(CartContext);
+  const { cart, cartTotal, clearCart, mergeGuestCart } = useCart();
+  const { isAuthenticated, user } = useAuth();
   
   const [loading, setLoading] = useState(false);
   const [pincodeChecking, setPincodeChecking] = useState(false);
   const [serviceable, setServiceable] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isGuestCheckout, setIsGuestCheckout] = useState(false);
+  const [guestVerificationToken, setGuestVerificationToken] = useState('');
   
   const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
+    fullName: user?.name || '',
+    phone: user?.phone || '',
+    email: user?.email || '',
     pincode: '',
     addressLine1: '',
     addressLine2: '',
@@ -34,8 +40,26 @@ const Checkout = () => {
   useEffect(() => {
     if (cart.items.length === 0) {
       navigate('/cart');
+      return;
     }
-  }, [cart, navigate]);
+
+    // If user is not authenticated, show auth modal
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    }
+  }, [cart, navigate, isAuthenticated]);
+
+  // Update form when user data changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: user.name || prev.fullName,
+        phone: user.phone || prev.phone,
+        email: user.email || prev.email
+      }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -67,8 +91,41 @@ const Checkout = () => {
     }
   };
 
+  const handleGuestCheckout = async (authResult) => {
+    try {
+      setIsGuestCheckout(true);
+      setGuestVerificationToken(authResult.guestVerificationToken || '');
+      setFormData(prev => ({
+        ...prev,
+        phone: authResult.verifiedPhone || prev.phone
+      }));
+      
+      toast.success('Phone verified! You can now complete your order.');
+    } catch (error) {
+      console.error('Guest checkout error:', error);
+      toast.error('Failed to setup guest checkout');
+    }
+  };
+
+  const handleLoginSuccess = async (authResult) => {
+    try {
+      // Merge guest cart with user cart
+      await mergeGuestCart();
+      toast.success('Welcome back! Your cart has been updated.');
+    } catch (error) {
+      console.error('Login success error:', error);
+      toast.error('Login successful, but failed to merge cart');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated or in guest checkout mode
+    if (!isAuthenticated && !isGuestCheckout) {
+      setShowAuthModal(true);
+      return;
+    }
     
     if (!serviceable) {
       toast.error('⚠️ Please click the CHECK button next to pincode first!', {
@@ -76,7 +133,6 @@ const Checkout = () => {
         autoClose: 5000,
         style: { fontSize: '16px', fontWeight: 'bold' }
       });
-      // Scroll to pincode field
       document.querySelector('input[name="pincode"]')?.scrollIntoView({ 
         behavior: 'smooth', 
         block: 'center' 
@@ -90,7 +146,7 @@ const Checkout = () => {
       // Create order
       const orderData = {
         items: cart.items
-          .filter(item => item.product) // Filter out items with null products
+          .filter(item => item.product)
           .map(item => ({
             product: item.product._id,
             name: item.product.name,
@@ -111,11 +167,13 @@ const Checkout = () => {
           pincode: formData.pincode
         },
         paymentMethod: formData.paymentMethod,
-        guestDetails: {
+        isGuestOrder: isGuestCheckout,
+        guestVerificationToken: isGuestCheckout ? guestVerificationToken : undefined,
+        guestDetails: isGuestCheckout ? {
           name: formData.fullName,
           phone: formData.phone,
           email: formData.email
-        }
+        } : null
       };
 
       const { data } = await axios.post('/api/orders/create', orderData);
@@ -139,7 +197,7 @@ const Checkout = () => {
             email: formData.email,
             contact: formData.phone
           },
-          theme: { color: '#D4A574' },
+          theme: { color: '#24470b' },
           handler: async function (response) {
             try {
               await axios.post('/api/payment/verify', {
@@ -166,15 +224,7 @@ const Checkout = () => {
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } else {
-        // COD order - check if OTP required
-        if (data.requiresOTP) {
-          // Show OTP modal
-          const otp = prompt('Enter OTP sent to your phone:');
-          if (otp) {
-            await axios.post(`/api/orders/${data.order.orderId}/verify-otp`, { otp });
-          }
-        }
-        
+        // COD order
         clearCart();
         navigate(`/order-success/${data.order.orderId}`);
       }
@@ -188,39 +238,26 @@ const Checkout = () => {
   return (
     <div className="checkout-page">
       <div className="container">
-        <h1>Checkout</h1>
+        <div className="checkout-header">
+          <h1>Checkout</h1>
+          {isAuthenticated && (
+            <div className="user-info">
+              <FiUser />
+              <span>Logged in as {user?.phone}</span>
+            </div>
+          )}
+          {isGuestCheckout && (
+            <div className="guest-info">
+              <span>Guest Checkout</span>
+            </div>
+          )}
+        </div>
         
         <div className="checkout-grid">
           <div className="checkout-form">
             <form onSubmit={handleSubmit}>
               <div className="form-section">
                 <h2>📍 Delivery Details</h2>
-                
-                <div className="pincode-check">
-                  <input
-                    type="text"
-                    name="pincode"
-                    placeholder="Enter Pincode"
-                    value={formData.pincode}
-                    onChange={handleChange}
-                    maxLength="6"
-                    required
-                  />
-                  <button 
-                    type="button" 
-                    onClick={checkPincode}
-                    disabled={pincodeChecking}
-                    className="btn btn-outline"
-                  >
-                    {pincodeChecking ? 'Checking...' : 'Check'}
-                  </button>
-                </div>
-                
-                {serviceable && (
-                  <div className="serviceable-msg">
-                    <FiCheckCircle /> Delivery available in 3-5 days
-                  </div>
-                )}
 
                 <div className="form-group">
                   <label>Full Name *</label>
@@ -242,6 +279,7 @@ const Checkout = () => {
                     onChange={handleChange}
                     pattern="[0-9]{10}"
                     required
+                    disabled={isAuthenticated || isGuestCheckout}
                   />
                 </div>
 
@@ -308,6 +346,60 @@ const Checkout = () => {
                     />
                   </div>
                 </div>
+
+                <div className="form-group pincode-section">
+                  <label>📍 Pincode * (Check Delivery Availability)</label>
+                  <div className="pincode-check">
+                    <input
+                      type="text"
+                      name="pincode"
+                      placeholder="Enter 6-digit Pincode"
+                      value={formData.pincode}
+                      onChange={handleChange}
+                      maxLength="6"
+                      required
+                      className={
+                        formData.pincode.length === 6 
+                          ? serviceable === true 
+                            ? 'valid' 
+                            : serviceable === false 
+                              ? 'invalid' 
+                              : ''
+                          : ''
+                      }
+                    />
+                    <button 
+                      type="button" 
+                      onClick={checkPincode}
+                      disabled={pincodeChecking || formData.pincode.length !== 6}
+                      className="btn btn-outline"
+                    >
+                      {pincodeChecking ? (
+                        <>
+                          <span className="spinner"></span>
+                          Checking...
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle />
+                          Check
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {serviceable === true && (
+                    <div className="serviceable-msg">
+                      <FiCheckCircle /> Delivery available in 3-5 days
+                    </div>
+                  )}
+
+                  {serviceable === false && (
+                    <div className="not-serviceable-msg">
+                      <FiX /> Sorry, we don't deliver to this pincode yet
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-section">
@@ -339,7 +431,7 @@ const Checkout = () => {
                     />
                     <div className="payment-details">
                       <strong>Cash on Delivery</strong>
-                      <small>📱 OTP verification required</small>
+                      <small>📱 Phone verification required</small>
                     </div>
                   </label>
                 </div>
@@ -362,7 +454,7 @@ const Checkout = () => {
               <button 
                 type="submit" 
                 className="btn btn-primary btn-block"
-                disabled={loading || !serviceable}
+                disabled={loading || !serviceable || (!isAuthenticated && !isGuestCheckout)}
                 title={!serviceable ? 'Please check pincode serviceability first' : ''}
               >
                 {loading ? 'Processing...' : 'Place Order'}
@@ -380,7 +472,7 @@ const Checkout = () => {
             <h2>📦 Order Summary</h2>
             
             {cart.items
-              .filter(item => item.product) // Filter out null products
+              .filter(item => item.product)
               .map(item => (
                 <div key={item._id} className="summary-item">
                   <span>{item.product.name} ({item.variant})</span>
@@ -429,6 +521,13 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      <CheckoutAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onGuestCheckout={handleGuestCheckout}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 };

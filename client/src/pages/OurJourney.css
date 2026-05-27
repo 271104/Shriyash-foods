@@ -5,7 +5,7 @@
 /* Hero Section */
 .journey-hero {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  padding: 180px 0 120px;
+  padding: 0;
   margin: 0;
   text-align: center;
   color: white;
@@ -200,9 +200,8 @@
 @media (max-width: 968px) {
   .journey-hero {
     font-size: 38px;
-    padding: 200px 0 80px; /* Adjusted for mobile */
-    margin-top: -100px;
-    padding-top: 200px;
+    padding: 0;
+    margin: 0;
   }
 
   .journey-hero h1 {
@@ -237,9 +236,8 @@
 
 @media (max-width: 576px) {
   .journey-hero {
-    padding: 180px 0 60px; /* Adjusted for mobile */
-    margin-top: -80px;
-    padding-top: 180px;
+    padding: 0;
+    margin: 0;
   }
 
   .journey-hero h1 {

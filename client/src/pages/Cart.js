@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CartContext } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import { FiTrash2, FiShoppingBag } from 'react-icons/fi';
 import './Cart.css';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, cartTotal } = useContext(CartContext);
+  const { cart, removeFromCart, cartTotal } = useCart();
 
   if (cart.items.length === 0) {
     return (

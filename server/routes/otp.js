@@ -18,7 +18,7 @@ router.post('/send', async (req, res) => {
       return res.status(400).json({ message: 'Phone number already registered' });
     }
 
-    const result = await sendOTP(phone);
+    const result = await sendOTP(phone, 'register');
     res.json(result);
   } catch (error) {
     console.error('Send OTP error:', error);
@@ -35,7 +35,7 @@ router.post('/verify', async (req, res) => {
       return res.status(400).json({ message: 'Phone number and OTP are required' });
     }
 
-    const result = verifyOTP(phone, otp);
+    const result = await verifyOTP(phone, otp, 'register');
     res.json(result);
   } catch (error) {
     console.error('Verify OTP error:', error);
@@ -52,7 +52,7 @@ router.post('/resend', async (req, res) => {
       return res.status(400).json({ message: 'Phone number is required' });
     }
 
-    const result = await sendOTP(phone);
+    const result = await sendOTP(phone, 'register');
     res.json(result);
   } catch (error) {
     console.error('Resend OTP error:', error);

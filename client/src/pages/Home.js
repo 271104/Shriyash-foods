@@ -119,22 +119,30 @@ const Home = () => {
           
           <div className="hero-value-props">
             <div className="value-prop">
-              <div className="value-icon">👥</div>
+              <div className="value-icon">
+                🤝
+              </div>
               <p>At Shriyash Foods, we are building a bridge between hardworking farmers and health-conscious families across the world.</p>
             </div>
             
             <div className="value-prop">
-              <div className="value-icon">🌾</div>
+              <div className="value-icon">
+                🌾
+              </div>
               <p>By transforming fresh farm produce into premium dehydrated products, we help preserve nature's nutrition with quality and care.</p>
             </div>
             
             <div className="value-prop">
-              <div className="value-icon">🌍</div>
+              <div className="value-icon">
+                🌍
+              </div>
               <p>Our vision is to create sustainable food solutions that support farmers, reduce wastage, and promote healthier lifestyles globally.</p>
             </div>
             
             <div className="value-prop">
-              <div className="value-icon">✓</div>
+              <div className="value-icon">
+                ✨
+              </div>
               <p>With innovation, hygiene, and authenticity at our core, we are shaping the future of natural food - one product at a time.</p>
             </div>
           </div>

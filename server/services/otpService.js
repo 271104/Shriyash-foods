@@ -1,79 +1,205 @@
-// Store OTPs temporarily (in production, use Redis)
-const otpStore = new Map();
+const axios = require('axios');
+const OTP = require('../models/OTP');
 
-// Generate 6-digit OTP
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Send OTP (Development mode - logs to console)
-const sendOTP = async (phoneNumber) => {
+const checkRateLimit = async (phone) => {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const recentRequests = await OTP.countDocuments({
+    phone,
+    createdAt: { $gte: oneHourAgo }
+  });
+
+  if (recentRequests >= 5) {
+    throw new Error('Too many OTP requests. Try again in 60 minutes.');
+  }
+
+  return true;
+};
+
+const sendWhatsAppOTP = async (phone, otp) => {
   try {
+    const apiKey = process.env.WASENDER_API_KEY;
+    const baseUrl = process.env.WASENDER_API_URL || 'https://www.wasenderapi.com';
+
+    if (!apiKey) {
+      throw new Error('WasenderAPI key not configured');
+    }
+
+    const response = await axios.post(
+      `${baseUrl.replace(/\/$/, '')}/api/send-message`,
+      {
+        to: `+91${phone}`,
+        text: `Your Shriyash Foods OTP is: ${otp}\n\nValid for 5 minutes. Do not share this code with anyone.\n\n- Team Shriyash Foods`
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (response.data?.success === false) {
+      throw new Error(response.data?.message || 'WasenderAPI rejected the OTP message');
+    }
+
+    return {
+      success: true,
+      messageId: response.data?.data?.msgId || response.data?.messageId || response.data?.id
+    };
+  } catch (error) {
+    console.error('WasenderAPI OTP failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+const sendSMSOTP = async (phone, otp) => {
+  try {
+    const msg91AuthKey = process.env.MSG91_AUTH_KEY;
+    const msg91TemplateId = process.env.MSG91_TEMPLATE_ID;
+
+    if (msg91AuthKey && msg91TemplateId) {
+      const response = await axios.post('https://api.msg91.com/api/v5/otp', {
+        mobile: `91${phone}`,
+        template_id: msg91TemplateId,
+        otp
+      }, {
+        headers: {
+          authkey: msg91AuthKey,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log(`SMS OTP sent via MSG91 to ${phone}`);
+      return { success: true, messageId: response.data.request_id };
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`SMS OTP for ${phone}: ${otp} (console fallback)`);
+      return { success: true, messageId: 'console_fallback' };
+    }
+
+    throw new Error('SMS fallback is not configured');
+  } catch (error) {
+    console.error('SMS OTP failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+const sendOTP = async (phone, purpose = 'login') => {
+  try {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      throw new Error('Invalid phone number format');
+    }
+
+    await checkRateLimit(phone);
+
     const otp = generateOTP();
-    const expiryTime = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    // Store OTP with expiry
-    otpStore.set(phoneNumber, { otp, expiryTime });
+    await OTP.deleteMany({ phone, purpose });
+    await OTP.create({ phone, otp, purpose, expiresAt });
 
-    // In development, log OTP to console
-    console.log(`\n🔐 OTP for ${phoneNumber}: ${otp}`);
-    console.log(`⏰ Expires in 10 minutes\n`);
+    let messageId = null;
 
-    // TODO: In production, integrate SMS service (MSG91, Twilio, etc.)
-    // Example with MSG91:
-    // const response = await axios.post('https://api.msg91.com/api/v5/otp', {
-    //   mobile: phoneNumber,
-    //   otp: otp
-    // });
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`OTP for ${phone}: ${otp} (development mode)`);
+      messageId = 'dev_console';
+    } else {
+      try {
+        const whatsappResult = await sendWhatsAppOTP(phone, otp);
+        messageId = whatsappResult.messageId;
+        console.log(`WhatsApp OTP sent via WasenderAPI to ${phone}`);
+      } catch (whatsappError) {
+        console.log(`WasenderAPI failed for ${phone}, trying SMS fallback...`);
+        const smsResult = await sendSMSOTP(phone, otp);
+        messageId = smsResult.messageId;
+      }
+    }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       message: 'OTP sent successfully',
-      // Only return OTP in development
+      messageId,
       otp: process.env.NODE_ENV === 'development' ? otp : undefined
     };
   } catch (error) {
     console.error('Error sending OTP:', error);
-    throw new Error('Failed to send OTP. Please try again.');
+    throw error;
   }
 };
 
-// Verify OTP
-const verifyOTP = (phoneNumber, otp) => {
-  const storedData = otpStore.get(phoneNumber);
+const verifyOTP = async (phone, otp, purpose = 'login') => {
+  try {
+    const otpRecord = await OTP.findOne({
+      phone,
+      purpose,
+      isUsed: false,
+      expiresAt: { $gt: new Date() }
+    });
 
-  if (!storedData) {
-    return { success: false, message: 'OTP not found or expired' };
-  }
-
-  const { otp: storedOTP, expiryTime } = storedData;
-
-  // Check if OTP expired
-  if (Date.now() > expiryTime) {
-    otpStore.delete(phoneNumber);
-    return { success: false, message: 'OTP has expired' };
-  }
-
-  // Verify OTP
-  if (storedOTP === otp) {
-    otpStore.delete(phoneNumber);
-    return { success: true, message: 'OTP verified successfully' };
-  }
-
-  return { success: false, message: 'Invalid OTP' };
-};
-
-// Clean up expired OTPs periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [phone, data] of otpStore.entries()) {
-    if (now > data.expiryTime) {
-      otpStore.delete(phone);
+    if (!otpRecord) {
+      return {
+        success: false,
+        message: 'OTP not found or expired. Please request a new OTP.'
+      };
     }
+
+    if (otpRecord.attempts >= 3) {
+      await OTP.updateOne(
+        { _id: otpRecord._id },
+        { $set: { isUsed: true } }
+      );
+      return {
+        success: false,
+        message: 'Maximum OTP attempts exceeded. Please request a new OTP.'
+      };
+    }
+
+    if (otpRecord.otp !== otp) {
+      await OTP.updateOne(
+        { _id: otpRecord._id },
+        { $inc: { attempts: 1 } }
+      );
+      return {
+        success: false,
+        message: `Invalid OTP. ${3 - otpRecord.attempts - 1} attempts remaining.`
+      };
+    }
+
+    await OTP.updateOne(
+      { _id: otpRecord._id },
+      { $set: { isUsed: true } }
+    );
+
+    return {
+      success: true,
+      message: 'OTP verified successfully'
+    };
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw new Error('OTP verification failed');
   }
-}, 60000); // Clean every minute
+};
+
+const cleanupExpiredOTPs = async () => {
+  try {
+    const result = await OTP.deleteMany({
+      expiresAt: { $lt: new Date() }
+    });
+    console.log(`Cleaned up ${result.deletedCount} expired OTPs`);
+  } catch (error) {
+    console.error('Error cleaning up OTPs:', error);
+  }
+};
+
+setInterval(cleanupExpiredOTPs, 10 * 60 * 1000);
 
 module.exports = {
   sendOTP,
-  verifyOTP
+  verifyOTP,
+  cleanupExpiredOTPs
 };

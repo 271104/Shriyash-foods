@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
-const User = require('../models/User');
 const Cart = require('../models/Cart');
 const { optional, protect } = require('../middleware/auth');
 const { validateOrderData } = require('../middleware/validation');
@@ -11,7 +11,41 @@ const { validateOrderData } = require('../middleware/validation');
 router.post('/create', optional, validateOrderData, async (req, res) => {
   try {
     console.log('📦 Order creation request received');
-    const { items, shippingAddress, paymentMethod, guestDetails } = req.body;
+    const { items, shippingAddress, paymentMethod, guestDetails, guestVerificationToken } = req.body;
+
+    const isGuestPhoneVerified = () => {
+      if (!guestVerificationToken) return false;
+
+      try {
+        const decoded = jwt.verify(guestVerificationToken, process.env.JWT_SECRET);
+        return decoded.purpose === 'checkout_guest' && decoded.phone === shippingAddress.phone;
+      } catch (error) {
+        return false;
+      }
+    };
+
+    if (req.user) {
+      const userPhoneMatches = req.user.phone === shippingAddress.phone;
+
+      if (!req.user.isPhoneVerified) {
+        return res.status(403).json({
+          success: false,
+          message: 'Please verify your phone number before placing an order.'
+        });
+      }
+
+      if (!userPhoneMatches && !isGuestPhoneVerified()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Please verify the delivery phone number before placing this order.'
+        });
+      }
+    } else if (!isGuestPhoneVerified()) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please verify your phone number with OTP before placing this order.'
+      });
+    }
     
     // Validate order value for COD
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -125,33 +159,10 @@ router.get('/', protect, async (req, res) => {
 // @route   POST /api/orders/:orderId/verify-otp
 // @desc    Verify OTP for COD order
 router.post('/:orderId/verify-otp', async (req, res) => {
-  try {
-    const { otp } = req.body;
-    
-    // TODO: Verify OTP
-    // For development, accept any 6-digit OTP
-    if (otp.length !== 6) {
-      return res.status(400).json({ success: false, message: 'Invalid OTP' });
-    }
-    
-    const order = await Order.findOne({ orderId: req.params.orderId });
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-    
-    order.isOTPVerified = true;
-    order.orderStatus = 'CONFIRMED';
-    order.statusHistory.push({
-      status: 'CONFIRMED',
-      note: 'OTP verified, order confirmed'
-    });
-    
-    await order.save();
-    
-    res.json({ success: true, message: 'Order confirmed successfully', order });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  res.status(410).json({
+    success: false,
+    message: 'Order OTP verification now happens before order creation.'
+  });
 });
 
 module.exports = router;

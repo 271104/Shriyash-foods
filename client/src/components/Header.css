@@ -243,15 +243,25 @@ body.about-page-active .header-main {
   padding: 10px 22px;
   background: #CC7722;
   color: white !important;
+  border: none;
   border-radius: 8px;
   font-weight: 500;
-  transition: all 0.3s;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(204, 119, 34, 0.2);
 }
 
 .login-btn:hover {
   background: #b36619;
   color: white !important;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(204, 119, 34, 0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(204, 119, 34, 0.2);
 }
 
 .login-btn svg {
@@ -452,13 +462,20 @@ body.about-page-active .header-main {
     height: 40px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     text-decoration: none;
+    box-shadow: 0 2px 4px rgba(204, 119, 34, 0.2);
   }
 
   .mobile-login-icon:hover {
     background: #b36619;
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(204, 119, 34, 0.3);
+  }
+
+  .mobile-login-icon:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(204, 119, 34, 0.2);
   }
 
   .mobile-login-icon svg {

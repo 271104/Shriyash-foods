@@ -4,20 +4,19 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
     trim: true
   },
   phone: {
     type: String,
-    trim: true,
-    sparse: true
+    required: true,
+    unique: true,
+    trim: true
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    sparse: true
   },
   password: {
     type: String,
@@ -26,6 +25,14 @@ const userSchema = new mongoose.Schema({
   isPhoneVerified: {
     type: Boolean,
     default: false
+  },
+  isGuest: {
+    type: Boolean,
+    default: false
+  },
+  guestSessionId: {
+    type: String,
+    sparse: true
   },
   addresses: [{
     fullName: String,
@@ -49,6 +56,16 @@ const userSchema = new mongoose.Schema({
   isBlocked: {
     type: Boolean,
     default: false
+  },
+  refreshToken: {
+    type: String
+  },
+  lastLogin: {
+    type: Date
+  },
+  otpAttempts: {
+    count: { type: Number, default: 0 },
+    lastAttempt: { type: Date }
   }
 }, { timestamps: true });
 

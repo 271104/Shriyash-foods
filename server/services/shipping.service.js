@@ -71,24 +71,42 @@ class ShippingService {
 
       const courierData = response.data.data || {};
       const couriers = courierData.available_courier_companies || [];
+      const getCharge = (...values) => {
+        for (const value of values) {
+          const amount = Number(value);
+          if (Number.isFinite(amount) && amount > 0) {
+            return amount;
+          }
+        }
+
+        return null;
+      };
       const mappedCouriers = couriers.map(courier => ({
         id: courier.id,
         name: courier.name || courier.courier_name || courier.company_name,
-        freightCharges: Number(courier.freight_charges || 0),
-        codCharges: Number(courier.cod_charges || 0),
+        freightCharges: getCharge(
+          courier.freight_charges,
+          courier.freight_charge,
+          courier.rate,
+          courier.shipping_charge,
+          courier.courier_charge,
+          courier.total_charge,
+          courier.charges
+        ),
+        codCharges: Number(courier.cod_charges || courier.cod_charge || 0),
         etd: courier.etd,
         etaDeliveryDays: courier.etaDeliveryDays
       }));
       const cheapestCourier = mappedCouriers
-        .filter(courier => courier.freightCharges > 0)
+        .filter(courier => Number.isFinite(Number(courier.freightCharges)) && Number(courier.freightCharges) > 0)
         .sort((a, b) => a.freightCharges - b.freightCharges)[0] || null;
 
       return {
         success: true,
-        serviceable: mappedCouriers.length > 0,
+        serviceable: Boolean(cheapestCourier),
         shippingCharge: cheapestCourier ? Math.ceil(cheapestCourier.freightCharges) : null,
         cheapestCourier,
-        couriers: mappedCouriers,
+        couriers: mappedCouriers.filter(courier => Number.isFinite(Number(courier.freightCharges)) && Number(courier.freightCharges) > 0),
         codAvailable: mappedCouriers.length > 0 && cod === 1,
         estimatedDays: courierData.etaDeliveryDays || '3-5 business days'
       };

@@ -109,13 +109,13 @@ const Checkout = () => {
       });
 
       const getCourierCharge = (courier) => {
-        const freight = Number(courier.freightCharges) || 0;
+        const freight = Number(courier.freightCharges);
         const codCharge = formData.paymentMethod === 'COD' ? Number(courier.codCharges) || 0 : 0;
 
         return freight + codCharge;
       };
       const cheapestCourier = data.couriers
-        ?.filter(courier => Number.isFinite(Number(courier.freightCharges)))
+        ?.filter(courier => Number.isFinite(Number(courier.freightCharges)) && getCourierCharge(courier) > 0)
         .sort((a, b) => getCourierCharge(a) - getCourierCharge(b))[0];
       const isServiceable = Boolean((data.serviceable ?? (data.couriers?.length > 0)) && cheapestCourier);
 

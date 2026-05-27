@@ -41,7 +41,7 @@ const getShiprocketShippingCharge = async (shippingAddress, items, paymentMethod
   }
 
   const cheapestCourier = result.couriers
-    .filter(courier => Number.isFinite(Number(courier.freightCharges)))
+    .filter(courier => Number.isFinite(Number(courier.freightCharges)) && Number(courier.freightCharges) > 0)
     .sort((a, b) => {
       const chargeA = Number(a.freightCharges) + (cod === 1 ? Number(a.codCharges) || 0 : 0);
       const chargeB = Number(b.freightCharges) + (cod === 1 ? Number(b.codCharges) || 0 : 0);

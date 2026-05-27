@@ -358,6 +358,8 @@ const Checkout = () => {
                       onChange={handleChange}
                       maxLength="6"
                       required
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       className={
                         formData.pincode.length === 6 
                           ? serviceable === true 

@@ -71,19 +71,25 @@ class ShippingService {
 
       const courierData = response.data.data || {};
       const couriers = courierData.available_courier_companies || [];
+      const mappedCouriers = couriers.map(courier => ({
+        id: courier.id,
+        name: courier.name || courier.courier_name || courier.company_name,
+        freightCharges: Number(courier.freight_charges || 0),
+        codCharges: Number(courier.cod_charges || 0),
+        etd: courier.etd,
+        etaDeliveryDays: courier.etaDeliveryDays
+      }));
+      const cheapestCourier = mappedCouriers
+        .filter(courier => courier.freightCharges > 0)
+        .sort((a, b) => a.freightCharges - b.freightCharges)[0] || null;
 
       return {
         success: true,
-        serviceable: couriers.length > 0,
-        couriers: couriers.map(courier => ({
-          id: courier.id,
-          name: courier.name,
-          freightCharges: courier.freight_charges,
-          codCharges: courier.cod_charges,
-          etd: courier.etd,
-          etaDeliveryDays: courier.etaDeliveryDays
-        })),
-        codAvailable: couriers.length > 0 && cod === 1,
+        serviceable: mappedCouriers.length > 0,
+        shippingCharge: cheapestCourier ? Math.ceil(cheapestCourier.freightCharges) : null,
+        cheapestCourier,
+        couriers: mappedCouriers,
+        codAvailable: mappedCouriers.length > 0 && cod === 1,
         estimatedDays: courierData.etaDeliveryDays || '3-5 business days'
       };
     } catch (error) {

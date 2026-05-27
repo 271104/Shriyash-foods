@@ -35,10 +35,9 @@ const Checkout = () => {
     paymentMethod: 'COD'
   });
 
-  const fallbackShipping = 40;
-  const shipping = cartTotal >= 500 ? 0 : (shippingQuote ?? fallbackShipping);
+  const shipping = shippingQuote;
   const discount = formData.paymentMethod === 'PREPAID' ? 25 : 0;
-  const total = cartTotal + shipping - discount;
+  const total = cartTotal + (shipping ?? 0) - discount;
 
   const getCartWeight = () => {
     const weight = cart.items.reduce((sum, item) => {
@@ -109,7 +108,6 @@ const Checkout = () => {
         }
       });
 
-      const isServiceable = data.serviceable ?? (data.couriers?.length > 0);
       const getCourierCharge = (courier) => {
         const freight = Number(courier.freightCharges) || 0;
         const codCharge = formData.paymentMethod === 'COD' ? Number(courier.codCharges) || 0 : 0;
@@ -119,12 +117,13 @@ const Checkout = () => {
       const cheapestCourier = data.couriers
         ?.filter(courier => Number.isFinite(Number(courier.freightCharges)))
         .sort((a, b) => getCourierCharge(a) - getCourierCharge(b))[0];
+      const isServiceable = Boolean((data.serviceable ?? (data.couriers?.length > 0)) && cheapestCourier);
 
       setServiceable(isServiceable);
       setSelectedCourier(cheapestCourier || null);
       setShippingQuote(
-        isServiceable && cartTotal < 500
-          ? Math.ceil(cheapestCourier ? getCourierCharge(cheapestCourier) : fallbackShipping)
+        isServiceable && cheapestCourier
+          ? Math.ceil(getCourierCharge(cheapestCourier))
           : null
       );
 
@@ -540,10 +539,10 @@ const Checkout = () => {
 
             <div className="summary-row">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+              <span>{shipping === null ? 'Check pincode' : `\u20B9${shipping}`}</span>
             </div>
 
-            {selectedCourier && cartTotal < 500 && (
+            {selectedCourier && (
               <div className="summary-row">
                 <span>Courier</span>
                 <span>{selectedCourier.name || 'Shiprocket'}</span>
@@ -570,12 +569,6 @@ const Checkout = () => {
               <span>Total</span>
               <span>₹{total}</span>
             </div>
-
-            {cartTotal < 500 && (
-              <div className="free-shipping-msg">
-                Add ₹{500 - cartTotal} more for FREE shipping!
-              </div>
-            )}
           </div>
         </div>
       </div>

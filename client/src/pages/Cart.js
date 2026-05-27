@@ -19,9 +19,6 @@ const Cart = () => {
     );
   }
 
-  const shipping = cartTotal >= 500 ? 0 : 40;
-  const total = cartTotal + shipping;
-
   return (
     <div className="cart-page">
       <div className="container">
@@ -70,21 +67,15 @@ const Cart = () => {
 
             <div className="summary-row">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+              <span>Calculated at checkout</span>
             </div>
 
             <div className="summary-divider"></div>
 
             <div className="summary-total">
               <span>Total</span>
-              <span>₹{total}</span>
+              <span>&#8377;{cartTotal}</span>
             </div>
-
-            {cartTotal < 500 && (
-              <div className="free-shipping-msg">
-                Add ₹{500 - cartTotal} more for FREE shipping!
-              </div>
-            )}
 
             <button 
               onClick={() => navigate('/checkout')}
@@ -104,3 +95,4 @@ const Cart = () => {
 };
 
 export default Cart;
+

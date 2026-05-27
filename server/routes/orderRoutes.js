@@ -7,8 +7,6 @@ const shippingService = require('../services/shipping.service');
 const { optional, protect } = require('../middleware/auth');
 const { validateOrderData } = require('../middleware/validation');
 
-const FALLBACK_SHIPPING_CHARGE = 40;
-const FREE_SHIPPING_THRESHOLD = 500;
 const PICKUP_POSTCODE = '413005';
 
 const getItemWeightKg = (variant) => {
@@ -51,7 +49,13 @@ const getShiprocketShippingCharge = async (shippingAddress, items, paymentMethod
       return chargeA - chargeB;
     })[0];
 
-  const freightCharge = Number(cheapestCourier?.freightCharges) || FALLBACK_SHIPPING_CHARGE;
+  if (!cheapestCourier) {
+    const error = new Error('No Shiprocket shipping charge available for this pincode');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const freightCharge = Number(cheapestCourier.freightCharges);
   const codCharge = cod === 1 ? Number(cheapestCourier?.codCharges) || 0 : 0;
 
   return Math.ceil(freightCharge + codCharge);
@@ -134,18 +138,16 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     console.log('🆔 Generated order ID:', orderId);
     
     // Calculate pricing
-    let shipping = 0;
-    if (subtotal < FREE_SHIPPING_THRESHOLD) {
-      try {
-        shipping = await getShiprocketShippingCharge(shippingAddress, items, paymentMethod);
-      } catch (error) {
-        if (error.statusCode === 400) {
-          return res.status(400).json({ success: false, message: error.message });
-        }
-
-        console.warn('Shiprocket shipping charge failed, using fallback charge:', error.message);
-        shipping = FALLBACK_SHIPPING_CHARGE;
-      }
+    let shipping;
+    try {
+      shipping = await getShiprocketShippingCharge(shippingAddress, items, paymentMethod);
+    } catch (error) {
+      return res.status(error.statusCode || 502).json({
+        success: false,
+        message: error.statusCode
+          ? error.message
+          : 'Unable to calculate Shiprocket shipping charges. Please try again.'
+      });
     }
     const discount = paymentMethod === 'PREPAID' ? 25 : 0;
     const total = subtotal + shipping - discount;

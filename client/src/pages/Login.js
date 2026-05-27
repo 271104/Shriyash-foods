@@ -68,7 +68,7 @@ const Login = () => {
               </div>
               <div className="feature-item">
                 <span className="feature-check">OK</span>
-                <span>Free Shipping Above Rs. 500</span>
+                <span>Shiprocket Delivery Rates</span>
               </div>
             </div>
           </div>

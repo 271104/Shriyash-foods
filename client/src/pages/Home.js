@@ -23,7 +23,7 @@ const bestsellers = [
   { name: 'Beetroot Powder', image: '/beetroot-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
   { name: 'Banana Powder', image: '/banana-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
   { name: 'Moringa Powder', image: '/moringa-removebg-preview.png', oldPrice: 'Rs. 299.00', price: 'Rs. 249.00' },
-  { name: 'Onion Powder', image: '/onion-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 199.00' },
+  { name: 'Onion Powder', image: '/onion-removebg-preview.png', oldPrice: 'Rs. 249.00', price: 'Rs. 10.00' },
   { name: 'ABC Powder', image: '/abc-removebg-preview.png', oldPrice: 'Rs. 299.00', price: 'Rs. 249.00' },
 ];
 

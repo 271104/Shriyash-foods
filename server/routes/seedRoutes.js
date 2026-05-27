@@ -75,7 +75,7 @@ const products = [
     description: 'Premium quality onion powder for cooking and health benefits. Rich in antioxidants and adds authentic flavor to your dishes.',
     category: 'powder',
     variants: [
-      { weight: '100g', price: 99, mrp: 149, stock: 100, sku: 'ONI-100' },
+      { weight: '100g', price: 10, mrp: 149, stock: 100, sku: 'ONI-100' },
       { weight: '250g', price: 199, mrp: 299, stock: 100, sku: 'ONI-250' },
       { weight: '500g', price: 349, mrp: 499, stock: 100, sku: 'ONI-500' }
     ],

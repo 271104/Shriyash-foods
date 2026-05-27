@@ -61,7 +61,7 @@ const fallbackProducts = [
     slug: 'onion-powder',
     description: 'Premium onion powder for cooking, seasoning, marinades, soups, and authentic flavor.',
     category: 'powder',
-    variants: [{ weight: '100g', price: 199, mrp: 249, stock: 100, sku: 'ONI-100' }],
+    variants: [{ weight: '100g', price: 10, mrp: 249, stock: 100, sku: 'ONI-100' }],
     images: [{ url: '/onion-removebg-preview.png' }],
     benefits: ['Rich in antioxidants', 'Supports immune system', 'Adds authentic flavor'],
     usage: 'Use in curries, soups, marinades, and seasoning.',

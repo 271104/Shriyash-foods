@@ -129,7 +129,7 @@ const products = [
     description: 'Premium Onion Powder - Enhances flavor naturally, rich in antioxidants, supports heart health, and serves as a convenient substitute for fresh onion.',
     category: 'powder',
     variants: [
-      { weight: '100g', price: 199, mrp: 249, stock: 100, sku: 'ONI-100' },
+      { weight: '100g', price: 10, mrp: 249, stock: 100, sku: 'ONI-100' },
       { weight: '250g', price: 449, mrp: 549, stock: 100, sku: 'ONI-250' },
       { weight: '500g', price: 799, mrp: 999, stock: 100, sku: 'ONI-500' }
     ],

@@ -10,7 +10,7 @@ const fallbackProducts = [
     slug: 'tomato-powder',
     description: 'Premium Tomato Powder - Rich in lycopene & antioxidants that supports immunity, enhances flavor naturally, and serves as a convenient replacement for fresh tomato.',
     images: [{ url: '/tomato-removebg-preview.png' }],
-    variants: [{ price: 199, mrp: 249 }],
+    variants: [{ price: 10, mrp: 249 }],
   },
   {
     _id: 'beetroot-powder',

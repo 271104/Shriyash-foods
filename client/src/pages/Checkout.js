@@ -10,7 +10,7 @@ import './Checkout.css';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { cart, cartTotal, clearCart, mergeGuestCart } = useCart();
+  const { cartItems, cartTotal, clearCart, mergeGuestCart } = useCart();
   const { isAuthenticated, user } = useAuth();
   
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ const Checkout = () => {
   const total = cartTotal + (shipping ?? 0) - discount;
 
   const getCartWeight = () => {
-    const weight = cart.items.reduce((sum, item) => {
+    const weight = cartItems.reduce((sum, item) => {
       const match = String(item.variant || '').match(/(\d+(?:\.\d+)?)\s*(kg|g)/i);
       if (!match) return sum;
 
@@ -55,7 +55,7 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    if (cart.items.length === 0) {
+    if (cartItems.length === 0) {
       navigate('/cart');
       return;
     }
@@ -64,7 +64,7 @@ const Checkout = () => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
     }
-  }, [cart, navigate, isAuthenticated]);
+  }, [cartItems.length, navigate, isAuthenticated]);
 
   // Update form when user data changes
   useEffect(() => {
@@ -193,8 +193,7 @@ const Checkout = () => {
     try {
       // Create order
       const orderData = {
-        items: cart.items
-          .filter(item => item.product)
+        items: cartItems
           .map(item => ({
             product: item.product._id,
             name: item.product.name,
@@ -521,8 +520,7 @@ const Checkout = () => {
           <div className="order-summary">
             <h2>📦 Order Summary</h2>
             
-            {cart.items
-              .filter(item => item.product)
+            {cartItems
               .map(item => (
                 <div key={item._id} className="summary-item">
                   <span>{item.product.name} ({item.variant})</span>

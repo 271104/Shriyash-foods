@@ -6,9 +6,9 @@ import './Cart.css';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, cartTotal } = useCart();
+  const { cartItems, removeFromCart, cartTotal } = useCart();
 
-  if (cart.items.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <div className="empty-cart">
         <FiShoppingBag size={80} />
@@ -26,13 +26,7 @@ const Cart = () => {
 
         <div className="cart-grid">
           <div className="cart-items">
-            {cart.items.map(item => {
-              // Skip items with missing product data
-              if (!item.product) {
-                return null;
-              }
-              
-              return (
+            {cartItems.map(item => (
                 <div key={item._id} className="cart-item">
                   <img 
                     src={item.product.images?.[0]?.url || '/placeholder.jpg'} 
@@ -53,8 +47,7 @@ const Cart = () => {
                     </button>
                   </div>
                 </div>
-              );
-            })}
+            ))}
           </div>
 
           <div className="cart-summary">

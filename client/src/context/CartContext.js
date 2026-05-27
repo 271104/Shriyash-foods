@@ -175,18 +175,20 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const cartItems = cart.items.filter(item => item.product);
+
   // Get cart totals
-  const cartTotal = cart.items.reduce((sum, item) => {
+  const cartTotal = cartItems.reduce((sum, item) => {
     const price = item.price || 0;
     const quantity = item.quantity || 0;
     return sum + (price * quantity);
   }, 0);
 
-  const cartCount = cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const cartCount = cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
   // Get cart items count by product (for display)
   const getProductQuantity = (productId, variant) => {
-    const item = cart.items.find(
+    const item = cartItems.find(
       item => item.product?._id === productId && item.variant === variant
     );
     return item ? item.quantity : 0;
@@ -194,6 +196,7 @@ export const CartProvider = ({ children }) => {
 
   const value = {
     cart,
+    cartItems,
     loading,
     addToCart,
     removeFromCart,

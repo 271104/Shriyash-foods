@@ -296,3 +296,78 @@
     font-size: 20px;
   }
 }
+
+/* Mode Toggle Buttons */
+.mode-toggle {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  background: #f5f5f5;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.toggle-btn:hover {
+  background: rgba(36, 71, 11, 0.1);
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #24470b, #2e5a0f);
+  color: white;
+  box-shadow: 0 4px 12px rgba(36, 71, 11, 0.3);
+}
+
+/* Error Message */
+.error-message {
+  background: #fff5f5;
+  border: 1px solid #f0a0a0;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 16px 0;
+  color: #c00;
+  font-size: 13px;
+}
+
+.error-message p {
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.error-message p:last-child {
+  margin-bottom: 0;
+}
+
+.error-message .help-text {
+  background: #fffbf0;
+  border-top: 1px solid #f0a0a0;
+  margin: 8px -12px -12px -12px;
+  padding: 8px 12px;
+  border-radius: 0 0 8px 8px;
+  color: #d97706;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .mode-toggle {
+    margin: 16px 0;
+  }
+  
+  .toggle-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}

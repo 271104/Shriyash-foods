@@ -22,6 +22,8 @@ const OTPModal = ({
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [userExists, setUserExists] = useState(false);
+  const [currentMode, setCurrentMode] = useState(purpose); // 'login' or 'register'
+  const [errorMessage, setErrorMessage] = useState(null);
   
   const otpRefs = useRef([]);
 
@@ -32,8 +34,10 @@ const OTPModal = ({
       setOtp(['', '', '', '', '', '']);
       setResendTimer(0);
       setUserExists(false);
+      setCurrentMode(purpose);
+      setErrorMessage(null);
     }
-  }, [isOpen]);
+  }, [isOpen, purpose]);
 
   // Resend timer
   useEffect(() => {
@@ -81,8 +85,9 @@ const OTPModal = ({
     }
 
     setLoading(true);
+    setErrorMessage(null);
     try {
-      const result = await sendOTP(phone, purpose);
+      const result = await sendOTP(phone, currentMode);
       setUserExists(result.userExists);
       setStep('otp');
       setResendTimer(60); // 60 seconds cooldown
@@ -93,7 +98,19 @@ const OTPModal = ({
         otpRefs.current[0]?.focus();
       }, 100);
     } catch (error) {
-      toast.error(error.message || 'Failed to send OTP');
+      const errorMsg = error.message || 'Failed to send OTP';
+      setErrorMessage(errorMsg);
+      
+      // If user tries to login but account doesn't exist, show register option
+      if (currentMode === 'login' && errorMsg.includes('No account found')) {
+        setErrorMessage(errorMsg);
+      }
+      // If user tries to register but account exists, show login option
+      else if (currentMode === 'register' && errorMsg.includes('already registered')) {
+        setErrorMessage(errorMsg);
+      }
+      
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -107,7 +124,7 @@ const OTPModal = ({
 
     setLoading(true);
     try {
-      const result = await verifyOTPAndLogin(phone, otpValue, purpose, guestData, userData);
+      const result = await verifyOTPAndLogin(phone, otpValue, currentMode, guestData, userData);
       toast.success(result.message);
       onSuccess && onSuccess(result);
       onClose();
@@ -126,7 +143,7 @@ const OTPModal = ({
     
     setLoading(true);
     try {
-      await sendOTP(phone, purpose);
+      await sendOTP(phone, currentMode);
       setResendTimer(60);
       toast.success('OTP resent successfully');
       // Clear current OTP
@@ -171,6 +188,46 @@ const OTPModal = ({
                   autoFocus
                 />
               </div>
+
+              {/* Mode Toggle */}
+              <div className="mode-toggle">
+                <button 
+                  className={`toggle-btn ${currentMode === 'login' ? 'active' : ''}`}
+                  onClick={() => {
+                    setCurrentMode('login');
+                    setStep('phone');
+                    setErrorMessage(null);
+                  }}
+                >
+                  Login
+                </button>
+                <button 
+                  className={`toggle-btn ${currentMode === 'register' ? 'active' : ''}`}
+                  onClick={() => {
+                    setCurrentMode('register');
+                    setStep('phone');
+                    setErrorMessage(null);
+                  }}
+                >
+                  Register
+                </button>
+              </div>
+
+              {errorMessage && (
+                <div className="error-message">
+                  <p>{errorMessage}</p>
+                  {errorMessage.includes('No account found') && currentMode === 'login' && (
+                    <p className="help-text">
+                      👉 <strong>Don't have an account?</strong> Click the "Register" button above to create one!
+                    </p>
+                  )}
+                  {errorMessage.includes('already registered') && currentMode === 'register' && (
+                    <p className="help-text">
+                      👉 <strong>Already have an account?</strong> Click the "Login" button above!
+                    </p>
+                  )}
+                </div>
+              )}
 
               <button 
                 className="btn btn-primary btn-block"

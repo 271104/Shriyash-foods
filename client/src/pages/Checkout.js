@@ -247,17 +247,32 @@ const Checkout = () => {
           theme: { color: '#24470b' },
           handler: async function (response) {
             try {
-              await axios.post('/api/payment/verify', {
+              const verifyResponse = await axios.post('/api/payment/verify', {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 orderId: data.order.orderId
               });
               
-              clearCart();
-              navigate(`/order-success/${data.order.orderId}`);
+              if (verifyResponse.data.success) {
+                clearCart();
+                navigate(`/order-success/${data.order.orderId}`);
+              } else {
+                throw new Error(verifyResponse.data.message || 'Verification failed');
+              }
             } catch (error) {
-              toast.error('Payment verification failed');
+              console.error('❌ Payment verification error:', error);
+              toast.error(error.response?.data?.message || 'Payment verification failed');
+              // Record the failed payment
+              try {
+                await axios.post('/api/payment/failed', {
+                  orderId: data.order.orderId,
+                  error: error.message
+                });
+              } catch (e) {
+                console.error('Failed to record payment error:', e);
+              }
+              setLoading(false);
             }
           },
           modal: {
@@ -268,7 +283,24 @@ const Checkout = () => {
           }
         };
 
+        // Add error handler for Razorpay errors
+        if (!window.Razorpay) {
+          toast.error('Payment gateway not loaded. Please refresh the page.');
+          setLoading(false);
+          return;
+        }
+
         const razorpay = new window.Razorpay(options);
+        razorpay.on('payment.failed', function(response) {
+          console.error('❌ Razorpay payment failed:', response.error);
+          toast.error(`Payment failed: ${response.error.description || response.error.reason}`);
+          setLoading(false);
+          // Record the failed payment
+          axios.post('/api/payment/failed', {
+            orderId: data.order.orderId,
+            error: response.error.description
+          }).catch(e => console.error('Failed to record payment error:', e));
+        });
         razorpay.open();
       } else {
         // COD order

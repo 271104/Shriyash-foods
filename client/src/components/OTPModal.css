@@ -156,7 +156,7 @@
   background: rgba(36, 71, 11, 0.05);
 }
 
-.btn {
+.otp-modal .btn {
   width: 100%;
   padding: 12px 24px;
   border: none;
@@ -171,23 +171,23 @@
   gap: 8px;
 }
 
-.btn-primary {
+.otp-modal .btn-primary {
   background: #24470b;
   color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
+.otp-modal .btn-primary:hover:not(:disabled) {
   background: #1e3a09;
   transform: translateY(-1px);
 }
 
-.btn-primary:disabled {
+.otp-modal .btn-primary:disabled {
   background: #ccc;
   cursor: not-allowed;
   transform: none;
 }
 
-.btn-block {
+.otp-modal .btn-block {
   width: 100%;
   margin-bottom: 16px;
 }

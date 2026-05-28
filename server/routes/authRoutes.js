@@ -159,12 +159,37 @@ router.post('/verify-otp', async (req, res) => {
 
       const cleanEmail = userData?.email?.trim().toLowerCase();
 
+      // Build address object from userData
+      const addressData = {
+        fullName: cleanName,
+        phone: phone,
+        addressLine1: userData?.addressLine1?.trim(),
+        addressLine2: userData?.addressLine2?.trim() || undefined,
+        landmark: userData?.landmark?.trim() || undefined,
+        city: userData?.city?.trim(),
+        state: userData?.state?.trim(),
+        pincode: userData?.pincode,
+        isDefault: true
+      };
+
+      // Validate required address fields
+      if (!addressData.addressLine1 || !addressData.city || !addressData.state || !addressData.pincode) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide complete address details'
+        });
+      }
+
       if (user) {
         user.name = cleanName;
         user.email = cleanEmail || undefined;
         user.isGuest = false;
         user.isPhoneVerified = true;
         user.lastLogin = new Date();
+        // Add address if it doesn't exist
+        if (!user.addresses || user.addresses.length === 0) {
+          user.addresses = [addressData];
+        }
         await user.save();
       } else {
         isNewUser = true;
@@ -174,6 +199,7 @@ router.post('/verify-otp', async (req, res) => {
           email: cleanEmail || undefined,
           isPhoneVerified: true,
           isGuest: false,
+          addresses: [addressData],
           lastLogin: new Date()
         });
       }

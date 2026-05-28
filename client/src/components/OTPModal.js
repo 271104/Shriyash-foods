@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiX, FiPhone, FiMessageCircle, FiLoader } from 'react-icons/fi';
+import { FiX, FiPhone, FiMessageCircle, FiLoader, FiUser, FiMail, FiMapPin } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import './OTPModal.css';
@@ -17,13 +17,26 @@ const OTPModal = ({
 }) => {
   const { sendOTP, verifyOTPAndLogin } = useAuth();
   
-  const [step, setStep] = useState('phone'); // 'phone' or 'otp'
+  const [step, setStep] = useState('phone'); // 'phone', 'registration_form', or 'otp'
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [userExists, setUserExists] = useState(false);
   const [currentMode, setCurrentMode] = useState(purpose); // 'login' or 'register'
   const [errorMessage, setErrorMessage] = useState(null);
+  
+  // Registration form fields
+  const [regForm, setRegForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    addressLine1: '',
+    addressLine2: '',
+    landmark: '',
+    city: '',
+    state: '',
+    pincode: ''
+  });
   
   const otpRefs = useRef([]);
 
@@ -36,8 +49,106 @@ const OTPModal = ({
       setUserExists(false);
       setCurrentMode(purpose);
       setErrorMessage(null);
+      setRegForm({
+        name: '',
+        phone: '',
+        email: '',
+        addressLine1: '',
+        addressLine2: '',
+        landmark: '',
+        city: '',
+        state: '',
+        pincode: ''
+      });
     }
   }, [isOpen, purpose]);
+
+  // Handle registration form input
+  const handleRegFormChange = (e) => {
+    const { name, value } = e.target;
+    setRegForm(prev => ({
+      ...prev,
+      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value.toUpperCase()
+    }));
+  };
+
+  // Validate registration form
+  const validateRegForm = () => {
+    if (!regForm.name.trim()) {
+      toast.error('Please enter your full name');
+      return false;
+    }
+    if (regForm.name.trim().length < 2) {
+      toast.error('Name must be at least 2 characters');
+      return false;
+    }
+    if (!/^[6-9]\d{9}$/.test(regForm.phone)) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return false;
+    }
+    if (!regForm.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regForm.email)) {
+      toast.error('Please enter a valid email address');
+      return false;
+    }
+    if (!regForm.addressLine1.trim()) {
+      toast.error('Please enter address line 1');
+      return false;
+    }
+    if (!regForm.city.trim()) {
+      toast.error('Please enter city');
+      return false;
+    }
+    if (!regForm.state.trim()) {
+      toast.error('Please enter state');
+      return false;
+    }
+    if (!/^\d{6}$/.test(regForm.pincode)) {
+      toast.error('Please enter a valid 6-digit pincode');
+      return false;
+    }
+    return true;
+  };
+
+  // Handle registration form submission
+  const handleRegFormSubmit = (e) => {
+    e.preventDefault();
+    if (!validateRegForm()) return;
+
+    setPhone(regForm.phone);
+    setLoading(true);
+    setErrorMessage(null);
+
+    // Send OTP with registration form data
+    sendOTP(regForm.phone, 'register')
+      .then(result => {
+        setUserExists(result.userExists);
+        setStep('otp');
+        setResendTimer(60);
+        toast.success('OTP sent to your WhatsApp number');
+        setTimeout(() => {
+          otpRefs.current[0]?.focus();
+        }, 100);
+      })
+      .catch(error => {
+        const errorMsg = error.message || 'Failed to send OTP';
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  // Handle phone step submission
+  const handlePhoneStepSubmit = (e) => {
+    e.preventDefault();
+    if (currentMode === 'register') {
+      // For registration, go to registration form
+      setStep('registration_form');
+      setRegForm(prev => ({ ...prev, phone: phone }));
+    } else {
+      // For login, send OTP directly
+      handleSendOTP();
+    }
+  };
 
   // Resend timer
   useEffect(() => {
@@ -124,7 +235,9 @@ const OTPModal = ({
 
     setLoading(true);
     try {
-      const result = await verifyOTPAndLogin(phone, otpValue, currentMode, guestData, userData);
+      // For registration, pass the registration form data as userData
+      const dataToPass = currentMode === 'register' ? regForm : userData;
+      const result = await verifyOTPAndLogin(phone, otpValue, currentMode, guestData, dataToPass);
       toast.success(result.message);
       onSuccess && onSuccess(result);
       onClose();
@@ -231,8 +344,159 @@ const OTPModal = ({
 
               <button 
                 className="btn btn-primary btn-block"
-                onClick={handleSendOTP}
+                onClick={handlePhoneStepSubmit}
                 disabled={loading || phone.length !== 10}
+              >
+                {loading ? (
+                  <>
+                    <FiLoader className="spinner" />
+                    {currentMode === 'register' ? 'Continue...' : 'Sending OTP...'}
+                  </>
+                ) : (
+                  currentMode === 'register' ? 'Continue' : 'Send OTP'
+                )}
+              </button>
+
+              <div className="otp-info">
+                <FiMessageCircle />
+                <span>OTP will be sent via WhatsApp</span>
+              </div>
+            </div>
+          ) : step === 'registration_form' ? (
+            <form className="registration-form" onSubmit={handleRegFormSubmit}>
+              <div className="step-icon">
+                <FiUser />
+              </div>
+              <h3>Complete Your Registration</h3>
+              <p>Enter your details to create an account</p>
+
+              {/* Name */}
+              <div className="form-group">
+                <label>Full Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  value={regForm.name}
+                  onChange={handleRegFormChange}
+                  required
+                />
+              </div>
+
+              {/* Phone (Read-only) */}
+              <div className="form-group">
+                <label>Phone Number *</label>
+                <div className="phone-display">
+                  <span>+91 {regForm.phone}</span>
+                  <button 
+                    type="button" 
+                    className="change-link"
+                    onClick={() => {
+                      setStep('phone');
+                      setRegForm(prev => ({ ...prev, phone: '' }));
+                      setPhone('');
+                    }}
+                  >
+                    Change
+                  </button>
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="form-group">
+                <label>Email Address *</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={regForm.email}
+                  onChange={handleRegFormChange}
+                  required
+                />
+              </div>
+
+              {/* Address Line 1 */}
+              <div className="form-group">
+                <label>Address Line 1 *</label>
+                <input
+                  type="text"
+                  name="addressLine1"
+                  placeholder="Street address"
+                  value={regForm.addressLine1}
+                  onChange={handleRegFormChange}
+                  required
+                />
+              </div>
+
+              {/* Address Line 2 */}
+              <div className="form-group">
+                <label>Address Line 2</label>
+                <input
+                  type="text"
+                  name="addressLine2"
+                  placeholder="Apartment, suite, etc. (optional)"
+                  value={regForm.addressLine2}
+                  onChange={handleRegFormChange}
+                />
+              </div>
+
+              {/* Landmark */}
+              <div className="form-group">
+                <label>Landmark</label>
+                <input
+                  type="text"
+                  name="landmark"
+                  placeholder="Nearby landmark (optional)"
+                  value={regForm.landmark}
+                  onChange={handleRegFormChange}
+                />
+              </div>
+
+              {/* City */}
+              <div className="form-group form-row">
+                <div>
+                  <label>City *</label>
+                  <input
+                    type="text"
+                    name="city"
+                    placeholder="City"
+                    value={regForm.city}
+                    onChange={handleRegFormChange}
+                    required
+                  />
+                </div>
+                {/* State */}
+                <div>
+                  <label>State *</label>
+                  <input
+                    type="text"
+                    name="state"
+                    placeholder="State"
+                    value={regForm.state}
+                    onChange={handleRegFormChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Pincode */}
+              <div className="form-group">
+                <label>Pincode *</label>
+                <input
+                  type="text"
+                  name="pincode"
+                  placeholder="6-digit pincode"
+                  value={regForm.pincode}
+                  onChange={(e) => handleRegFormChange({ target: { name: 'pincode', value: e.target.value.replace(/\D/g, '').slice(0, 6) } })}
+                  maxLength="6"
+                  required
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn btn-primary btn-block"
+                disabled={loading}
               >
                 {loading ? (
                   <>
@@ -244,11 +508,15 @@ const OTPModal = ({
                 )}
               </button>
 
-              <div className="otp-info">
-                <FiMessageCircle />
-                <span>OTP will be sent via WhatsApp</span>
-              </div>
-            </div>
+              <button 
+                type="button"
+                className="back-btn"
+                onClick={() => setStep('phone')}
+                disabled={loading}
+              >
+                Back to Phone Entry
+              </button>
+            </form>
           ) : (
             <div className="otp-step">
               <div className="step-icon">

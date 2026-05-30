@@ -1,0 +1,243 @@
+.register-page {
+  align-items: flex-start;
+  padding-top: 30px;
+  padding-bottom: 40px;
+}
+
+.register-container {
+  max-width: 1100px;
+}
+
+.register-right {
+  padding: 40px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.register-form-container {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.register-title {
+  font-size: 26px;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.register-subtitle {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.register-form {
+  gap: 16px;
+}
+
+.register-form .form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--dark);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.register-form .form-group label svg {
+  color: var(--primary);
+}
+
+.address-section {
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.address-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.register-phone-group {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--cream);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.register-phone-group:focus-within {
+  border-color: var(--primary);
+  background: white;
+}
+
+.register-phone-group .country-code {
+  padding: 14px 12px;
+  background: rgba(45, 90, 30, 0.08);
+  color: var(--primary);
+  font-weight: 600;
+  border-right: 1px solid var(--border);
+}
+
+.register-phone-group input {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  padding: 14px 16px;
+  border-radius: 0 !important;
+}
+
+.register-otp-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--gray);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.register-otp-note svg {
+  color: #25d366;
+}
+
+.register-otp-step {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.back-to-form-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.back-to-form-btn:hover {
+  text-decoration: underline;
+}
+
+.otp-step-header .step-icon-inline {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.otp-step-header h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--dark);
+}
+
+.otp-step-header p {
+  color: var(--gray);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.register-otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.register-otp-inputs .otp-input {
+  width: 48px;
+  height: 52px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--cream);
+  transition: all 0.2s;
+}
+
+.register-otp-inputs .otp-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+}
+
+.resend-section {
+  margin-top: 20px;
+}
+
+.resend-timer {
+  color: var(--gray);
+  font-size: 14px;
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.resend-btn:hover {
+  text-decoration: underline;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 968px) {
+  .register-right {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-otp-inputs .otp-input {
+    width: 42px;
+    height: 48px;
+    font-size: 18px;
+  }
+}

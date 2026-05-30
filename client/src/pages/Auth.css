@@ -194,12 +194,32 @@
   margin-bottom: 16px;
 }
 
+.login-title {
+  font-size: 26px;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
 .link-btn {
   background: none;
   border: none;
   color: var(--primary);
   font-weight: 600;
   cursor: pointer;
+  text-decoration: underline;
+}
+
+a.link-btn {
+  text-decoration: none;
+}
+
+a.link-btn:hover {
   text-decoration: underline;
 }
 

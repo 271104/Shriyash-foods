@@ -277,6 +277,29 @@ body.about-page-active .header-main {
   display: none;
 }
 
+.register-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  background: transparent;
+  color: var(--primary) !important;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register-btn:hover {
+  background: var(--primary);
+  color: white !important;
+}
+
+.register-btn::after {
+  display: none;
+}
+
 .user-menu {
   position: relative;
 }
@@ -526,7 +549,8 @@ body.about-page-active .header-main {
     gap: 16px;
   }
   
-  .login-btn {
+  .login-btn,
+  .register-btn {
     width: 100%;
     justify-content: center;
   }

@@ -1,38 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FiMail, FiUser, FiPhone } from 'react-icons/fi';
+import { FiPhone } from 'react-icons/fi';
 import OTPModal from '../components/OTPModal';
 import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
   const [showOTPModal, setShowOTPModal] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: ''
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value
-    });
-  };
+  const [phone, setPhone] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
       toast.error('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    if (!isLogin && formData.name.trim().length < 2) {
-      toast.error('Please enter your full name');
       return;
     }
 
@@ -40,13 +22,8 @@ const Login = () => {
   };
 
   const handleOTPSuccess = () => {
-    toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
+    toast.success('Welcome back!');
     navigate('/products');
-  };
-
-  const switchMode = () => {
-    setIsLogin(prev => !prev);
-    setFormData({ name: '', phone: '', email: '' });
   };
 
   return (
@@ -76,40 +53,10 @@ const Login = () => {
 
         <div className="auth-right">
           <div className="auth-form-container">
-            <div className="auth-tabs">
-              <button
-                className={isLogin ? 'active' : ''}
-                onClick={() => setIsLogin(true)}
-                type="button"
-              >
-                Login
-              </button>
-              <button
-                className={!isLogin ? 'active' : ''}
-                onClick={() => setIsLogin(false)}
-                type="button"
-              >
-                Register
-              </button>
-            </div>
+            <h1 className="login-title">Login to Your Account</h1>
+            <p className="login-subtitle">Enter your WhatsApp number to receive OTP</p>
 
             <form onSubmit={handleSubmit} className="auth-form">
-              {!isLogin && (
-                <div className="form-group">
-                  <label>
-                    <FiUser /> Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter your name"
-                    required
-                  />
-                </div>
-              )}
-
               <div className="form-group">
                 <label>
                   <FiPhone /> WhatsApp Number
@@ -117,43 +64,26 @@ const Login = () => {
                 <input
                   type="tel"
                   name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                   placeholder="10-digit mobile number"
                   pattern="[6-9][0-9]{9}"
                   required
                 />
               </div>
 
-              {!isLogin && (
-                <div className="form-group">
-                  <label>
-                    <FiMail /> Email Address
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="your@email.com"
-                  />
-                </div>
-              )}
-
               <button type="submit" className="btn btn-primary btn-block">
-                {isLogin ? 'Send Login OTP' : 'Send Registration OTP'}
+                Send Login OTP
               </button>
             </form>
 
             <div className="auth-footer">
               <p>
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button onClick={switchMode} className="link-btn" type="button">
-                  {isLogin ? 'Register' : 'Login'}
-                </button>
+                Don&apos;t have an account?{' '}
+                <Link to="/register" className="link-btn">Create Account</Link>
               </p>
               <Link to="/products" className="guest-link">
-                Continue as Guest ->
+                Continue as Guest →
               </Link>
             </div>
           </div>
@@ -163,12 +93,11 @@ const Login = () => {
       <OTPModal
         isOpen={showOTPModal}
         onClose={() => setShowOTPModal(false)}
-        phone={formData.phone}
-        setPhone={(phone) => setFormData(prev => ({ ...prev, phone }))}
-        purpose={isLogin ? 'login' : 'register'}
+        phone={phone}
+        setPhone={setPhone}
+        purpose="login"
         onSuccess={handleOTPSuccess}
-        userData={!isLogin ? { name: formData.name, email: formData.email } : null}
-        title={isLogin ? 'Login with WhatsApp OTP' : 'Verify and Create Account'}
+        title="Login with WhatsApp OTP"
       />
     </div>
   );

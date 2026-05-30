@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiUser, FiMenu, FiX, FiCheckCircle, FiDroplet, FiShield, FiHeadphones, FiHelpCircle, FiPhone } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +7,7 @@ import OTPModal from './OTPModal';
 import './Header.css';
 
 const Header = () => {
+  const navigate = useNavigate();
   const { cartCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
@@ -90,7 +91,7 @@ const Header = () => {
                     )}
                   </div>
                 ) : (
-                  <button 
+                  <button
                     className="mobile-login-icon"
                     onClick={() => setShowLoginModal(true)}
                   >
@@ -139,13 +140,21 @@ const Header = () => {
                       )}
                     </div>
                   ) : (
-                    <button 
-                      className="login-btn" 
-                      onClick={() => setShowLoginModal(true)}
-                    >
-                      <FiUser size={22} />
-                      <span>Login</span>
-                    </button>
+                    <>
+                      <button
+                        className="register-btn"
+                        onClick={() => navigate('/register')}
+                      >
+                        Register
+                      </button>
+                      <button
+                        className="login-btn"
+                        onClick={() => setShowLoginModal(true)}
+                      >
+                        <FiUser size={22} />
+                        <span>Login</span>
+                      </button>
+                    </>
                   )}
                 </div>
               </nav>

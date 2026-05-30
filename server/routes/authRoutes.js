@@ -158,6 +158,12 @@ router.post('/verify-otp', async (req, res) => {
       }
 
       const cleanEmail = userData?.email?.trim().toLowerCase();
+      if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid email address'
+        });
+      }
 
       // Build address object from userData
       const addressData = {
@@ -182,7 +188,7 @@ router.post('/verify-otp', async (req, res) => {
 
       if (user) {
         user.name = cleanName;
-        user.email = cleanEmail || undefined;
+        user.email = cleanEmail;
         user.isGuest = false;
         user.isPhoneVerified = true;
         user.lastLogin = new Date();
@@ -196,7 +202,7 @@ router.post('/verify-otp', async (req, res) => {
         user = await User.create({
           phone,
           name: cleanName,
-          email: cleanEmail || undefined,
+          email: cleanEmail,
           isPhoneVerified: true,
           isGuest: false,
           addresses: [addressData],

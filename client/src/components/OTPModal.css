@@ -214,6 +214,22 @@
   margin-top: 16px;
 }
 
+.modal-register-link {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.modal-register-link a {
+  color: var(--primary, #24470b);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.modal-register-link a:hover {
+  text-decoration: underline;
+}
+
 .welcome-back {
   background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
   color: #24470b;

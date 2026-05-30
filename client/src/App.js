@@ -14,6 +14,7 @@ import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderTracking from './pages/OrderTracking';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Profile from './pages/Profile';
 import ContactUs from './pages/ContactUs';
 import AboutUs from './pages/AboutUs';
@@ -42,6 +43,7 @@ function App() {
                   <Route path="/order-success/:orderId" element={<OrderSuccess />} />
                   <Route path="/track/:orderId" element={<OrderTracking />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/about" element={<AboutUs />} />
                   <Route path="/our-journey" element={<OurJourney />} />

@@ -68,7 +68,7 @@ const OTPModal = ({
     const { name, value } = e.target;
     setRegForm(prev => ({
       ...prev,
-      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value.toUpperCase()
+      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : name === 'pincode' ? value.replace(/\D/g, '').slice(0, 6) : value
     }));
   };
 
@@ -344,7 +344,20 @@ const OTPModal = ({
 
               <button 
                 className="btn btn-primary btn-block"
-                onClick={handlePhoneStepSubmit}
+                onClick={() => {
+                  if (currentMode === 'register') {
+                    // For registration, go to registration form
+                    if (!/^[6-9]\d{9}$/.test(phone)) {
+                      toast.error('Please enter a valid 10-digit phone number');
+                      return;
+                    }
+                    setStep('registration_form');
+                    setRegForm(prev => ({ ...prev, phone: phone }));
+                  } else {
+                    // For login, send OTP directly
+                    handleSendOTP();
+                  }
+                }}
                 disabled={loading || phone.length !== 10}
               >
                 {loading ? (

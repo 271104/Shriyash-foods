@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiX, FiPhone, FiMessageCircle, FiLoader, FiUser, FiMail, FiMapPin } from 'react-icons/fi';
+import { FiX, FiPhone, FiMessageCircle, FiLoader, FiUser } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import './OTPModal.css';
@@ -138,17 +138,7 @@ const OTPModal = ({
   };
 
   // Handle phone step submission
-  const handlePhoneStepSubmit = (e) => {
-    e.preventDefault();
-    if (currentMode === 'register') {
-      // For registration, go to registration form
-      setStep('registration_form');
-      setRegForm(prev => ({ ...prev, phone: phone }));
-    } else {
-      // For login, send OTP directly
-      handleSendOTP();
-    }
-  };
+  // Now handled inline in the button onClick
 
   // Resend timer
   useEffect(() => {

@@ -6,10 +6,23 @@ const orderSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  customerType: {
+    type: String,
+    enum: ['guest', 'registered'],
+    required: true,
+    index: true
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    index: true
   },
+  guestUser: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    index: true
+  },
+  guestSessionId: String,
   guestDetails: {
     name: String,
     phone: String,
@@ -25,7 +38,8 @@ const orderSchema = new mongoose.Schema({
     variant: String,
     price: Number,
     quantity: Number,
-    sku: String
+    sku: String,
+    lineTotal: Number
   }],
   shippingAddress: {
     fullName: { type: String, required: true },
@@ -61,7 +75,6 @@ const orderSchema = new mongoose.Schema({
     enum: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RTO'],
     default: 'PENDING'
   },
-  // Shiprocket Integration Fields
   shiprocketOrderId: String,
   shiprocketShipmentId: String,
   awbCode: String,
@@ -92,11 +105,50 @@ const orderSchema = new mongoose.Schema({
     default: false
   },
   isFirstOrder: Boolean,
+  clientInfo: {
+    ip: String,
+    userAgent: String,
+    sessionId: String
+  },
+  placedAt: Date,
+  paidAt: Date,
+  shippedAt: Date,
+  deliveredAt: Date,
+  cancelledAt: Date,
   statusHistory: [{
     status: String,
     timestamp: { type: Date, default: Date.now },
-    note: String
+    note: String,
+    source: { type: String, default: 'system' }
+  }],
+  orderLog: [{
+    event: String,
+    timestamp: { type: Date, default: Date.now },
+    details: mongoose.Schema.Types.Mixed,
+    source: { type: String, default: 'system' }
+  }],
+  paymentLog: [{
+    status: String,
+    timestamp: { type: Date, default: Date.now },
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
+    amount: Number,
+    message: String,
+    raw: mongoose.Schema.Types.Mixed
+  }],
+  shippingLog: [{
+    status: String,
+    timestamp: { type: Date, default: Date.now },
+    awbCode: String,
+    courierName: String,
+    shipmentId: String,
+    message: String,
+    raw: mongoose.Schema.Types.Mixed
   }]
 }, { timestamps: true });
+
+orderSchema.index({ customerType: 1, createdAt: -1 });
+orderSchema.index({ guestSessionId: 1 });
+orderSchema.index({ 'guestDetails.phone': 1 });
 
 module.exports = mongoose.model('Order', orderSchema);

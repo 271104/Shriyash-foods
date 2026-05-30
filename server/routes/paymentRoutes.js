@@ -3,6 +3,7 @@ const router = express.Router();
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Order = require('../models/Order');
+const { appendOrderLog, appendPaymentLog } = require('../utils/activityLogger');
 
 const getRazorpay = () => new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -41,6 +42,18 @@ router.post('/create-order', async (req, res) => {
       { orderId },
       { razorpayOrderId: razorpayOrder.id }
     );
+
+    await appendOrderLog(orderId, 'PAYMENT_INITIATED', {
+      razorpayOrderId: razorpayOrder.id,
+      amount
+    }, 'payment');
+
+    await appendPaymentLog(orderId, {
+      status: 'INITIATED',
+      razorpayOrderId: razorpayOrder.id,
+      amount,
+      message: 'Razorpay payment order created'
+    });
     
     res.json({
       success: true,
@@ -105,15 +118,32 @@ router.post('/verify', async (req, res) => {
         paymentStatus: 'PAID',
         razorpayPaymentId: razorpay_payment_id,
         orderStatus: 'CONFIRMED',
+        paidAt: new Date(),
         $push: {
           statusHistory: {
             status: 'CONFIRMED',
-            note: 'Payment successful'
+            note: 'Payment successful',
+            source: 'payment'
           }
         }
       },
       { new: true }
     );
+
+    if (order) {
+      await appendOrderLog(orderId, 'PAYMENT_SUCCESS', {
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id
+      }, 'payment');
+
+      await appendPaymentLog(orderId, {
+        status: 'PAID',
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        amount: order.pricing?.total,
+        message: 'Payment verified successfully'
+      });
+    }
     
     if (!order) {
       console.error('❌ Order not found after payment verification:', orderId);
@@ -157,12 +187,22 @@ router.post('/failed', async (req, res) => {
         $push: {
           statusHistory: {
             status: 'FAILED',
-            note: `Payment failed: ${error || 'Unknown error'}`
+            note: `Payment failed: ${error || 'Unknown error'}`,
+            source: 'payment'
           }
         }
       },
       { new: true }
     );
+
+    if (updatedOrder) {
+      await appendOrderLog(orderId, 'PAYMENT_FAILED', { error: error || 'Unknown error' }, 'payment');
+      await appendPaymentLog(orderId, {
+        status: 'FAILED',
+        amount: updatedOrder.pricing?.total,
+        message: error || 'Payment failed'
+      });
+    }
     
     if (!updatedOrder) {
       console.error('❌ Order not found when recording payment failure:', orderId);

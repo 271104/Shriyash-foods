@@ -3,9 +3,12 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
+const User = require('../models/User');
 const shippingService = require('../services/shipping.service');
 const { optional, protect } = require('../middleware/auth');
 const { validateOrderData } = require('../middleware/validation');
+const { getClientInfo, logUserActivity } = require('../utils/activityLogger');
+const { findOrCreateGuestUser } = require('../utils/guestUserService');
 
 const PICKUP_POSTCODE = '413005';
 
@@ -151,33 +154,114 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     }
     const discount = paymentMethod === 'PREPAID' ? 25 : 0;
     const total = subtotal + shipping - discount;
-    
-    // Create order
+
+    const customerType = req.user ? 'registered' : 'guest';
+    const sessionId = req.headers['x-session-id'] || null;
+    const clientInfo = getClientInfo(req);
+    let guestUserRecord = null;
+
+    if (customerType === 'guest' && sessionId) {
+      guestUserRecord = await findOrCreateGuestUser(sessionId, req);
+    }
+
+    const orderItems = items.map((item) => ({
+      ...item,
+      lineTotal: (item.price || 0) * (item.quantity || 0)
+    }));
+
     const order = await Order.create({
       orderId,
+      customerType,
       user: req.user?._id,
+      guestUser: guestUserRecord?._id,
+      guestSessionId: customerType === 'guest' ? sessionId : undefined,
       guestDetails: !req.user ? guestDetails : undefined,
-      items,
+      items: orderItems,
       shippingAddress,
       pricing: { subtotal, shipping, discount, total },
       paymentMethod,
-      paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
+      paymentStatus: 'PENDING',
       isFirstOrder,
+      isOTPVerified: customerType === 'guest' ? isGuestPhoneVerified() : true,
+      clientInfo,
+      placedAt: new Date(),
       statusHistory: [{
         status: 'PENDING',
-        note: 'Order created'
+        note: 'Order created',
+        source: 'system'
+      }],
+      orderLog: [{
+        event: 'ORDER_CREATED',
+        timestamp: new Date(),
+        source: 'system',
+        details: {
+          customerType,
+          paymentMethod,
+          itemCount: orderItems.length,
+          totalItems: orderItems.reduce((sum, item) => sum + (item.quantity || 0), 0),
+          subtotal,
+          shipping,
+          discount,
+          total,
+          isFirstOrder,
+          sessionId,
+          userId: req.user?._id || null,
+          guestUserId: guestUserRecord?._id || null
+        }
+      }],
+      paymentLog: [{
+        status: 'PENDING',
+        timestamp: new Date(),
+        amount: total,
+        message: `Order initiated with ${paymentMethod}`
       }]
     });
+
+    if (req.user) {
+      await logUserActivity(req.user, 'ORDER_PLACED', {
+        orderId,
+        total,
+        paymentMethod,
+        itemCount: orderItems.length
+      }, req);
+
+      await User.findByIdAndUpdate(req.user._id, {
+        $addToSet: { orderHistory: order._id }
+      });
+    } else if (guestUserRecord) {
+      await logUserActivity(guestUserRecord, 'ORDER_PLACED', {
+        orderId,
+        total,
+        paymentMethod,
+        itemCount: orderItems.length,
+        guestDetails
+      }, req);
+    }
+
+    const cartQuery = req.user
+      ? { user: req.user._id }
+      : { sessionId };
+
+    const activeCart = await Cart.findOne(cartQuery);
+    if (activeCart) {
+      activeCart.activityLog = activeCart.activityLog || [];
+      activeCart.activityLog.push({
+        action: 'CHECKOUT',
+        timestamp: new Date(),
+        customerType,
+        userId: req.user?._id || null,
+        sessionId,
+        note: `Checkout completed for order ${orderId}`,
+        itemCountAfter: 0
+      });
+      activeCart.items = [];
+      activeCart.itemCount = 0;
+      activeCart.totalValue = 0;
+      activeCart.lastActivityAt = new Date();
+      await activeCart.save();
+    }
     
     console.log('✅ Order created successfully:', orderId);
-    
-    // Clear cart
-    if (req.user) {
-      await Cart.findOneAndDelete({ user: req.user._id });
-    } else {
-      const sessionId = req.headers['x-session-id'];
-      await Cart.findOneAndDelete({ sessionId });
-    }
     
     res.status(201).json({
       success: true,

@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const { appendOrderLog } = require('../utils/activityLogger');
 
 /**
  * Shiprocket Webhook Controller
@@ -126,22 +127,49 @@ exports.handleWebhook = async (req, res) => {
       });
     }
 
-    await Order.findByIdAndUpdate(
-      order._id,
-      {
-        shippingStatus: newStatus,
-        orderStatus: newOrderStatus,
-        courierName: courier_name || order.courierName,
-        $push: {
-          statusHistory: {
-            status: newStatus,
-            note: current_status ? `${current_status} via ${courier_name || 'courier'}` : newStatus,
-            timestamp: new Date()
-          }
+    const updatePayload = {
+      shippingStatus: newStatus,
+      orderStatus: newOrderStatus,
+      courierName: courier_name || order.courierName,
+      $push: {
+        statusHistory: {
+          status: newStatus,
+          note: current_status ? `${current_status} via ${courier_name || 'courier'}` : newStatus,
+          timestamp: new Date(),
+          source: 'shiprocket'
+        },
+        shippingLog: {
+          status: newStatus,
+          timestamp: new Date(),
+          awbCode: awb || order.awbCode,
+          courierName: courier_name || order.courierName,
+          shipmentId: shipment_id || order.shiprocketShipmentId,
+          message: current_status || shipment_status,
+          raw: req.body
         }
-      },
-      { new: true }
-    );
+      }
+    };
+
+    if (newStatus === 'IN_TRANSIT' || newStatus === 'PICKED_UP') {
+      updatePayload.shippedAt = new Date();
+    }
+    if (newOrderStatus === 'DELIVERED') {
+      updatePayload.deliveredAt = new Date();
+    }
+    if (newOrderStatus === 'CANCELLED') {
+      updatePayload.cancelledAt = new Date();
+    }
+
+    await Order.findByIdAndUpdate(order._id, updatePayload, { new: true });
+
+    await appendOrderLog(order.orderId, 'SHIPPING_STATUS_UPDATED', {
+      previousStatus: lastStatus,
+      newStatus,
+      orderStatus: newOrderStatus,
+      awb,
+      shipment_id,
+      courier_name
+    }, 'shiprocket');
 
     console.log(`Order updated: ${order.orderId}`);
     console.log(`   Status: ${lastStatus} -> ${newStatus}`);

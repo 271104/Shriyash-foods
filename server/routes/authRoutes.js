@@ -4,7 +4,13 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect, optional } = require('../middleware/auth');
 const { sendOTP, verifyOTP } = require('../services/otpService');
+const { logUserActivity } = require('../utils/activityLogger');
+const { findOrCreateGuestUser, linkGuestSessionToRegisteredUser } = require('../utils/guestUserService');
 const rateLimit = require('express-rate-limit');
+
+const isRegisteredUser = (user) => user && (
+  user.userType === 'registered' || (!user.isGuest && user.isPhoneVerified)
+);
 
 const OTP_PURPOSES = ['login', 'register', 'checkout_guest'];
 
@@ -61,7 +67,7 @@ router.post('/send-otp', otpLimiter, async (req, res) => {
       });
     }
 
-    const hasRegisteredAccount = existingUser && !existingUser.isGuest && existingUser.isPhoneVerified;
+    const hasRegisteredAccount = isRegisteredUser(existingUser);
 
     if (purpose === 'register' && hasRegisteredAccount) {
       return res.status(409).json({
@@ -124,8 +130,15 @@ router.post('/verify-otp', async (req, res) => {
     }
 
     if (purpose === 'checkout_guest') {
+      const sessionId = req.headers['x-session-id'] || guestData?.sessionId;
+      const guestUser = sessionId ? await findOrCreateGuestUser(sessionId, req) : null;
+
+      if (guestUser) {
+        await logUserActivity(guestUser, 'CHECKOUT_OTP_VERIFIED', { phone }, req);
+      }
+
       const guestVerificationToken = jwt.sign(
-        { phone, purpose: 'checkout_guest' },
+        { phone, purpose: 'checkout_guest', sessionId },
         process.env.JWT_SECRET,
         { expiresIn: '30m' }
       );
@@ -142,7 +155,7 @@ router.post('/verify-otp', async (req, res) => {
     let isNewUser = false;
 
     if (purpose === 'register') {
-      if (user && !user.isGuest && user.isPhoneVerified) {
+      if (user && isRegisteredUser(user)) {
         return res.status(409).json({
           success: false,
           message: 'This phone number is already registered. Please login instead.'
@@ -189,10 +202,11 @@ router.post('/verify-otp', async (req, res) => {
       if (user) {
         user.name = cleanName;
         user.email = cleanEmail;
+        user.userType = 'registered';
         user.isGuest = false;
         user.isPhoneVerified = true;
         user.lastLogin = new Date();
-        // Add address if it doesn't exist
+        user.lastSeenAt = new Date();
         if (!user.addresses || user.addresses.length === 0) {
           user.addresses = [addressData];
         }
@@ -203,25 +217,47 @@ router.post('/verify-otp', async (req, res) => {
           phone,
           name: cleanName,
           email: cleanEmail,
+          userType: 'registered',
           isPhoneVerified: true,
           isGuest: false,
           addresses: [addressData],
-          lastLogin: new Date()
+          lastLogin: new Date(),
+          firstSeenAt: new Date(),
+          lastSeenAt: new Date(),
+          activityLog: [],
+          stats: {
+            totalCartActions: 0,
+            totalOrders: 0,
+            totalLogins: 1,
+            lastActivityAt: new Date()
+          }
         });
       }
+
+      const sessionId = guestData?.sessionId || req.headers['x-session-id'];
+      await linkGuestSessionToRegisteredUser(sessionId, user, req);
+      await logUserActivity(user, 'REGISTER', {
+        phone,
+        email: cleanEmail,
+        isNewUser
+      }, req);
     }
 
     if (purpose === 'login') {
-      if (!user || user.isGuest) {
+      if (!user || !isRegisteredUser(user)) {
         return res.status(404).json({
           success: false,
           message: 'No account found for this phone number. Please register first.'
         });
       }
 
+      user.userType = 'registered';
+      user.isGuest = false;
       user.isPhoneVerified = true;
       user.lastLogin = new Date();
+      user.lastSeenAt = new Date();
       await user.save();
+      await logUserActivity(user, 'LOGIN', { phone }, req);
     }
 
     // Generate tokens
@@ -244,6 +280,7 @@ router.post('/verify-otp', async (req, res) => {
         name: user.name,
         phone: user.phone,
         email: user.email,
+        userType: user.userType,
         isPhoneVerified: user.isPhoneVerified,
         addresses: user.addresses || []
       }
@@ -336,7 +373,11 @@ router.get('/me', protect, async (req, res) => {
 // @desc    Logout user
 router.post('/logout', protect, async (req, res) => {
   try {
-    // Clear refresh token
+    const user = await User.findById(req.user.id);
+    if (user) {
+      await logUserActivity(user, 'LOGOUT', {}, req);
+    }
+
     await User.updateOne(
       { _id: req.user.id },
       { $unset: { refreshToken: 1 } }

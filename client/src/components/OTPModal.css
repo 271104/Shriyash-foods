@@ -368,19 +368,38 @@
 .registration-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.registration-form .step-icon {
+  margin-bottom: 12px;
 }
 
 .registration-form h3 {
-  margin: 0 0 8px 0;
+  margin: 8px 0;
   font-size: 18px;
+  font-weight: 600;
   color: #333;
+  text-align: center;
 }
 
 .registration-form > p {
   margin: 0 0 16px 0;
   color: #666;
   font-size: 14px;
+  text-align: center;
 }
 
 .form-group {
@@ -402,6 +421,9 @@
   font-size: 14px;
   font-family: inherit;
   transition: all 0.2s;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group input:focus {
@@ -422,6 +444,11 @@
   background: #f5f5f5;
   border-radius: 6px;
   font-weight: 500;
+  border: 1px solid #ddd;
+}
+
+.phone-display span {
+  color: #333;
 }
 
 .change-link {
@@ -432,6 +459,8 @@
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
+  padding: 0;
+  transition: color 0.2s;
 }
 
 .change-link:hover {
@@ -441,7 +470,7 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .form-row > div {
@@ -461,6 +490,8 @@
   font-size: 14px;
   transition: all 0.2s;
   margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .back-btn:hover:not(:disabled) {
@@ -478,5 +509,9 @@
 @media (max-width: 480px) {
   .form-row {
     grid-template-columns: 1fr;
+  }
+  
+  .registration-form {
+    gap: 12px;
   }
 }

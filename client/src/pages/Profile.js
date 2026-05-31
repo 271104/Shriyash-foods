@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { FiUser, FiPhone, FiMail, FiEdit2, FiSave, FiX } from 'react-icons/fi';
@@ -169,9 +170,9 @@ const Profile = () => {
             <div className="stat-card">
               <h3>Order History</h3>
               <p>View your past orders and track current ones</p>
-              <a href="/orders" className="btn btn-outline">
+              <Link to="/orders" className="btn btn-outline">
                 View Orders
-              </a>
+              </Link>
             </div>
 
             <div className="stat-card">

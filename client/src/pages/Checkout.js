@@ -563,33 +563,28 @@ const Checkout = () => {
             <div className="summary-divider"></div>
 
             <div className="summary-row">
-              <span>Subtotal</span>
-              <span>₹{cartTotal}</span>
+              <span className="summary-label">Subtotal</span>
+              <span className="summary-value">₹{cartTotal}</span>
             </div>
 
             <div className="summary-row">
-              <span>Shipping</span>
-              <span>{shipping === null ? 'Check pincode' : `\u20B9${shipping}`}</span>
+              <span className="summary-label">Shipping</span>
+              <span className={`summary-value ${shipping === null ? 'pending' : ''}`}>
+                {shipping === null ? 'Check pincode' : `₹${shipping}`}
+              </span>
             </div>
 
             {selectedCourier && (
               <div className="summary-row">
-                <span>Courier</span>
-                <span>{selectedCourier.name || 'Shiprocket'}</span>
+                <span className="summary-label">Courier</span>
+                <span className="summary-value">{selectedCourier.name || 'Shiprocket'}</span>
               </div>
             )}
 
             {discount > 0 && (
-              <div className="summary-row discount" style={{
-                color: '#28a745',
-                fontWeight: '600',
-                backgroundColor: '#d4edda',
-                padding: '8px',
-                borderRadius: '4px',
-                margin: '8px 0'
-              }}>
-                <span>💰 Prepaid Discount</span>
-                <span>-₹{discount}</span>
+              <div className="summary-row discount">
+                <span className="summary-label">Prepaid discount</span>
+                <span className="summary-value">-₹{discount}</span>
               </div>
             )}
 

@@ -4,6 +4,7 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Order = require('../models/Order');
 const { appendOrderLog, appendPaymentLog } = require('../utils/activityLogger');
+const { sendOrderConfirmationNotifications } = require('../services/orderNotification.service');
 
 const getRazorpay = () => new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -154,6 +155,11 @@ router.post('/verify', async (req, res) => {
     }
     
     console.log('✅ Payment verified successfully for order:', orderId);
+
+    sendOrderConfirmationNotifications(orderId).catch((err) => {
+      console.error('Prepaid order notification error:', err.message);
+    });
+
     res.json({ success: true, message: 'Payment verified successfully', order });
   } catch (error) {
     console.error('❌ Payment verification error:', error.message, error.stack);

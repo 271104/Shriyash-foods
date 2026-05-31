@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const { appendOrderLog } = require('../utils/activityLogger');
+const { sendShipmentNotifications } = require('../services/orderNotification.service');
 
 /**
  * Shiprocket Webhook Controller
@@ -150,6 +151,13 @@ exports.handleWebhook = async (req, res) => {
       }
     };
 
+    if (awb) {
+      updatePayload.awbCode = awb;
+    }
+    if (shipment_id) {
+      updatePayload.shiprocketShipmentId = shipment_id;
+    }
+
     if (newStatus === 'IN_TRANSIT' || newStatus === 'PICKED_UP') {
       updatePayload.shippedAt = new Date();
     }
@@ -170,6 +178,20 @@ exports.handleWebhook = async (req, res) => {
       shipment_id,
       courier_name
     }, 'shiprocket');
+
+    const shipmentNotifyStatuses = [
+      'SHIPMENT_CREATED',
+      'AWB_ASSIGNED',
+      'PICKUP_GENERATED',
+      'PICKED_UP',
+      'IN_TRANSIT',
+      'OUT_FOR_DELIVERY'
+    ];
+    if (shipmentNotifyStatuses.includes(newStatus)) {
+      sendShipmentNotifications(order.orderId).catch((err) => {
+        console.error('Shipment notification error:', err.message);
+      });
+    }
 
     console.log(`Order updated: ${order.orderId}`);
     console.log(`   Status: ${lastStatus} -> ${newStatus}`);

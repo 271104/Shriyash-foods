@@ -1,6 +1,5 @@
 const axios = require('axios');
 const Order = require('../models/Order');
-const { sendOTPWhatsApp } = require('./otpService');
 
 // Notification types mapping to WasenderAPI templates
 const NOTIFICATION_TEMPLATES = {

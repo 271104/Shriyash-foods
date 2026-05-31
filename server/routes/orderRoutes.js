@@ -9,6 +9,7 @@ const { optional, protect } = require('../middleware/auth');
 const { validateOrderData } = require('../middleware/validation');
 const { getClientInfo, logUserActivity } = require('../utils/activityLogger');
 const { findOrCreateGuestUser } = require('../utils/guestUserService');
+const { sendOrderConfirmationNotifications } = require('../services/orderNotification.service');
 
 const PICKUP_POSTCODE = '413005';
 
@@ -262,6 +263,13 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     }
     
     console.log('✅ Order created successfully:', orderId);
+
+    // COD: send WhatsApp + email confirmation immediately
+    if (paymentMethod === 'COD') {
+      sendOrderConfirmationNotifications(orderId).catch((err) => {
+        console.error('COD order notification error:', err.message);
+      });
+    }
     
     res.status(201).json({
       success: true,

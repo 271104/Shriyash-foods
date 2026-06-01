@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const Order = require('../models/Order');
 const { appendOrderLog, appendPaymentLog } = require('../utils/activityLogger');
 const { sendOrderConfirmationNotifications } = require('../services/orderNotification.service');
+const shippingService = require('../services/shipping.service');
 
 const getRazorpay = () => new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -155,6 +156,37 @@ router.post('/verify', async (req, res) => {
     }
     
     console.log('✅ Payment verified successfully for order:', orderId);
+
+    // 🚀 Create Shiprocket shipment order
+    try {
+      console.log('📦 Creating Shiprocket shipment for order:', orderId);
+      const shiprocketResult = await shippingService.createShipment(order.toObject());
+      
+      if (shiprocketResult.success) {
+        console.log('✅ Shiprocket shipment created successfully:', {
+          orderId,
+          shiprocketOrderId: shiprocketResult.shiprocketOrderId,
+          shipmentId: shiprocketResult.shipmentId
+        });
+
+        await appendOrderLog(orderId, 'SHIPMENT_CREATED', {
+          shiprocketOrderId: shiprocketResult.shiprocketOrderId,
+          shipmentId: shiprocketResult.shipmentId
+        }, 'shiprocket');
+      } else {
+        console.warn('⚠️ Shiprocket shipment creation failed:', shiprocketResult.message);
+        // Don't fail the payment verification, just log the warning
+        await appendOrderLog(orderId, 'SHIPMENT_CREATION_FAILED', {
+          error: shiprocketResult.message
+        }, 'shiprocket');
+      }
+    } catch (shiprocketError) {
+      console.error('❌ Error creating Shiprocket shipment:', shiprocketError.message);
+      // Don't fail the payment verification, just log the error
+      await appendOrderLog(orderId, 'SHIPMENT_CREATION_ERROR', {
+        error: shiprocketError.message || shiprocketError.toString()
+      }, 'shiprocket');
+    }
 
     sendOrderConfirmationNotifications(orderId).catch((err) => {
       console.error('Prepaid order notification error:', err.message);

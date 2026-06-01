@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { FiX, FiPhone, FiMessageCircle, FiLoader, FiUser } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +15,6 @@ const OTPModal = ({
   userData = null,
   title = 'Verify Your Phone Number'
 }) => {
-  const navigate = useNavigate();
   const { sendOTP, verifyOTPAndLogin } = useAuth();
   
   const [step, setStep] = useState('phone'); // 'phone', 'registration_form', or 'otp'
@@ -309,8 +307,9 @@ const OTPModal = ({
                 <button 
                   className={`toggle-btn ${currentMode === 'register' ? 'active' : ''}`}
                   onClick={() => {
-                    onClose();
-                    navigate('/register');
+                    setCurrentMode('register');
+                    setStep('phone');
+                    setErrorMessage(null);
                   }}
                 >
                   Register
@@ -365,13 +364,6 @@ const OTPModal = ({
                 <FiMessageCircle />
                 <span>OTP will be sent via WhatsApp</span>
               </div>
-
-              {purpose === 'login' && (
-                <p className="modal-register-link">
-                  New customer?{' '}
-                  <Link to="/register" onClick={onClose}>Create an account</Link>
-                </p>
-              )}
             </div>
           ) : step === 'registration_form' ? (
             <form className="registration-form" onSubmit={handleRegFormSubmit}>

@@ -551,48 +551,53 @@ const Checkout = () => {
 
           <div className="order-summary">
             <h2>📦 Order Summary</h2>
-            
-            {cartItems
-              .map(item => (
+
+            <div className="summary-items">
+              {cartItems.map((item) => (
                 <div key={item._id} className="summary-item">
-                  <span>{item.product.name} ({item.variant})</span>
-                  <span>₹{item.price} × {item.quantity}</span>
+                  <span className="summary-item-name">
+                    {item.product.name} ({item.variant})
+                  </span>
+                  <span className="summary-item-price">
+                    ₹{item.price} × {item.quantity}
+                  </span>
                 </div>
               ))}
-
-            <div className="summary-divider"></div>
-
-            <div className="summary-row">
-              <span className="summary-label">Subtotal</span>
-              <span className="summary-value">₹{cartTotal}</span>
             </div>
 
-            <div className="summary-row">
-              <span className="summary-label">Shipping</span>
-              <span className={`summary-value ${shipping === null ? 'pending' : ''}`}>
-                {shipping === null ? 'Check pincode' : `₹${shipping}`}
-              </span>
-            </div>
+            <div className="summary-divider" />
 
-            {selectedCourier && (
+            <div className="summary-totals">
               <div className="summary-row">
-                <span className="summary-label">Courier</span>
-                <span className="summary-value">{selectedCourier.name || 'Shiprocket'}</span>
+                <span className="summary-label">Subtotal</span>
+                <span className="summary-value">₹{cartTotal}</span>
               </div>
-            )}
 
-            {discount > 0 && (
-              <div className="summary-row discount">
-                <span className="summary-label">Prepaid discount</span>
-                <span className="summary-value">-₹{discount}</span>
+              <div className="summary-row">
+                <span className="summary-label">Shipping</span>
+                <span className={`summary-value ${shipping === null ? 'pending' : ''}`}>
+                  {shipping === null ? 'Check pincode' : `₹${shipping}`}
+                </span>
               </div>
-            )}
 
-            <div className="summary-divider"></div>
+              {selectedCourier && (
+                <div className="summary-row">
+                  <span className="summary-label">Courier</span>
+                  <span className="summary-value">{selectedCourier.name || 'Shiprocket'}</span>
+                </div>
+              )}
 
-            <div className="summary-total">
-              <span>Total</span>
-              <span>₹{total}</span>
+              {discount > 0 && (
+                <div className="summary-row discount">
+                  <span className="summary-label">Prepaid discount</span>
+                  <span className="summary-value">-₹{discount}</span>
+                </div>
+              )}
+
+              <div className="summary-total">
+                <span>Total</span>
+                <span>₹{total}</span>
+              </div>
             </div>
           </div>
         </div>

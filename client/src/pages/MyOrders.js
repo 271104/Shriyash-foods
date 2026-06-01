@@ -150,7 +150,7 @@ const MyOrders = () => {
                 </div>
 
                 <div className="order-card-footer">
-                  <div className="order-summary">
+                  <div className="order-footer-summary">
                     <span>Payment: <strong>{order.paymentMethod}</strong></span>
                     <span>Total: <strong>₹{order.pricing?.total}</strong></span>
                   </div>

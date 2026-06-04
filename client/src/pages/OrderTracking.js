@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FiMapPin, FiPackage, FiTruck } from 'react-icons/fi';
+import API_BASE from '../config/api';
 import './OrderTracking.css';
 
 const OrderTracking = () => {
@@ -16,7 +17,7 @@ const OrderTracking = () => {
 
   const fetchTracking = async () => {
     try {
-      const { data } = await axios.get(`/orders/${orderId}/track`);
+      const { data } = await axios.get(`${API_BASE}/orders/${orderId}/track`);
       setTracking(data);
       setErrorMessage('');
     } catch (error) {

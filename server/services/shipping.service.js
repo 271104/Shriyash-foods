@@ -234,6 +234,10 @@ class ShippingService {
 
       // Shiprocket adhoc API returns data directly
       const data = response.data;
+      console.log(
+        '[SHIPROCKET] Parsed Response:',
+        JSON.stringify(data, null, 2)
+      );
 
       // Validate response
       if (!data.order_id) {
@@ -250,7 +254,9 @@ class ShippingService {
           awbCode: data.awb_code || '',
           courierName: data.courier_name || '',
 
-          shippingStatus: 'AWB_ASSIGNED',
+          shippingStatus: data.awb_code
+            ? 'AWB_ASSIGNED'
+            : 'SHIPMENT_CREATED',
 
           $push: {
             statusHistory: {
@@ -268,6 +274,31 @@ class ShippingService {
       console.log('[SHIPPING SERVICE] ✅ Shipment ID:', data.shipment_id);
       console.log('[SHIPPING SERVICE] ✅ AWB Code:', data.awb_code);
       console.log('[SHIPPING SERVICE] ✅ Courier:', data.courier_name);
+      return {
+        success: true,
+        shiprocketOrderId: String(data.order_id),
+        shipmentId: String(data.shipment_id),
+        awbCode: data.awb_code || '',
+        courierName: data.courier_name || '',
+        message: 'Shipment created successfully'
+      };
+
+      } catch (error) {
+        console.error('[SHIPPING SERVICE] ❌ Error in createShipment:', {
+          orderId: orderData.orderId,
+          message: error.message,
+          response: error.response?.data,
+          stack: error.stack
+        });
+
+        throw {
+          success: false,
+          message: 'Failed to create shipment',
+          error: error.message,
+          details: error.response?.data
+        };
+      }
+      }
 
 
  

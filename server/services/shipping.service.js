@@ -317,6 +317,8 @@ class ShippingService {
     try {
       const token = await tokenManager.getToken();
 
+      console.log('🚚 Assigning AWB for shipment:', shipmentId);
+
       const response = await shiprocketAxios.post(
         SHIPROCKET_CONFIG.endpoints.COURIER_ASSIGN,
         {
@@ -327,6 +329,11 @@ class ShippingService {
             Authorization: `Bearer ${token}`
           }
         }
+      );
+
+      console.log(
+        '🚚 AWB RAW RESPONSE:',
+        JSON.stringify(response.data, null, 2)
       );
 
       if (!response.data.success) {
@@ -344,12 +351,13 @@ class ShippingService {
         message: 'AWB assigned successfully'
       };
     } catch (error) {
-      console.error('Assign AWB error:', error.message);
-      throw {
-        success: false,
-        message: 'Failed to assign AWB',
-        error: error.message
-      };
+      console.error('🚨 ASSIGN AWB FULL ERROR:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        shipmentId
+      });
+ 
     }
   }
 

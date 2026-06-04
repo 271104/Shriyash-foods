@@ -455,11 +455,8 @@ class ShippingService {
       console.log('📍 Tracking AWB:', awbCode);
 
       const response = await shiprocketAxios.get(
-        SHIPROCKET_CONFIG.endpoints.TRACKING_DATA,
+        `${SHIPROCKET_CONFIG.endpoints.TRACKING_DATA}/${awbCode}`,
         {
-          params: {
-            awb: awbCode
-          },
           headers: {
             Authorization: `Bearer ${token}`
           }

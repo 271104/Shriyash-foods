@@ -42,7 +42,7 @@ const SHIPROCKET_CONFIG = {
     PICKUP_REQUEST: '/courier/generate/pickup',
     
     // Tracking
-    TRACKING_DATA: '/trackings/tracking_data',
+    TRACKING_DATA: '/courier/track/awb',
     
     // Label & Invoice
     LABEL_GENERATE: '/labels/generate/v2',

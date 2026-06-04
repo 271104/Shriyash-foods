@@ -184,6 +184,14 @@ router.post('/verify', async (req, res) => {
           shiprocketOrderId: shiprocketResult.shiprocketOrderId,
           shipmentId: shiprocketResult.shipmentId
         }, 'shiprocket');
+
+        console.log('🚚 STARTING: Assigning AWB...');
+
+        const awbResult = await shippingService.assignAWB(
+          shiprocketResult.shipmentId
+        );
+
+        console.log('🚚 AWB RESULT:', awbResult);
       } else {
         console.warn('⚠️ FAILED: Shiprocket shipment creation failed:', {
           orderId,

@@ -322,4 +322,50 @@ router.post('/:orderId/verify-otp', async (req, res) => {
   });
 });
 
+router.get('/:orderId/track', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findOne({ orderId });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    if (!order.awbCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tracking not available yet'
+      });
+    }
+
+    const tracking =
+      await shippingService.trackShipment(
+        order.awbCode
+      );
+
+    return res.json({
+      success: true,
+      orderId: order.orderId,
+      awbCode: order.awbCode,
+      courier: order.courierName,
+      tracking
+    });
+
+  } catch (error) {
+    console.error(
+      '[TRACK ORDER ERROR]',
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 module.exports = router;

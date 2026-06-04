@@ -465,26 +465,56 @@ class ShippingService {
         }
       );
 
-      if (!response.data.success) {
+      console.log(
+        '[TRACKING] RAW RESPONSE:',
+        JSON.stringify(response.data, null, 2)
+      );
+
+      if (
+        response.data?.tracking_data?.track_status !== 1
+      ) {
         throw new Error('Shipment not found or tracking unavailable');
       }
 
-      const tracking = response.data.data?.[0] || {};
+      const tracking = response.data?.tracking_data || {};
 
-      return {
-        success: true,
-        status: tracking.shipment_status || 'PROCESSING',
-        statusText: this._mapShipmentStatus(tracking.shipment_status),
-        courierName: tracking.courier_name || '',
-        activities: (tracking.tracking_data || []).map(activity => ({
-          timestamp: activity.date,
-          status: activity.status,
-          location: activity.location,
-          remark: activity.remark
-        })),
-        trackUrl: `https://tracking.shiprocket.in/${awbCode}`,
-        eta: tracking.expected_delivery_date || null
-      };
+      const shipment =
+        tracking.shipment_track?.[0] || {};
+        return {
+          success: true,
+
+          awbCode: shipment.awb_code,
+
+          status:
+            shipment.current_status ||
+            'UNKNOWN',
+
+          statusCode:
+            shipment.current_status_id,
+
+          courierName:
+            shipment.courier_name,
+
+          destination:
+            shipment.destination,
+
+          currentLocation:
+            shipment.delivered_to,
+
+          activities:
+            (tracking.shipment_track_activities || []).map(
+              activity => ({
+                timestamp: activity.date,
+                status: activity.status,
+                activity: activity.activity,
+                location: activity.location
+              })
+            ),
+
+          trackUrl: tracking.track_url,
+
+          eta: tracking.etd
+        };
     } catch (error) {
       console.error('Track shipment error:', error.message);
       throw {

@@ -200,15 +200,44 @@ router.post('/verify', async (req, res) => {
         );
 
         console.log('📦 PICKUP RESULT:', pickupResult);
+
+        await Order.findOneAndUpdate(
+          { orderId },
+          {
+            awbCode: awbResult.awbCode,
+            courierName: awbResult.courierName,
+
+            $push: {
+              shippingLog: {
+                status: 'AWB_ASSIGNED',
+                awbCode: awbResult.awbCode,
+                courierName: awbResult.courierName,
+                shipmentId: awbResult.shipmentId,
+                message: 'AWB assigned successfully'
+              }
+            }
+          }
+        );
         await Order.findOneAndUpdate(
           { orderId },
           {
             pickupReference: pickupResult.pickupReference,
-            shippingStatus: 'PICKUP_GENERATED'
+            shippingStatus: 'PICKUP_GENERATED',
+
+            $push: {
+              shippingLog: {
+                status: 'PICKUP_GENERATED',
+                awbCode: awbResult.awbCode,
+                courierName: awbResult.courierName,
+                shipmentId: awbResult.shipmentId,
+                message: pickupResult.message
+              }
+            }
           }
         );
 
         console.log('✅ Pickup details saved to MongoDB');
+      
       } else {
         console.warn('⚠️ FAILED: Shiprocket shipment creation failed:', {
           orderId,

@@ -57,11 +57,12 @@ const normalizeStatusText = (status) => String(status || '')
  * while some older examples use numeric status IDs.
  */
 
-console.log(
-  '🚀 SHIPROCKET WEBHOOK RECEIVED:',
-  JSON.stringify(req.body, null, 2)
-);
+
 exports.handleWebhook = async (req, res) => {
+  console.log(
+    '🚀 SHIPROCKET WEBHOOK RECEIVED:',
+    JSON.stringify(req.body, null, 2)
+  );
   try {
     const {
       awb,

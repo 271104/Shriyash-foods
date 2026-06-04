@@ -34,7 +34,8 @@ const SHIPROCKET_CONFIG = {
     COURIER_ASSIGN: '/courier/assign/awb',
     
     // Shipment Management
-    ORDER_CREATE: '/orders/create/v2',
+    ORDER_CREATE: '/orders/create/adhoc',
+    baseURL: process.env.SHIPROCKET_BASE_URL || process.env.SHIPROCKET_API_URL || 'https://apiv2.shiprocket.in/v1/external',
     ORDER_CANCEL: '/orders/cancel/v2',
     
     // Pickup

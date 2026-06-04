@@ -194,6 +194,11 @@ class ShippingService {
       });
 
       console.log('[SHIPPING SERVICE] 🚀 Calling Shiprocket API endpoint:', SHIPROCKET_CONFIG.endpoints.ORDER_CREATE);
+      console.log(
+        '\n================ SHIPROCKET FULL PAYLOAD ================\n',
+        JSON.stringify(payload, null, 2),
+        '\n=========================================================\n'
+      );
       const response = await shiprocketAxios.post(
         SHIPROCKET_CONFIG.endpoints.ORDER_CREATE,
         payload,

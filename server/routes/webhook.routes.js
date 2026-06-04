@@ -4,111 +4,194 @@ const { body, param, validationResult } = require('express-validator');
 const webhookController = require('../controllers/webhook.controller');
 
 /**
- * Verify Shiprocket webhook requests.
- * Configure the same value in Shiprocket's x-api-key header and .env.
- */
-const verifyShiprocketApiKey = (req, res, next) => {
+
+* Verify Shiprocket webhook requests
+  */
+  const verifyShiprocketApiKey = (req, res, next) => {
   const expectedApiKey = process.env.SHIPROCKET_WEBHOOK_SECRET;
   const receivedApiKey = req.get('x-api-key');
 
-  if (!expectedApiKey) {
-    console.error('SHIPROCKET_WEBHOOK_SECRET is not configured');
-    return res.status(500).json({
-      success: false,
-      message: 'Webhook authentication is not configured'
-    });
-  }
+if (!expectedApiKey) {
+console.error('SHIPROCKET_WEBHOOK_SECRET is not configured');
 
-  if (!receivedApiKey || receivedApiKey !== expectedApiKey) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid webhook API key'
-    });
-  }
+```
+return res.status(500).json({
+  success: false,
+  message: 'Webhook authentication is not configured'
+});
+```
 
-  next();
+}
+
+if (!receivedApiKey || receivedApiKey !== expectedApiKey) {
+return res.status(401).json({
+success: false,
+message: 'Invalid webhook API key'
+});
+}
+
+next();
 };
 
 /**
- * Middleware to handle validation errors
- */
-const handleValidationErrors = (req, res, next) => {
+
+* Handle validation errors
+  */
+  const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      message: 'Validation failed',
-      errors: errors.array().map(err => ({
-        field: err.param,
-        message: err.msg
-      }))
-    });
-  }
-  next();
+
+if (!errors.isEmpty()) {
+return res.status(400).json({
+success: false,
+message: 'Validation failed',
+errors: errors.array()
+});
+}
+
+next();
 };
 
-const shiprocketWebhookHandlers = [
+/**
+
+* Shiprocket Webhook Handler Stack
+  */
+  const shiprocketWebhookHandlers = [
   verifyShiprocketApiKey,
   webhookController.handleWebhook
-];
+  ];
 
 /**
- * POST /api/webhooks/order-status
- * Receive shipment status webhook events from Shiprocket.
- *
- * Payload format:
- * {
- *   "awb": "14112366035400",
- *   "shipment_status": 7,
- *   "current_status": "Delivered",
- *   "courier_name": "Xpressbees Surface",
- *   "shipment_id": 1360828812
- * }
- */
-router.post('/order-status', shiprocketWebhookHandlers);
+
+* ======================================================
+* SHIPROCKET WEBHOOKS
+* ======================================================
+  */
 
 /**
- * Legacy endpoint. Shiprocket may reject this URL because it contains the
- * word "shiprocket", so use /api/webhooks/order-status in their dashboard.
- */
-router.post('/shiprocket', shiprocketWebhookHandlers);
+
+* POST /api/webhooks/order-status
+*
+* Recommended webhook URL for Shiprocket dashboard
+  */
+  router.post('/order-status', shiprocketWebhookHandlers);
 
 /**
- * GET /api/tracking/:orderId
- * Get order tracking information
- */
-router.get(
+
+* Legacy endpoint
+  */
+  router.post('/shiprocket', shiprocketWebhookHandlers);
+
+/**
+
+* ======================================================
+* TRACKING
+* ======================================================
+  */
+
+/**
+
+* GET /api/webhooks/tracking/:orderId
+*
+* Get tracking data from MongoDB
+  */
+  router.get(
   '/tracking/:orderId',
-  param('orderId').trim().notEmpty().withMessage('orderId is required'),
+  param('orderId')
+  .trim()
+  .notEmpty()
+  .withMessage('orderId is required'),
   handleValidationErrors,
   webhookController.getOrderTracking
-);
+  );
 
 /**
- * POST /api/webhooks/test
- * Test webhook (for development/testing)
- */
-router.post(
+
+* ======================================================
+* TESTING
+* ======================================================
+  */
+
+/**
+
+* POST /api/webhooks/test
+*
+* Simulate Shiprocket webhook locally
+  */
+  router.post(
   '/test',
-  body('orderId').trim().notEmpty().withMessage('orderId is required'),
-  body('shipment_status').optional().isInt().withMessage('shipment_status must be a number'),
-  body('current_status').optional().trim(),
-  handleValidationErrors,
-  webhookController.testWebhook
+  body('orderId')
+  .trim()
+  .notEmpty()
+  .withMessage('orderId is required'),
+
+body('shipment_status')
+.optional()
+.isInt()
+.withMessage('shipment_status must be numeric'),
+
+body('current_status')
+.optional()
+.trim(),
+
+handleValidationErrors,
+webhookController.testWebhook
 );
 
 /**
- * POST /api/webhooks/manual-update
- * Manual status update (admin endpoint - add auth in production)
- */
-router.post(
+
+* ======================================================
+* ADMIN
+* ======================================================
+  */
+
+/**
+
+* POST /api/webhooks/manual-update
+*
+* Manual order status update
+  */
+  router.post(
   '/manual-update',
-  body('orderId').trim().notEmpty().withMessage('orderId is required'),
-  body('shippingStatus').trim().notEmpty().withMessage('shippingStatus is required'),
-  body('orderStatus').optional().trim(),
-  body('note').optional().trim(),
-  handleValidationErrors,
-  webhookController.manualStatusUpdate
+
+body('orderId')
+.trim()
+.notEmpty()
+.withMessage('orderId is required'),
+
+body('shippingStatus')
+.trim()
+.notEmpty()
+.withMessage('shippingStatus is required'),
+
+body('orderStatus')
+.optional()
+.trim(),
+
+body('note')
+.optional()
+.trim(),
+
+handleValidationErrors,
+webhookController.manualStatusUpdate
 );
+
+/**
+
+* ======================================================
+* HEALTH CHECK
+* ======================================================
+  */
+
+/**
+
+* GET /api/webhooks/health
+  */
+  router.get('/health', (req, res) => {
+  res.json({
+  success: true,
+  service: 'Shiprocket Webhooks',
+  status: 'Running'
+  });
+  });
 
 module.exports = router;

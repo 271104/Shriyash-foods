@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const { appendOrderLog } = require('../utils/activityLogger');
+const shippingService = require('../services/shipping.service');
 const { sendShipmentNotifications } = require('../services/orderNotification.service');
 
 /**
@@ -55,6 +56,11 @@ const normalizeStatusText = (status) => String(status || '')
  * Shiprocket may send shipment_status as a text value like "IN TRANSIT",
  * while some older examples use numeric status IDs.
  */
+
+console.log(
+  '🚀 SHIPROCKET WEBHOOK RECEIVED:',
+  JSON.stringify(req.body, null, 2)
+);
 exports.handleWebhook = async (req, res) => {
   try {
     const {
@@ -264,16 +270,7 @@ exports.getOrderTracking = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    if (!orderId) {
-      return res.status(400).json({
-        success: false,
-        message: 'orderId is required'
-      });
-    }
-
-    const order = await Order.findOne({ orderId }).select(
-      'orderId shippingStatus orderStatus awbCode courierName trackingUrl statusHistory'
-    );
+    const order = await Order.findOne({ orderId });
 
     if (!order) {
       return res.status(404).json({
@@ -282,28 +279,41 @@ exports.getOrderTracking = async (req, res) => {
       });
     }
 
-    res.json({
+    if (!order.awbCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'AWB not generated yet'
+      });
+    }
+
+    const tracking =
+      await shippingService.trackShipment(
+        order.awbCode
+      );
+
+    return res.json({
       success: true,
-      order: {
-        orderId: order.orderId,
-        shippingStatus: order.shippingStatus,
-        orderStatus: order.orderStatus,
-        awbCode: order.awbCode,
-        courierName: order.courierName,
-        trackingUrl: order.trackingUrl,
-        statusHistory: (order.statusHistory || []).map(entry => ({
-          status: entry.status,
-          timestamp: entry.timestamp,
-          note: entry.note
-        }))
-      }
+      orderId: order.orderId,
+      awbCode: order.awbCode,
+      courierName: tracking.courierName,
+      status: tracking.status,
+      statusCode: tracking.statusCode,
+      destination: tracking.destination,
+      currentLocation: tracking.currentLocation,
+      trackingUrl: tracking.trackUrl,
+      eta: tracking.eta,
+      activities: tracking.activities
     });
 
   } catch (error) {
-    console.error('Get tracking error:', error);
-    res.status(500).json({
+    console.error(
+      '[TRACK ORDER ERROR]',
+      error
+    );
+
+    return res.status(500).json({
       success: false,
-      message: 'Failed to get tracking information'
+      message: error.message
     });
   }
 };

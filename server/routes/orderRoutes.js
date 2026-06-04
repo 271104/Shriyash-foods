@@ -335,33 +335,23 @@ router.get('/:orderId/track', async (req, res) => {
       });
     }
 
-    if (!order.awbCode) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tracking not available yet'
-      });
-    }
-
-    const tracking =
-      await shippingService.trackShipment(
-        order.awbCode
-      );
-
       return res.json({
         success: true,
         orderId: order.orderId,
         awbCode: order.awbCode,
         courier: order.courierName,
         shippingStatus: order.shippingStatus,
-
-        trackingUrl: tracking.trackUrl,
-        status: tracking.status,
-        statusCode: tracking.statusCode,
-        currentLocation: tracking.currentLocation,
-        destination: tracking.destination,
-        eta: tracking.eta,
-
-        activities: tracking.activities
+        orderStatus: order.orderStatus,
+        trackingUrl: order.trackingUrl,
+        expectedDeliveryDate: order.estimatedDeliveryDate,
+        statusHistory: order.statusHistory,
+        shippingLog: order.shippingLog,
+        activities: order.shippingLog?.map((entry) => ({
+          status: entry.status,
+          activity: entry.message || entry.status,
+          date: entry.timestamp,
+          location: entry.currentLocation || entry.location
+        })) || []
       });
     } catch (error) {
     console.error(

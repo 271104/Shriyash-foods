@@ -138,58 +138,70 @@ class ShippingService {
       const token = await tokenManager.getToken();
       console.log('[SHIPPING SERVICE] ✅ Token obtained successfully');
 
+      const fullName = orderData.shippingAddress.fullName || '';
+      const nameParts = fullName.trim().split(' ');
+      const firstName = nameParts[0] || 'Customer';
+      const lastName = nameParts.slice(1).join(' ') || '.';
+
       // Build Shiprocket order payload
       const payload = {
         order_id: orderData.orderId,
-        order_date: new Date(orderData.createdAt).toISOString(),
-        pickup_location_slug: SHIPROCKET_CONFIG.pickupLocation,
-        
-        // Customer details
-        customer_name: orderData.shippingAddress.fullName,
-        customer_email: orderData.shippingAddress.email || orderData.guestDetails?.email,
-        customer_phone: orderData.shippingAddress.phone,
-        
-        // Shipping address
-        shipping_address: orderData.shippingAddress.addressLine1,
-        shipping_address_2: orderData.shippingAddress.addressLine2 || '',
-        shipping_city: orderData.shippingAddress.city,
-        shipping_state: orderData.shippingAddress.state,
-        shipping_postcode: orderData.shippingAddress.pincode,
-        shipping_country: 'India',
-        
-        // Order items
-        line_items: orderData.items.map(item => ({
+
+        order_date: new Date(orderData.createdAt)
+          .toISOString()
+          .slice(0, 16)
+          .replace('T', ' '),
+
+        pickup_location: SHIPROCKET_CONFIG.pickupLocation,
+
+        shipping_is_billing: true,
+
+        billing_customer_name: firstName,
+        billing_last_name: lastName,
+
+        billing_address: orderData.shippingAddress.addressLine1,
+        billing_address_2: orderData.shippingAddress.addressLine2 || '',
+
+        billing_city: orderData.shippingAddress.city,
+        billing_pincode: Number(orderData.shippingAddress.pincode),
+        billing_state: orderData.shippingAddress.state,
+        billing_country: 'India',
+
+        billing_email:
+          orderData.shippingAddress.email ||
+          orderData.guestDetails?.email ||
+          'customer@example.com',
+
+        billing_phone: orderData.shippingAddress.phone,
+
+        order_items: orderData.items.map(item => ({
           name: item.name,
           sku: item.sku || `SKU-${item.product}`,
           units: item.quantity,
-          selling_price: item.price,
-          discount: 0
+          selling_price: item.price
         })),
-        
-        // Pricing
-        billing_amount: orderData.pricing.total || orderData.pricing.subtotal,
-        shipping_charges: orderData.pricing.shipping || 0,
-        cod_amount: orderData.paymentMethod === 'COD' ? orderData.pricing.total : 0,
-        
-        // Payment method
-        payment_method: orderData.paymentMethod === 'COD' ? 'COD' : 'Prepaid',
-        
-        // Package dimensions (if available)
-        weight: orderData.weight || 0.5,
-        dimensions: orderData.dimensions || {
-          length: 15,
-          breadth: 10,
-          height: 4,
-          unit: 'cm'
-        }
+
+        payment_method:
+          orderData.paymentMethod === 'COD'
+            ? 'COD'
+            : 'Prepaid',
+
+        sub_total:
+          orderData.pricing.subtotal ||
+          orderData.pricing.total,
+
+        length: 15,
+        breadth: 10,
+        height: 4,
+        weight: 0.5
       };
 
       console.log('[SHIPPING SERVICE] 📦 Payload being sent to Shiprocket API:', {
         orderId: payload.order_id,
-        customer: payload.customer_name,
-        city: payload.shipping_city,
-        itemCount: payload.line_items.length,
-        amount: payload.billing_amount,
+        customer: `${payload.billing_customer_name} ${payload.billing_last_name}`,
+        city: payload.billing_city,
+        itemCount: payload.order_items.length,
+        amount: payload.sub_total,
         paymentMethod: payload.payment_method
       });
 

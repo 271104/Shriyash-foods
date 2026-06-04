@@ -192,6 +192,23 @@ router.post('/verify', async (req, res) => {
         );
 
         console.log('🚚 AWB RESULT:', awbResult);
+
+        console.log('📦 STARTING: Generating Pickup...');
+
+        const pickupResult = await shippingService.generatePickup(
+          shiprocketResult.shipmentId
+        );
+
+        console.log('📦 PICKUP RESULT:', pickupResult);
+        await Order.findOneAndUpdate(
+          { orderId },
+          {
+            pickupReference: pickupResult.pickupReference,
+            shippingStatus: 'PICKUP_GENERATED'
+          }
+        );
+
+        console.log('✅ Pickup details saved to MongoDB');
       } else {
         console.warn('⚠️ FAILED: Shiprocket shipment creation failed:', {
           orderId,

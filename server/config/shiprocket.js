@@ -39,7 +39,7 @@ const SHIPROCKET_CONFIG = {
     ORDER_CANCEL: '/orders/cancel/v2',
     
     // Pickup
-    PICKUP_REQUEST: '/pickups/new',
+    PICKUP_REQUEST: '/courier/generate/pickup',
     
     // Tracking
     TRACKING_DATA: '/trackings/tracking_data',

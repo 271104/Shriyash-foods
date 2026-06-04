@@ -382,42 +382,62 @@ class ShippingService {
    * @returns {Promise<{success, pickupScheduledDate, pickupReference}>}
    */
   async generatePickup(shipmentId) {
-    try {
-      const token = await tokenManager.getToken();
+  try {
+    const token = await tokenManager.getToken();
 
-      const response = await shiprocketAxios.post(
-        SHIPROCKET_CONFIG.endpoints.PICKUP_REQUEST,
-        {
-          shipment_id: shipmentId
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+    console.log('📦 Generating Pickup for shipment:', shipmentId);
+
+    const response = await shiprocketAxios.post(
+      SHIPROCKET_CONFIG.endpoints.PICKUP_REQUEST,
+      {
+        shipment_id: [shipmentId]
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      );
-
-      if (!response.data.success) {
-        throw new Error(response.data.message || 'Failed to generate pickup');
       }
+    );
 
-      const data = response.data.data;
+    console.log(
+      '📦 PICKUP RAW RESPONSE:',
+      JSON.stringify(response.data, null, 2)
+    );
 
-      return {
-        success: true,
-        pickupScheduledDate: data.pickup_scheduled_date || new Date().toISOString(),
-        pickupReference: data.pickup_id || shipmentId,
-        message: 'Pickup generated successfully'
-      };
-    } catch (error) {
-      console.error('Generate pickup error:', error.message);
-      throw {
-        success: false,
-        message: 'Failed to generate pickup',
-        error: error.message
-      };
+    const data = response.data?.response;
+
+    if (!data) {
+      throw new Error('Pickup generation failed');
     }
+
+    console.log('[PICKUP] Parsed Data:', {
+      pickupScheduledDate: data.pickup_scheduled_date,
+      pickupReference: data.pickup_token_number
+    });
+
+    return {
+      success: true,
+      pickupScheduledDate: data.pickup_scheduled_date,
+      pickupReference: data.pickup_token_number,
+      message: data.data
+    };
+
+  } catch (error) {
+    console.error('🚨 PICKUP FULL ERROR:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      shipmentId
+    });
+
+    throw {
+      success: false,
+      message: 'Failed to generate pickup',
+      error: error.message,
+      details: error.response?.data
+    };
   }
+}
 
   /**
    * TRACKING

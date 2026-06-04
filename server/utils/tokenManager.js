@@ -23,20 +23,27 @@ class ShiprocketTokenManager {
    */
   async getToken() {
     try {
+      console.log('[TOKEN MANAGER] 🔄 Getting Shiprocket token...');
+      
       // If token is valid, return it
       if (this.isTokenValid()) {
+        console.log('[TOKEN MANAGER] ✅ Using cached token (still valid)');
         return this.token;
       }
 
+      console.log('[TOKEN MANAGER] ⏳ Cached token invalid or expired, need to refresh');
+
       // If already refreshing, wait for refresh to complete
       if (this.isRefreshing) {
+        console.log('[TOKEN MANAGER] ⏳ Token refresh in progress, waiting...');
         return await this.refreshPromise;
       }
 
       // Fetch new token
+      console.log('[TOKEN MANAGER] 🔄 Initiating new token refresh...');
       return await this.refreshToken();
     } catch (error) {
-      console.error('❌ Token Manager Error:', error.message);
+      console.error('[TOKEN MANAGER] ❌ Token Manager Error:', error.message);
       throw new Error('Failed to get Shiprocket token: ' + error.message);
     }
   }
@@ -82,7 +89,10 @@ class ShiprocketTokenManager {
    */
   async _performTokenRefresh() {
     try {
-      console.log('🔄 Refreshing Shiprocket token...');
+      console.log('[TOKEN MANAGER] 🔄 PERFORMING token refresh...');
+      console.log('[TOKEN MANAGER] 📧 Email:', SHIPROCKET_CONFIG.email ? '✓ Set' : '❌ NOT SET');
+      console.log('[TOKEN MANAGER] 🔑 Password:', SHIPROCKET_CONFIG.password ? '✓ Set' : '❌ NOT SET');
+      console.log('[TOKEN MANAGER] 🌐 Endpoint:', SHIPROCKET_CONFIG.endpoints.AUTH_LOGIN);
 
       const response = await shiprocketAxios.post(
         SHIPROCKET_CONFIG.endpoints.AUTH_LOGIN,
@@ -92,7 +102,14 @@ class ShiprocketTokenManager {
         }
       );
 
+      console.log('[TOKEN MANAGER] 📥 Auth response received:', {
+        hasToken: !!response.data?.token,
+        message: response.data?.message,
+        expiryTime: response.data?.expires_in
+      });
+
       if (!response.data || !response.data.token) {
+        console.error('[TOKEN MANAGER] ❌ Invalid token response:', response.data);
         throw new Error('Invalid token response from Shiprocket');
       }
 
@@ -100,14 +117,16 @@ class ShiprocketTokenManager {
       this.token = response.data.token;
       this.expiryTime = Date.now() + SHIPROCKET_CONFIG.tokenExpiry;
 
-      console.log('✅ Shiprocket token refreshed successfully');
-      console.log(`   Token valid until: ${new Date(this.expiryTime).toISOString()}`);
+      console.log('[TOKEN MANAGER] ✅ Token refreshed successfully');
+      console.log(`[TOKEN MANAGER] ⏰ Token valid until: ${new Date(this.expiryTime).toISOString()}`);
 
       return this.token;
     } catch (error) {
-      console.error('❌ Token refresh failed:', {
+      console.error('[TOKEN MANAGER] ❌ Token refresh failed:', {
         message: error.message,
-        response: error.response?.data
+        status: error.response?.status,
+        data: error.response?.data,
+        endpoint: SHIPROCKET_CONFIG.endpoints.AUTH_LOGIN
       });
       throw error;
     }

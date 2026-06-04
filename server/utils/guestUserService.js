@@ -7,23 +7,36 @@ const findOrCreateGuestUser = async (sessionId, req = {}) => {
   let user = await User.findOne({ guestSessionId: sessionId, userType: 'guest' });
 
   if (!user) {
-    user = await User.create({
-      userType: 'guest',
-      isGuest: true,
-      guestSessionId: sessionId,
-      firstSeenAt: new Date(),
-      lastSeenAt: new Date(),
-      activityLog: [],
-      stats: {
-        totalCartActions: 0,
-        totalOrders: 0,
-        totalLogins: 0,
-        lastActivityAt: new Date()
-      }
-    });
+    // Generate a unique phone identifier for guest (so unique index doesn't conflict)
+    const guestPhone = `guest_${sessionId}`;
+    
+    try {
+      user = await User.create({
+        userType: 'guest',
+        isGuest: true,
+        guestSessionId: sessionId,
+        phone: guestPhone,  // Assign unique guest phone
+        firstSeenAt: new Date(),
+        lastSeenAt: new Date(),
+        activityLog: [],
+        stats: {
+          totalCartActions: 0,
+          totalOrders: 0,
+          totalLogins: 0,
+          lastActivityAt: new Date()
+        }
+      });
 
-    await logUserActivity(user, 'GUEST_SESSION_STARTED', { sessionId }, req);
-    return user;
+      await logUserActivity(user, 'GUEST_SESSION_STARTED', { sessionId }, req);
+      return user;
+    } catch (error) {
+      if (error.code === 11000 && error.keyPattern?.guestSessionId) {
+        // Race condition: session was created in parallel, fetch it
+        user = await User.findOne({ guestSessionId: sessionId, userType: 'guest' });
+        return user;
+      }
+      throw error;
+    }
   }
 
   user.lastSeenAt = new Date();

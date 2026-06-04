@@ -156,17 +156,28 @@ router.post('/verify', async (req, res) => {
     }
     
     console.log('✅ Payment verified successfully for order:', orderId);
+    console.log('📋 Order details before Shiprocket call:', {
+      orderId: order.orderId,
+      customer: order.customer?.name,
+      itemCount: order.items?.length,
+      total: order.pricing?.total,
+      paymentMethod: order.paymentMethod,
+      shippingAddress: order.shippingAddress?.city
+    });
 
     // 🚀 Create Shiprocket shipment order
     try {
-      console.log('📦 Creating Shiprocket shipment for order:', orderId);
+      console.log('📦 STARTING: Creating Shiprocket shipment for order:', orderId);
+      console.log('🔍 Calling shippingService.createShipment()...');
       const shiprocketResult = await shippingService.createShipment(order.toObject());
+      console.log('📦 RESPONSE from shippingService.createShipment():', shiprocketResult);
       
-      if (shiprocketResult.success) {
-        console.log('✅ Shiprocket shipment created successfully:', {
+      if (shiprocketResult && shiprocketResult.success) {
+        console.log('✅ SUCCESS: Shiprocket shipment created successfully:', {
           orderId,
           shiprocketOrderId: shiprocketResult.shiprocketOrderId,
-          shipmentId: shiprocketResult.shipmentId
+          shipmentId: shiprocketResult.shipmentId,
+          message: shiprocketResult.message
         });
 
         await appendOrderLog(orderId, 'SHIPMENT_CREATED', {
@@ -174,17 +185,30 @@ router.post('/verify', async (req, res) => {
           shipmentId: shiprocketResult.shipmentId
         }, 'shiprocket');
       } else {
-        console.warn('⚠️ Shiprocket shipment creation failed:', shiprocketResult.message);
+        console.warn('⚠️ FAILED: Shiprocket shipment creation failed:', {
+          orderId,
+          message: shiprocketResult?.message,
+          error: shiprocketResult?.error,
+          fullResponse: shiprocketResult
+        });
         // Don't fail the payment verification, just log the warning
         await appendOrderLog(orderId, 'SHIPMENT_CREATION_FAILED', {
-          error: shiprocketResult.message
+          error: shiprocketResult?.message || 'Unknown error',
+          fullResponse: shiprocketResult
         }, 'shiprocket');
       }
     } catch (shiprocketError) {
-      console.error('❌ Error creating Shiprocket shipment:', shiprocketError.message);
+      console.error('❌ EXCEPTION: Error creating Shiprocket shipment:', {
+        orderId,
+        message: shiprocketError.message,
+        error: shiprocketError.error,
+        stack: shiprocketError.stack,
+        fullError: shiprocketError
+      });
       // Don't fail the payment verification, just log the error
       await appendOrderLog(orderId, 'SHIPMENT_CREATION_ERROR', {
-        error: shiprocketError.message || shiprocketError.toString()
+        error: shiprocketError.message || shiprocketError.toString(),
+        fullError: shiprocketError
       }, 'shiprocket');
     }
 

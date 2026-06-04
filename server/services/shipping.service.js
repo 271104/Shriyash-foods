@@ -132,7 +132,11 @@ class ShippingService {
    */
   async createShipment(orderData) {
     try {
+      console.log('[SHIPPING SERVICE] 🔄 Starting createShipment for order:', orderData.orderId);
+      
+      console.log('[SHIPPING SERVICE] 🔐 Getting Shiprocket token...');
       const token = await tokenManager.getToken();
+      console.log('[SHIPPING SERVICE] ✅ Token obtained successfully');
 
       // Build Shiprocket order payload
       const payload = {
@@ -180,6 +184,16 @@ class ShippingService {
         }
       };
 
+      console.log('[SHIPPING SERVICE] 📦 Payload being sent to Shiprocket API:', {
+        orderId: payload.order_id,
+        customer: payload.customer_name,
+        city: payload.shipping_city,
+        itemCount: payload.line_items.length,
+        amount: payload.billing_amount,
+        paymentMethod: payload.payment_method
+      });
+
+      console.log('[SHIPPING SERVICE] 🚀 Calling Shiprocket API endpoint:', SHIPROCKET_CONFIG.endpoints.ORDER_CREATE);
       const response = await shiprocketAxios.post(
         SHIPROCKET_CONFIG.endpoints.ORDER_CREATE,
         payload,
@@ -190,12 +204,21 @@ class ShippingService {
         }
       );
 
+      console.log('[SHIPPING SERVICE] 📥 Response received from Shiprocket:', {
+        success: response.data.success,
+        message: response.data.message,
+        orderId: response.data.data?.order_id,
+        shipmentId: response.data.data?.shipment_id
+      });
+
       if (!response.data.success) {
+        console.error('[SHIPPING SERVICE] ❌ Shiprocket returned success=false:', response.data.message);
         throw new Error(response.data.message || 'Failed to create order');
       }
 
       const data = response.data.data;
 
+      console.log('[SHIPPING SERVICE] 💾 Updating MongoDB with Shiprocket IDs...');
       // Save to MongoDB
       await Order.findOneAndUpdate(
         { orderId: orderData.orderId },
@@ -211,7 +234,9 @@ class ShippingService {
         },
         { new: true }
       );
+      console.log('[SHIPPING SERVICE] ✅ MongoDB updated successfully');
 
+      console.log('[SHIPPING SERVICE] ✅ Shipment created successfully for order:', orderData.orderId);
       return {
         success: true,
         shiprocketOrderId: data.order_id,
@@ -219,11 +244,17 @@ class ShippingService {
         message: 'Shipment created successfully'
       };
     } catch (error) {
-      console.error('Create shipment error:', error.message);
+      console.error('[SHIPPING SERVICE] ❌ Error in createShipment:', {
+        orderId: orderData.orderId,
+        message: error.message,
+        response: error.response?.data,
+        stack: error.stack
+      });
       throw {
         success: false,
         message: 'Failed to create shipment',
-        error: error.message
+        error: error.message,
+        details: error.response?.data
       };
     }
   }

@@ -86,15 +86,23 @@ router.get('/', optional, async (req, res) => {
 router.post('/add', optional, async (req, res) => {
   try {
     const { productId, variant, quantity } = req.body;
+    console.log('🛒 [CART] POST /add request received:', { productId, variant, quantity });
+    
     const { customerType, user, guestUser, sessionId } = await getCustomerContext(req);
+    console.log('🛒 [CART] Customer context:', { customerType, sessionId, userId: user?._id });
 
     const product = await Product.findById(productId);
     if (!product) {
+      console.error('🛒 [CART] Product not found:', productId);
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
+    console.log('🛒 [CART] Product found:', { name: product.name, variants: product.variants.length });
+    console.log('🛒 [CART] Product variants:', product.variants.map(v => ({ weight: v.weight, price: v.price })));
 
     const variantData = product.variants.find((v) => v.weight === variant);
+    console.log('🛒 [CART] Looking for variant:', { looking: variant, found: !!variantData });
     if (!variantData) {
+      console.error('🛒 [CART] Invalid variant:', { requested: variant, available: product.variants.map(v => v.weight) });
       return res.status(400).json({ success: false, message: 'Invalid variant' });
     }
 
@@ -163,7 +171,11 @@ router.post('/add', optional, async (req, res) => {
 
     res.json({ success: true, cart });
   } catch (error) {
-    console.error('Add to cart error:', error);
+    console.error('🛒 [CART] Add to cart error:', {
+      message: error.message,
+      stack: error.stack,
+      received: { productId: req.body.productId, variant: req.body.variant, quantity: req.body.quantity }
+    });
     res.status(500).json({ success: false, message: error.message });
   }
 });

@@ -48,7 +48,7 @@ const MyOrders = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await axios.get('/api/orders');
+      const { data } = await axios.get('/orders');
       setOrders(data.orders || []);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load orders');

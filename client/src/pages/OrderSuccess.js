@@ -15,7 +15,7 @@ const OrderSuccess = () => {
 
   const fetchOrder = async () => {
     try {
-      const { data } = await axios.get(`/api/orders/${orderId}`);
+      const { data } = await axios.get(`/orders/${orderId}`);
       setOrder(data.order);
     } catch (error) {
       console.error('Error fetching order:', error);

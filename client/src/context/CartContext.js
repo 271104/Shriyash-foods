@@ -43,7 +43,7 @@ export const CartProvider = ({ children }) => {
         headers['x-session-id'] = getSessionId();
       }
       
-      const { data } = await axios.get('/api/cart', { headers });
+      const { data } = await axios.get('/cart', { headers });
       setCart(data.cart || { items: [] });
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -70,7 +70,7 @@ export const CartProvider = ({ children }) => {
         headers['x-session-id'] = getSessionId();
       }
       
-      const { data } = await axios.post('/api/cart/add', {
+      const { data } = await axios.post('/cart/add', {
         productId,
         variant,
         quantity
@@ -97,7 +97,7 @@ export const CartProvider = ({ children }) => {
         headers['x-session-id'] = getSessionId();
       }
       
-      const { data } = await axios.delete(`/api/cart/remove/${itemId}`, { headers });
+      const { data } = await axios.delete(`/cart/remove/${itemId}`, { headers });
       setCart(data.cart);
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -121,7 +121,7 @@ export const CartProvider = ({ children }) => {
         headers['x-session-id'] = getSessionId();
       }
       
-      const { data } = await axios.put(`/api/cart/update/${itemId}`, { quantity }, { headers });
+      const { data } = await axios.put(`/cart/update/${itemId}`, { quantity }, { headers });
       setCart(data.cart);
     } catch (error) {
       console.error('Error updating cart quantity:', error);
@@ -141,7 +141,7 @@ export const CartProvider = ({ children }) => {
         headers['x-session-id'] = getSessionId();
       }
       
-      await axios.delete('/api/cart/clear', { headers });
+      await axios.delete('/cart/clear', { headers });
       setCart({ items: [] });
     } catch (error) {
       console.error('Error clearing cart:', error);
@@ -158,7 +158,7 @@ export const CartProvider = ({ children }) => {
       if (!sessionId) return;
 
       // Send merge request to backend
-      const { data } = await axios.post('/api/cart/merge-guest', {
+      const { data } = await axios.post('/cart/merge-guest', {
         sessionId
       });
 

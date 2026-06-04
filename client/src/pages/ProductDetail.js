@@ -23,7 +23,7 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const { data } = await axios.get(`/api/products/${slug}`);
+      const { data } = await axios.get(`/products/${slug}`);
       setProduct(data.product);
       setSelectedVariant(data.product.variants[0]);
     } catch (error) {

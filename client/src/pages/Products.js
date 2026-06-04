@@ -84,7 +84,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('/api/products');
+      const { data } = await axios.get('/products');
       setProducts(data.products?.length ? data.products : fallbackProducts);
     } catch (error) {
       console.error('Error fetching products:', error);

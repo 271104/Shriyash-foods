@@ -21,7 +21,7 @@ const OrderDownloads = ({ order }) => {
 
       // Otherwise, generate new invoice
       const response = await axios.post(
-        `/api/shipping/generate-invoice`,
+        `/shipping/generate-invoice`,
         { orderId: order.orderId },
         { responseType: 'blob' }
       );
@@ -58,7 +58,7 @@ const OrderDownloads = ({ order }) => {
 
       // Otherwise, generate new label
       const response = await axios.post(
-        `/api/shipping/generate-label`,
+        `/shipping/generate-label`,
         { orderId: order.orderId },
         { responseType: 'blob' }
       );

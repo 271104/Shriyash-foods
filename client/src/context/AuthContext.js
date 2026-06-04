@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
           try {
             const refreshToken = localStorage.getItem('refreshToken');
             if (refreshToken) {
-              const { data } = await axios.post('/api/auth/refresh-token', {
+              const { data } = await axios.post('/auth/refresh-token', {
                 refreshToken
               });
               
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get('/api/auth/me');
+      const { data } = await axios.get('/auth/me');
       setUser(data.user);
       setIsAuthenticated(true);
     } catch (error) {
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
 
   const sendOTP = async (phone, purpose = 'login') => {
     try {
-      const { data } = await axios.post('/api/auth/send-otp', { 
+      const { data } = await axios.post('/auth/send-otp', { 
         phone, 
         purpose 
       });
@@ -117,7 +117,7 @@ export const AuthProvider = ({ children }) => {
 
   const verifyOTPAndLogin = async (phone, otp, purpose = 'login', guestData = null, userData = null) => {
     try {
-      const { data } = await axios.post('/api/auth/verify-otp', { 
+      const { data } = await axios.post('/auth/verify-otp', { 
         phone, 
         otp, 
         purpose,
@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Call logout API if user is authenticated
       if (isAuthenticated) {
-        await axios.post('/api/auth/logout');
+        await axios.post('/auth/logout');
       }
     } catch (error) {
       console.error('Logout API error:', error);
@@ -162,7 +162,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const { data } = await axios.put('/api/auth/profile', profileData);
+      const { data } = await axios.put('/auth/profile', profileData);
       setUser(data.user);
       return data;
     } catch (error) {
@@ -172,7 +172,7 @@ export const AuthProvider = ({ children }) => {
 
   const mergeGuestCart = async (guestCartItems) => {
     try {
-      const { data } = await axios.post('/api/auth/merge-guest-cart', {
+      const { data } = await axios.post('/auth/merge-guest-cart', {
         guestCartItems
       });
       return data;

@@ -42,7 +42,7 @@ const GuestTrackOrder = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post('/api/track-guest/send-otp', {
+      const response = await axios.post('/track-guest/send-otp', {
         phone,
         orderId
       });
@@ -71,7 +71,7 @@ const GuestTrackOrder = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post('/api/track-guest/verify-otp', {
+      const response = await axios.post('/track-guest/verify-otp', {
         phone,
         orderId,
         otp

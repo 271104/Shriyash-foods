@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { FiPackage, FiTruck, FiCheckCircle } from 'react-icons/fi';
+import { FiMapPin, FiPackage, FiTruck } from 'react-icons/fi';
 import './OrderTracking.css';
 
 const OrderTracking = () => {
   const { orderId } = useParams();
-  const [order, setOrder] = useState(null);
+  const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    fetchOrder();
+    fetchTracking();
   }, [orderId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchOrder = async () => {
+  const fetchTracking = async () => {
     try {
-      const { data } = await axios.get(`/api/orders/${orderId}`);
-      setOrder(data.order);
+      const { data } = await axios.get(`/orders/${orderId}/track`);
+      setTracking(data);
+      setErrorMessage('');
     } catch (error) {
-      console.error('Error fetching order:', error);
+      const message = error.response?.data?.message || 'Tracking details are not available right now';
+      setErrorMessage(message);
+      console.error('Error fetching tracking:', error);
     } finally {
       setLoading(false);
     }
@@ -32,89 +36,70 @@ const OrderTracking = () => {
     );
   }
 
-  if (!order) {
+  if (!tracking) {
     return (
       <div className="container" style={{ padding: '60px 0', textAlign: 'center' }}>
-        <h2>Order not found</h2>
+        <h2>{errorMessage || 'Tracking not found'}</h2>
       </div>
     );
   }
-
-  const statusSteps = [
-    { key: 'PENDING', label: 'Order Placed', icon: FiPackage },
-    { key: 'CONFIRMED', label: 'Confirmed', icon: FiCheckCircle },
-    { key: 'PROCESSING', label: 'Processing', icon: FiPackage },
-    { key: 'SHIPPED', label: 'Shipped', icon: FiTruck },
-    { key: 'DELIVERED', label: 'Delivered', icon: FiCheckCircle }
-  ];
-
-  const currentStepIndex = statusSteps.findIndex(step => step.key === order.orderStatus);
 
   return (
     <div className="order-tracking-page">
       <div className="container">
         <h1>Track Order</h1>
-        
+
         <div className="tracking-card">
           <div className="order-header">
             <div>
-              <h2>Order #{order.orderId}</h2>
-              <p>Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
+              <h2>Order #{tracking.orderId}</h2>
+              <p>AWB: {tracking.awbCode}</p>
             </div>
             <div className="order-status-badge">
-              {order.orderStatus}
+              {tracking.status || tracking.shippingStatus || 'Tracking'}
             </div>
           </div>
 
-          <div className="tracking-timeline">
-            {statusSteps.map((step, index) => {
-              const Icon = step.icon;
-              const isCompleted = index <= currentStepIndex;
-              const isCurrent = index === currentStepIndex;
-              
-              return (
-                <div key={step.key} className={`timeline-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}>
-                  <div className="step-icon">
-                    <Icon />
-                  </div>
-                  <div className="step-label">{step.label}</div>
-                  {index < statusSteps.length - 1 && <div className="step-line"></div>}
-                </div>
-              );
-            })}
+          <div className="tracking-info">
+            <p><strong>Status:</strong> {tracking.status || tracking.shippingStatus || 'Not updated yet'}</p>
+            <p><strong>Courier:</strong> {tracking.courier || 'Assigned'}</p>
+            {tracking.currentLocation && (
+              <p><strong>Current Location:</strong> {tracking.currentLocation}</p>
+            )}
+            {tracking.destination && (
+              <p><strong>Destination:</strong> {tracking.destination}</p>
+            )}
+            {tracking.eta && (
+              <p><strong>Expected Delivery:</strong> {tracking.eta}</p>
+            )}
+            {tracking.trackingUrl && (
+              <a href={tracking.trackingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+                Track on Shiprocket
+              </a>
+            )}
           </div>
 
-          {order.awbCode && (
-            <div className="tracking-info">
-              <p><strong>AWB Code:</strong> {order.awbCode}</p>
-              {order.trackingUrl && (
-                <a href={order.trackingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
-                  Track on Courier Website
-                </a>
-              )}
+          {tracking.activities?.length > 0 && (
+            <div className="order-details">
+              <h3>Shipment Activity</h3>
+              {tracking.activities.map((activity, index) => (
+                <div key={index} className="detail-item">
+                  <span>
+                    <FiPackage /> {activity.activity || activity.status || 'Shipment update'}
+                  </span>
+                  <span>{activity.date || activity.time || activity.timestamp || ''}</span>
+                </div>
+              ))}
             </div>
           )}
 
-          <div className="order-details">
-            <h3>Order Details</h3>
-            {order.items.map((item, index) => (
-              <div key={index} className="detail-item">
-                <span>{item.name} ({item.variant}) × {item.quantity}</span>
-                <span>₹{item.price * item.quantity}</span>
-              </div>
-            ))}
-            <div className="detail-total">
-              <span>Total</span>
-              <span>₹{order.pricing.total}</span>
-            </div>
-          </div>
-
           <div className="delivery-address">
-            <h3>Delivery Address</h3>
-            <p>{order.shippingAddress.fullName}</p>
-            <p>{order.shippingAddress.addressLine1}</p>
-            {order.shippingAddress.addressLine2 && <p>{order.shippingAddress.addressLine2}</p>}
-            <p>{order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}</p>
+            <h3><FiTruck /> Shipment Details</h3>
+            <p>Order ID: {tracking.orderId}</p>
+            <p>AWB Code: {tracking.awbCode}</p>
+            {tracking.currentLocation && (
+              <p><FiMapPin /> {tracking.currentLocation}</p>
+            )}
           </div>
         </div>
       </div>

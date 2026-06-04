@@ -47,7 +47,7 @@ const OTPVerification = ({ phone, onVerified, onCancel }) => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/otp/verify', {
+      const { data } = await axios.post('/otp/verify', {
         phone,
         otp: otpValue
       });
@@ -70,7 +70,7 @@ const OTPVerification = ({ phone, onVerified, onCancel }) => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/otp/resend', { phone });
+      const { data } = await axios.post('/otp/resend', { phone });
       if (data.success) {
         toast.success('OTP resent successfully!');
         setResendTimer(60);

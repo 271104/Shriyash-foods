@@ -99,7 +99,7 @@ const Checkout = () => {
 
     setPincodeChecking(true);
     try {
-      const { data } = await axios.get('/api/shipping/serviceability', {
+      const { data } = await axios.get('/shipping/serviceability', {
         params: {
           pickup_postcode: '413005',
           delivery_postcode: formData.pincode,
@@ -223,11 +223,11 @@ const Checkout = () => {
         } : null
       };
 
-      const { data } = await axios.post('/api/orders/create', orderData);
+      const { data } = await axios.post('/orders/create', orderData);
 
       if (formData.paymentMethod === 'PREPAID') {
         // Initiate Razorpay payment
-        const paymentData = await axios.post('/api/payment/create-order', {
+        const paymentData = await axios.post('/payment/create-order', {
           orderId: data.order.orderId,
           amount: data.order.pricing.total
         });
@@ -247,7 +247,7 @@ const Checkout = () => {
           theme: { color: '#24470b' },
           handler: async function (response) {
             try {
-              const verifyResponse = await axios.post('/api/payment/verify', {
+              const verifyResponse = await axios.post('/payment/verify', {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
@@ -265,7 +265,7 @@ const Checkout = () => {
               toast.error(error.response?.data?.message || 'Payment verification failed');
               // Record the failed payment
               try {
-                await axios.post('/api/payment/failed', {
+                await axios.post('/payment/failed', {
                   orderId: data.order.orderId,
                   error: error.message
                 });
@@ -296,7 +296,7 @@ const Checkout = () => {
           toast.error(`Payment failed: ${response.error.description || response.error.reason}`);
           setLoading(false);
           // Record the failed payment
-          axios.post('/api/payment/failed', {
+          axios.post('/payment/failed', {
             orderId: data.order.orderId,
             error: response.error.description
           }).catch(e => console.error('Failed to record payment error:', e));

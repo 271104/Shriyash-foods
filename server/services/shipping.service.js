@@ -227,25 +227,31 @@ class ShippingService {
         '\n=========================================================\n'
       );
 
-      // if (!response.data.success) {
-      //   console.error('[SHIPPING SERVICE] ❌ Shiprocket returned success=false:', response.data.message);
-      //   throw new Error(response.data.message || 'Failed to create order');
-      // }
-
       console.log(
         '[SHIPROCKET] Response keys:',
         Object.keys(response.data || {})
       );
 
-      const data = response.data.data;
+      // Shiprocket adhoc API returns data directly
+      const data = response.data;
+
+      // Validate response
+      if (!data.order_id) {
+        throw new Error('Shiprocket order creation failed - order_id not returned');
+      }
 
       console.log('[SHIPPING SERVICE] 💾 Updating MongoDB with Shiprocket IDs...');
-      // Save to MongoDB
+
       await Order.findOneAndUpdate(
         { orderId: orderData.orderId },
         {
-          shiprocketOrderId: data.order_id,
-          shiprocketShipmentId: data.shipment_id,
+          shiprocketOrderId: String(data.order_id),
+          shiprocketShipmentId: String(data.shipment_id),
+          awbCode: data.awb_code || '',
+          courierName: data.courier_name || '',
+
+          shippingStatus: 'AWB_ASSIGNED',
+
           $push: {
             statusHistory: {
               status: 'SHIPMENT_CREATED',
@@ -255,30 +261,16 @@ class ShippingService {
         },
         { new: true }
       );
+
       console.log('[SHIPPING SERVICE] ✅ MongoDB updated successfully');
 
-      console.log('[SHIPPING SERVICE] ✅ Shipment created successfully for order:', orderData.orderId);
-      return {
-        success: true,
-        shiprocketOrderId: data.order_id,
-        shipmentId: data.shipment_id,
-        message: 'Shipment created successfully'
-      };
-    } catch (error) {
-      console.error('[SHIPPING SERVICE] ❌ Error in createShipment:', {
-        orderId: orderData.orderId,
-        message: error.message,
-        response: error.response?.data,
-        stack: error.stack
-      });
-      throw {
-        success: false,
-        message: 'Failed to create shipment',
-        error: error.message,
-        details: error.response?.data
-      };
-    }
-  }
+      console.log('[SHIPPING SERVICE] ✅ Shiprocket Order ID:', data.order_id);
+      console.log('[SHIPPING SERVICE] ✅ Shipment ID:', data.shipment_id);
+      console.log('[SHIPPING SERVICE] ✅ AWB Code:', data.awb_code);
+      console.log('[SHIPPING SERVICE] ✅ Courier:', data.courier_name);
+
+
+ 
 
   /**
    * COURIER ASSIGNMENT & AWB

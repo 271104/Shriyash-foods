@@ -221,17 +221,21 @@ class ShippingService {
         }
       );
 
-      console.log('[SHIPPING SERVICE] 📥 Response received from Shiprocket:', {
-        success: response.data.success,
-        message: response.data.message,
-        orderId: response.data.data?.order_id,
-        shipmentId: response.data.data?.shipment_id
-      });
+      console.log(
+        '\n================ SHIPROCKET RAW RESPONSE ================\n',
+        JSON.stringify(response.data, null, 2),
+        '\n=========================================================\n'
+      );
 
-      if (!response.data.success) {
-        console.error('[SHIPPING SERVICE] ❌ Shiprocket returned success=false:', response.data.message);
-        throw new Error(response.data.message || 'Failed to create order');
-      }
+      // if (!response.data.success) {
+      //   console.error('[SHIPPING SERVICE] ❌ Shiprocket returned success=false:', response.data.message);
+      //   throw new Error(response.data.message || 'Failed to create order');
+      // }
+
+      console.log(
+        '[SHIPROCKET] Response keys:',
+        Object.keys(response.data || {})
+      );
 
       const data = response.data.data;
 

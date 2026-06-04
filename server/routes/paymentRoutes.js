@@ -214,6 +214,12 @@ router.post('/verify', async (req, res) => {
                 courierName: awbResult.courierName,
                 shipmentId: awbResult.shipmentId,
                 message: 'AWB assigned successfully'
+              },
+
+              statusHistory: {
+                status: 'AWB_ASSIGNED',
+                note: `AWB assigned: ${awbResult.awbCode}`,
+                source: 'shiprocket'
               }
             }
           }
@@ -231,7 +237,13 @@ router.post('/verify', async (req, res) => {
                 courierName: awbResult.courierName,
                 shipmentId: awbResult.shipmentId,
                 message: pickupResult.message
+              },
+              statusHistory: {
+                status: 'PICKUP_GENERATED',
+                note: 'Pickup generated successfully',
+                source: 'shiprocket'
               }
+
             }
           }
         );

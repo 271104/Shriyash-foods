@@ -347,15 +347,23 @@ router.get('/:orderId/track', async (req, res) => {
         order.awbCode
       );
 
-    return res.json({
-      success: true,
-      orderId: order.orderId,
-      awbCode: order.awbCode,
-      courier: order.courierName,
-      tracking
-    });
+      return res.json({
+        success: true,
+        orderId: order.orderId,
+        awbCode: order.awbCode,
+        courier: order.courierName,
+        shippingStatus: order.shippingStatus,
 
-  } catch (error) {
+        trackingUrl: tracking.trackUrl,
+        status: tracking.status,
+        statusCode: tracking.statusCode,
+        currentLocation: tracking.currentLocation,
+        destination: tracking.destination,
+        eta: tracking.eta,
+
+        activities: tracking.activities
+      });
+    } catch (error) {
     console.error(
       '[TRACK ORDER ERROR]',
       error

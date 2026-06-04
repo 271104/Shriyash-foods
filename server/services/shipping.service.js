@@ -452,6 +452,7 @@ class ShippingService {
   async trackShipment(awbCode) {
     try {
       const token = await tokenManager.getToken();
+      console.log('📍 Tracking AWB:', awbCode);
 
       const response = await shiprocketAxios.get(
         SHIPROCKET_CONFIG.endpoints.TRACKING_DATA,
@@ -470,13 +471,11 @@ class ShippingService {
         JSON.stringify(response.data, null, 2)
       );
 
-      if (
-        response.data?.tracking_data?.track_status !== 1
-      ) {
-        throw new Error('Shipment not found or tracking unavailable');
-      }
+      const tracking = response.data?.tracking_data;
 
-      const tracking = response.data?.tracking_data || {};
+      if (!tracking) {
+        throw new Error('Tracking data not found');
+      }
 
       const shipment =
         tracking.shipment_track?.[0] || {};
@@ -515,8 +514,15 @@ class ShippingService {
 
           eta: tracking.etd
         };
-    } catch (error) {
-      console.error('Track shipment error:', error.message);
+    } 
+    catch (error) {
+      console.error('🚨 TRACK FULL ERROR:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        awbCode
+      });
+
       throw {
         success: false,
         message: 'Failed to track shipment',

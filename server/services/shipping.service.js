@@ -330,17 +330,22 @@ class ShippingService {
           }
         }
       );
-
       console.log(
         '🚚 AWB RAW RESPONSE:',
         JSON.stringify(response.data, null, 2)
       );
 
-      if (!response.data.success) {
-        throw new Error(response.data.message || 'Failed to assign AWB');
+      const data = response.data?.response?.data;
+
+      if (!data || !data.awb_code) {
+        throw new Error('AWB code not returned by Shiprocket');
       }
 
-      const data = response.data.data;
+      console.log('[AWB] Parsed Data:', {
+        awbCode: data.awb_code,
+        shipmentId: data.shipment_id,
+        courierName: data.courier_name
+      });
 
       return {
         success: true,
@@ -357,6 +362,12 @@ class ShippingService {
         status: error.response?.status,
         shipmentId
       });
+        throw {
+        success: false,
+        message: 'Failed to assign AWB',
+        error: error.message,
+        details: error.response?.data
+      };
  
     }
   }

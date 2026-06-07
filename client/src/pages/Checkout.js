@@ -18,6 +18,8 @@ const Checkout = () => {
   const [serviceable, setServiceable] = useState(null);
   const [shippingQuote, setShippingQuote] = useState(null);
   const [selectedCourier, setSelectedCourier] = useState(null);
+  const [serviceabilityQuote, setServiceabilityQuote] = useState(null);
+  const [deliveryEstimate, setDeliveryEstimate] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isGuestCheckout, setIsGuestCheckout] = useState(false);
   const [guestVerificationToken, setGuestVerificationToken] = useState('');
@@ -54,6 +56,57 @@ const Checkout = () => {
     return Math.max(weight, 0.5);
   };
 
+  const getCourierCharge = (courier, paymentMethod = formData.paymentMethod) => {
+    const freight = Number(courier.freightCharges);
+    const codCharge = paymentMethod === 'COD' ? Number(courier.codCharges) || 0 : 0;
+
+    return freight + codCharge;
+  };
+
+  const getCourierDeliveryEstimate = (courier, fallbackEstimate) => {
+    return (
+      courier?.estimatedDeliveryDate ||
+      courier?.estimatedDeliveryDays ||
+      courier?.etaDeliveryDays ||
+      courier?.etd ||
+      fallbackEstimate ||
+      ''
+    );
+  };
+
+  const formatDeliveryEstimate = (estimate) => {
+    if (!estimate) return '';
+
+    const numericEstimate = Number(estimate);
+    if (Number.isFinite(numericEstimate) && numericEstimate > 0) {
+      return `${numericEstimate} ${numericEstimate === 1 ? 'day' : 'days'}`;
+    }
+
+    return String(estimate).replace(/business days/i, 'days');
+  };
+
+  const applyShippingQuoteForPayment = (couriers, paymentMethod, fallbackEstimate = '') => {
+    const cheapestCourier = couriers
+      ?.filter(courier => Number.isFinite(Number(courier.freightCharges)) && getCourierCharge(courier, paymentMethod) > 0)
+      .sort((a, b) => getCourierCharge(a, paymentMethod) - getCourierCharge(b, paymentMethod))[0];
+    const isServiceable = Boolean(cheapestCourier);
+
+    setServiceable(isServiceable);
+    setSelectedCourier(cheapestCourier || null);
+    setShippingQuote(
+      isServiceable && cheapestCourier
+        ? Math.ceil(getCourierCharge(cheapestCourier, paymentMethod))
+        : null
+    );
+    setDeliveryEstimate(
+      isServiceable
+        ? formatDeliveryEstimate(getCourierDeliveryEstimate(cheapestCourier, fallbackEstimate))
+        : ''
+    );
+
+    return { isServiceable, cheapestCourier };
+  };
+
   useEffect(() => {
     if (cartItems.length === 0) {
       navigate('/cart');
@@ -84,10 +137,20 @@ const Checkout = () => {
 
     setFormData({ ...formData, [name]: nextValue });
 
-    if (name === 'pincode' || name === 'paymentMethod') {
+    if (name === 'pincode') {
       setServiceable(null);
       setShippingQuote(null);
       setSelectedCourier(null);
+      setServiceabilityQuote(null);
+      setDeliveryEstimate('');
+    }
+
+    if (name === 'paymentMethod' && serviceabilityQuote?.couriers?.length) {
+      applyShippingQuoteForPayment(
+        serviceabilityQuote.couriers,
+        nextValue,
+        serviceabilityQuote.estimatedDays
+      );
     }
   };
 
@@ -104,31 +167,22 @@ const Checkout = () => {
           pickup_postcode: '413005',
           delivery_postcode: formData.pincode,
           weight: getCartWeight(),
-          cod: formData.paymentMethod === 'COD' ? 1 : 0
+          cod: 1
         }
       });
 
-      const getCourierCharge = (courier) => {
-        const freight = Number(courier.freightCharges);
-        const codCharge = formData.paymentMethod === 'COD' ? Number(courier.codCharges) || 0 : 0;
-
-        return freight + codCharge;
-      };
-      const cheapestCourier = data.couriers
-        ?.filter(courier => Number.isFinite(Number(courier.freightCharges)) && getCourierCharge(courier) > 0)
-        .sort((a, b) => getCourierCharge(a) - getCourierCharge(b))[0];
-      const isServiceable = Boolean((data.serviceable ?? (data.couriers?.length > 0)) && cheapestCourier);
-
-      setServiceable(isServiceable);
-      setSelectedCourier(cheapestCourier || null);
-      setShippingQuote(
-        isServiceable && cheapestCourier
-          ? Math.ceil(getCourierCharge(cheapestCourier))
-          : null
+      setServiceabilityQuote(data);
+      const { isServiceable, cheapestCourier } = applyShippingQuoteForPayment(
+        data.couriers,
+        formData.paymentMethod,
+        data.estimatedDays
       );
 
       if (isServiceable) {
-        toast.success('✓ Delivery available in 3-5 days');
+        const estimate = formatDeliveryEstimate(
+          getCourierDeliveryEstimate(cheapestCourier, data.estimatedDays)
+        );
+        toast.success(`Delivery available${estimate ? ` in ${estimate}` : ''}`);
       } else {
         toast.error('Sorry, we don\'t deliver to this pincode yet');
       }
@@ -471,7 +525,10 @@ const Checkout = () => {
                   
                   {serviceable === true && (
                     <div className="serviceable-msg">
-                      <FiCheckCircle /> Delivery available in 3-5 days
+                      <FiCheckCircle />
+                      {deliveryEstimate
+                        ? `Delivery available in ${deliveryEstimate}`
+                        : 'Delivery available'}
                     </div>
                   )}
 
@@ -614,3 +671,4 @@ const Checkout = () => {
 };
 
 export default Checkout;
+

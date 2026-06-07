@@ -81,6 +81,20 @@ class ShippingService {
 
         return null;
       };
+      const getEstimate = (courier) => {
+        return (
+          courier.etd ||
+          courier.estimatedDeliveryDays ||
+          courier.estimatedDeliveryDate ||
+          courier.estimated_delivery_days ||
+          courier.estimated_delivery_date ||
+          courier.eta_delivery_days ||
+          courier.etaDeliveryDays ||
+          courier.delivery_performance ||
+          courier.estimated_delivery ||
+          ''
+        );
+      };
       const mappedCouriers = couriers.map(courier => ({
         id: courier.id,
         name: courier.name || courier.courier_name || courier.company_name,
@@ -95,7 +109,8 @@ class ShippingService {
         ),
         codCharges: Number(courier.cod_charges || courier.cod_charge || 0),
         etd: courier.etd,
-        etaDeliveryDays: courier.etaDeliveryDays
+        estimatedDeliveryDays: getEstimate(courier),
+        estimatedDeliveryDate: courier.estimated_delivery_date || courier.eta || ''
       }));
       const cheapestCourier = mappedCouriers
         .filter(courier => Number.isFinite(Number(courier.freightCharges)) && Number(courier.freightCharges) > 0)
@@ -108,7 +123,12 @@ class ShippingService {
         cheapestCourier,
         couriers: mappedCouriers.filter(courier => Number.isFinite(Number(courier.freightCharges)) && Number(courier.freightCharges) > 0),
         codAvailable: mappedCouriers.length > 0 && cod === 1,
-        estimatedDays: courierData.etaDeliveryDays || '3-5 business days'
+        estimatedDays:
+          getEstimate(cheapestCourier || {}) ||
+          courierData.etaDeliveryDays ||
+          courierData.estimated_delivery_days ||
+          courierData.etd ||
+          ''
       };
     } catch (error) {
       console.error('Serviceability check error:', error.message);

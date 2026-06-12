@@ -120,28 +120,28 @@ const Home = () => {
           <div className="hero-value-props">
             <div className="value-prop">
               <div className="value-icon">
-                🤝
+                <img src="/icons/Layer8.png" alt="Bridge between farmers and families" />
               </div>
               <p>At Shriyash Foods, we are building a bridge between hardworking farmers and health-conscious families across the world.</p>
             </div>
             
             <div className="value-prop">
               <div className="value-icon">
-                🌾
+                <img src="/icons/Layer9.png" alt="Fresh farm produce" />
               </div>
               <p>By transforming fresh farm produce into premium dehydrated products, we help preserve nature's nutrition with quality and care.</p>
             </div>
             
             <div className="value-prop">
               <div className="value-icon">
-                🌍
+                <img src="/icons/Layer11.png" alt="Sustainable food solutions" />
               </div>
               <p>Our vision is to create sustainable food solutions that support farmers, reduce wastage, and promote healthier lifestyles globally.</p>
             </div>
             
             <div className="value-prop">
               <div className="value-icon">
-                ✨
+                <img src="/icons/Layer22.png" alt="Innovation and authenticity" />
               </div>
               <p>With innovation, hygiene, and authenticity at our core, we are shaping the future of natural food - one product at a time.</p>
             </div>
@@ -165,28 +165,33 @@ const Home = () => {
       {/* Trust Badges */}
       <section className="trust-badges">
         <div className="trust-badge">
-          <div className="trust-icon">🍃</div>
+          <img className="trust-icon" src="/icons/Layer24.png" alt="" aria-hidden="true" />
           <div className="trust-text">
             <strong>100% Natural</strong>
             <span>Ingredients</span>
           </div>
         </div>
         <div className="trust-badge">
-          <div className="trust-icon">🤝</div>
+          <img
+            className="trust-icon"
+            src="/icons/supporting-farmers.png"
+            alt=""
+            aria-hidden="true"
+          />
           <div className="trust-text">
             <strong>Supporting</strong>
             <span>Farmers</span>
           </div>
         </div>
         <div className="trust-badge">
-          <div className="trust-icon">✨</div>
+          <img className="trust-icon" src="/icons/Layer23.png" alt="" aria-hidden="true" />
           <div className="trust-text">
             <strong>Hygienically</strong>
             <span>Processed</span>
           </div>
         </div>
         <div className="trust-badge">
-          <div className="trust-icon">🌱</div>
+          <img className="trust-icon" src="/icons/Layer22.png" alt="" aria-hidden="true" />
           <div className="trust-text">
             <strong>Sustainable</strong>
             <span>Food Vision</span>
@@ -335,3 +340,4 @@ const Home = () => {
 };
 
 export default Home;
+

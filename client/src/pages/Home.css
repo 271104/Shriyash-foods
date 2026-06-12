@@ -57,15 +57,19 @@
 }
 
 .value-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(36, 71, 11, 0.15);
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 28px;
+}
+
+.value-icon img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  display: block;
 }
 
 .value-prop p {
@@ -161,7 +165,11 @@
 }
 
 .trust-icon {
-  font-size: 32px;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  flex: 0 0 46px;
+  display: block;
 }
 
 .trust-text strong {
@@ -896,4 +904,3 @@
     text-align: center;
   }
 }
-

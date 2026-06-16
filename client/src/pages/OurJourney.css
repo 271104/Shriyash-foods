@@ -4,50 +4,15 @@
 
 /* Hero Section */
 .journey-hero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  padding: 0;
-  margin: 0;
-  text-align: center;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  min-height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.journey-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url('../../public/banner_our_journey.png');
+  background-image: url('/banner_our_journey.png');
   background-position: center;
   background-size: cover;
-  opacity: 1;
-  z-index: 0;
-}
-
-.journey-hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(74, 44, 12, 0.35);
-  z-index: 1;
-}
-
-.journey-hero .container {
-  position: relative;
-  z-index: 2;
-}
-
-.hero-subtitle {
-  font-size: 28px;
-  color: white;
-  opacity: 1;
-  font-style: italic;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  background-repeat: no-repeat;
+  padding: 0;
   margin: 0;
+  width: 100%;
+  min-height: 450px;
+  position: relative;
 }
 
 /* Journey Story */
@@ -109,7 +74,7 @@
 
 .story-image img {
   width: 100%;
-  max-width: 650px; /* Increased from 500px */
+  max-width: 750px;
   aspect-ratio: auto;
   object-fit: contain;
   border-radius: 16px;
@@ -199,17 +164,7 @@
 /* Responsive */
 @media (max-width: 968px) {
   .journey-hero {
-    font-size: 38px;
-    padding: 0;
-    margin: 0;
-  }
-
-  .journey-hero h1 {
-    font-size: 38px;
-  }
-
-  .hero-subtitle {
-    font-size: 20px;
+    min-height: 350px;
   }
 
   .story-content {
@@ -222,7 +177,7 @@
   }
 
   .story-image img {
-    max-width: 700px; /* Increased for tablet */
+    max-width: 100%;
     margin: 0 auto;
     display: block;
   }
@@ -236,16 +191,7 @@
 
 @media (max-width: 576px) {
   .journey-hero {
-    padding: 0;
-    margin: 0;
-  }
-
-  .journey-hero h1 {
-    font-size: 32px;
-  }
-
-  .hero-subtitle {
-    font-size: 18px;
+    min-height: 250px;
   }
 
   .journey-story,
@@ -280,11 +226,7 @@
 }
 
 @media (max-width: 380px) {
-  .journey-hero h1 {
-    font-size: 28px;
-  }
-
-  .hero-subtitle {
-    font-size: 16px;
+  .journey-hero {
+    min-height: 200px;
   }
 }

@@ -7,14 +7,17 @@ const categories = [
   {
     title: 'Vegetable Powders',
     images: ['/shop_by_Category/vegetable_powder.png'],
+    target: '/products#vegetables',
   },
   {
     title: 'Fruit Powders',
     images: ['/shop_by_Category/fruit_powder.png'],
+    target: '/products#fruits',
   },
   {
     title: 'Green Powders',
     images: ['/shop_by_Category/green_powder.png'],
+    target: '/products#green-powder',
   },
 ];
 
@@ -218,7 +221,7 @@ const Home = () => {
                   className={`category-item category-slide-${index} ${index === 0 ? 'category-item-active' : ''}`}
                   key={`${category.title}-${activeCategory}`}
                 >
-                  <Link to="/products" className="category-image-wrap">
+                  <Link to={category.target} className="category-image-wrap">
                     {category.images.map((src, index) => (
                       <img
                         src={src}
@@ -229,7 +232,7 @@ const Home = () => {
                     ))}
                   </Link>
                   <h3>{category.title}</h3>
-                  <Link to="/products" className="category-link">Shop Now -></Link>
+                  <Link to={category.target} className="category-link">Shop Now -></Link>
                 </article>
               ))}
             </div>

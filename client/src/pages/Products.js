@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Products.css';
 
@@ -54,13 +54,59 @@ const fallbackProducts = [
   },
 ];
 
+const categorySections = [
+  {
+    id: 'green-powder',
+    title: 'Green Powder',
+    description: 'Nutrient-rich green superfood powders.',
+    productKeys: ['moringa']
+  },
+  {
+    id: 'fruits',
+    title: 'Fruits',
+    description: 'Naturally sweet and wholesome fruit-based powders.',
+    productKeys: ['apple', 'banana', 'tomato', 'abc']
+  },
+  {
+    id: 'vegetables',
+    title: 'Vegetables',
+    description: 'Everyday vegetable powders for flavor and nutrition.',
+    productKeys: ['tomato', 'onion']
+  }
+];
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [highlightedCategory, setHighlightedCategory] = useState('');
+  const location = useLocation();
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (loading || !location.hash) return undefined;
+
+    const categoryId = location.hash.replace('#', '');
+    const target = document.getElementById(categoryId);
+
+    if (!target) return undefined;
+
+    const scrollTimer = setTimeout(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHighlightedCategory(categoryId);
+    }, 120);
+
+    const highlightTimer = setTimeout(() => {
+      setHighlightedCategory('');
+    }, 2600);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(highlightTimer);
+    };
+  }, [loading, location.hash, products]);
 
   useEffect(() => {
     const observerOptions = {
@@ -98,6 +144,54 @@ const Products = () => {
     return Math.round(((mrp - price) / mrp) * 100);
   };
 
+  const productMatchesKey = (product, key) => {
+    const searchable = `${product.slug || ''} ${product.name || ''}`.toLowerCase();
+    return searchable.includes(key);
+  };
+
+  const getCategoryProducts = (productKeys) => {
+    return productKeys
+      .map(key => products.find(product => productMatchesKey(product, key)))
+      .filter(Boolean);
+  };
+
+  const renderProductCard = (product, isHighlighted = false) => {
+    const variant = product.variants[0];
+    const discount = variant.mrp > variant.price ? calculateDiscount(variant.mrp, variant.price) : 0;
+
+    return (
+      <Link
+        to={`/products/${product.slug}`}
+        key={`${product._id}-${product.slug}`}
+        className={`product-card ${isHighlighted ? 'product-card-highlight' : ''}`}
+      >
+        {discount > 0 && (
+          <div className="product-badge">{discount}% OFF</div>
+        )}
+        <div className="product-image">
+          <img
+            src={product.images[0]?.url || '/placeholder.jpg'}
+            alt={product.name}
+          />
+        </div>
+        <div className="product-info">
+          <h3>{product.name}</h3>
+          <p className="product-desc">{product.description}</p>
+          <div className="product-price">
+            <span className="price">&#8377;{variant.price}</span>
+            {variant.mrp > variant.price && (
+              <>
+                <span className="mrp">&#8377;{variant.mrp}</span>
+                <span className="discount-badge">SAVE &#8377;{variant.mrp - variant.price}</span>
+              </>
+            )}
+          </div>
+          <button className="btn btn-primary btn-block">View Details &rarr;</button>
+        </div>
+      </Link>
+    );
+  };
+
   if (loading) {
     return (
       <div className="loading">
@@ -114,41 +208,28 @@ const Products = () => {
           <p className="subtitle">Handpicked health powders for your wellness journey</p>
         </div>
 
-        <div className="products-grid">
-          {products.map((product, index) => {
-            const variant = product.variants[0];
-            const discount = variant.mrp > variant.price ? calculateDiscount(variant.mrp, variant.price) : 0;
-            
+        <div className="product-categories">
+          {categorySections.map((category) => {
+            const categoryProducts = getCategoryProducts(category.productKeys);
+
+            if (categoryProducts.length === 0) return null;
+
             return (
-              <Link to={`/products/${product.slug}`} key={product._id} className="product-card">
-                {discount > 0 && (
-                  <div className="product-badge">{discount}% OFF</div>
-                )}
-                <div className="product-image">
-                  <img 
-                    src={product.images[0]?.url || '/placeholder.jpg'} 
-                    alt={product.name}
-                  />
+              <section className="product-category" id={category.id} key={category.title}>
+                <div className="category-heading">
+                  <h2>{category.title}</h2>
+                  <p>{category.description}</p>
                 </div>
-                <div className="product-info">
-                  <h3>{product.name}</h3>
-                  <p className="product-desc">{product.description}</p>
-                  <div className="product-price">
-                    <span className="price">₹{variant.price}</span>
-                    {variant.mrp > variant.price && (
-                      <>
-                        <span className="mrp">₹{variant.mrp}</span>
-                        <span className="discount-badge">SAVE ₹{variant.mrp - variant.price}</span>
-                      </>
-                    )}
-                  </div>
-                  <button className="btn btn-primary btn-block">View Details →</button>
+                <div className="products-grid">
+                  {categoryProducts.map((product) => renderProductCard(
+                    product,
+                    highlightedCategory === category.id
+                  ))}
                 </div>
-              </Link>
+              </section>
             );
           })}
         </div>
-
         {products.length === 0 && (
           <div className="no-products">
             <p>No products available at the moment</p>
@@ -160,3 +241,5 @@ const Products = () => {
 };
 
 export default Products;
+
+

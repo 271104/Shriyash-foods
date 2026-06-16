@@ -13,7 +13,15 @@ const OurJourney = () => {
 
   return (
     <div className="journey-page">
-      <section className="journey-hero">
+      <section 
+        className="journey-hero"
+        style={{
+          backgroundImage: 'url(/banner_our_journey.png)',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
       </section>
 
       <section className="journey-story">

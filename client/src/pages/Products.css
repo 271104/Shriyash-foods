@@ -228,6 +228,7 @@
   font-weight: 800;
   color: #24470b;
   letter-spacing: -0.5px;
+  text-decoration: none !important;
 }
 
 .mrp {

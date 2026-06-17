@@ -75,6 +75,7 @@
   font-size: 32px;
   font-weight: 700;
   color: var(--primary);
+  text-decoration: none !important;
 }
 
 .mrp {

@@ -185,11 +185,11 @@ const Products = () => {
           <h3>{product.name}</h3>
           <p className="product-desc">{product.description}</p>
           <div className="product-price">
-            <span className="price">&#8377;{variant.price}</span>
+            <span className="price">₹{variant.price}</span>
             {showStrikethrough && variant.mrp > variant.price && (
               <>
-                <span className="mrp">&#8377;{variant.mrp}</span>
-                <span className="discount-badge">SAVE &#8377;{variant.mrp - variant.price}</span>
+                <span className="mrp">₹{variant.mrp}</span>
+                <span className="discount-badge">SAVE ₹{variant.mrp - variant.price}</span>
               </>
             )}
           </div>

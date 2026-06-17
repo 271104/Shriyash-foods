@@ -65,9 +65,9 @@ const products = [
     description: 'Pure Moringa Powder - A nutrient-rich superfood packed with vitamins & minerals that supports overall wellness, improves energy naturally, and boosts immunity.',
     category: 'powder',
     variants: [
-      { weight: '100g', price: 249, mrp: 299, stock: 100, sku: 'MOR-100' },
-      { weight: '250g', price: 549, mrp: 649, stock: 100, sku: 'MOR-250' },
-      { weight: '500g', price: 999, mrp: 1199, stock: 100, sku: 'MOR-500' }
+      { weight: '150g', price: 199, mrp: 249, stock: 100, sku: 'MOR-150' },
+      { weight: '250g', price: 299, mrp: 349, stock: 100, sku: 'MOR-250' },
+      { weight: '500g', price: 499, mrp: 599, stock: 100, sku: 'MOR-500' }
     ],
     images: [{ url: '/moringa-removebg-preview.png' }],
     benefits: [
@@ -97,9 +97,9 @@ const products = [
     description: 'Natural Beetroot Powder - Rich in iron & antioxidants that helps boost immunity, supports stamina & blood circulation, and increases energy naturally.',
     category: 'powder',
     variants: [
-      { weight: '100g', price: 199, mrp: 249, stock: 100, sku: 'BEE-100' },
-      { weight: '250g', price: 449, mrp: 549, stock: 100, sku: 'BEE-250' },
-      { weight: '500g', price: 799, mrp: 999, stock: 100, sku: 'BEE-500' }
+      { weight: '150g', price: 149, mrp: 199, stock: 100, sku: 'BEE-150' },
+      { weight: '250g', price: 199, mrp: 249, stock: 100, sku: 'BEE-250' },
+      { weight: '500g', price: 349, mrp: 449, stock: 100, sku: 'BEE-500' }
     ],
     images: [{ url: '/beetroot-removebg-preview.png' }],
     benefits: [
@@ -129,9 +129,9 @@ const products = [
     description: 'Premium Onion Powder - Enhances flavor naturally, rich in antioxidants, supports heart health, and serves as a convenient substitute for fresh onion.',
     category: 'powder',
     variants: [
-      { weight: '100g', price: 10, mrp: 249, stock: 100, sku: 'ONI-100' },
-      { weight: '250g', price: 449, mrp: 549, stock: 100, sku: 'ONI-250' },
-      { weight: '500g', price: 799, mrp: 999, stock: 100, sku: 'ONI-500' }
+      { weight: '150g', price: 110, mrp: 155, stock: 100, sku: 'ONI-150' },
+      { weight: '250g', price: 155, mrp: 199, stock: 100, sku: 'ONI-250' },
+      { weight: '500g', price: 249, mrp: 299, stock: 100, sku: 'ONI-500' }
     ],
     images: [{ url: '/onion-removebg-preview.png' }],
     benefits: [

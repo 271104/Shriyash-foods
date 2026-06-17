@@ -61,13 +61,6 @@ const ProductDetail = () => {
 
   if (!product) return null;
 
-  // Products without strikethrough MRP display
-  const noStrikethroughProducts = ['onion powder', 'moringa powder', 'beetroot powder'];
-  const showStrikethrough = !noStrikethroughProducts.some(name => 
-    product.slug.toLowerCase().includes(name.replace(' ', '')) || 
-    product.name.toLowerCase().includes(name)
-  );
-
   return (
     <div className="product-detail-page">
       <div className="container">
@@ -101,7 +94,7 @@ const ProductDetail = () => {
             {selectedVariant && (
               <div className="price-section">
                 <span className="price">₹{selectedVariant.price}</span>
-                {showStrikethrough && selectedVariant.mrp > selectedVariant.price && (
+                {selectedVariant.mrp > selectedVariant.price && (
                   <>
                     <span className="mrp">₹{selectedVariant.mrp}</span>
                     <span className="discount">

@@ -158,13 +158,6 @@ const Products = () => {
   const renderProductCard = (product, isHighlighted = false) => {
     const variant = product.variants[0];
     const discount = variant.mrp > variant.price ? calculateDiscount(variant.mrp, variant.price) : 0;
-    
-    // Products without strikethrough MRP display
-    const noStrikethroughProducts = ['onion powder', 'moringa powder', 'beetroot powder'];
-    const showStrikethrough = !noStrikethroughProducts.some(name => 
-      product.slug.toLowerCase().includes(name.replace(' ', '')) || 
-      product.name.toLowerCase().includes(name)
-    );
 
     return (
       <Link
@@ -186,7 +179,7 @@ const Products = () => {
           <p className="product-desc">{product.description}</p>
           <div className="product-price">
             <span className="price">₹{variant.price}</span>
-            {showStrikethrough && variant.mrp > variant.price && (
+            {variant.mrp > variant.price && (
               <>
                 <span className="mrp">₹{variant.mrp}</span>
                 <span className="discount-badge">SAVE ₹{variant.mrp - variant.price}</span>

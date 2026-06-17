@@ -91,10 +91,10 @@ body.about-page-active .header-main {
 }
 
 .logo-image {
-  height: 72px;
+  height: 90px;
   width: auto;
   object-fit: contain;
-  transform: translateY(-24px) scale(1.95);
+  transform: translateY(-24px) scale(2.2);
   transform-origin: left center;
 }
 
@@ -370,9 +370,9 @@ body.about-page-active .header-main {
   }
 
   .logo-image {
-    height: 70px;
+    height: 85px;
     width: auto;
-    transform: translateY(-15px);
+    transform: translateY(-15px) scale(1.15);
   }
 
   .header-top-content {
@@ -540,8 +540,8 @@ body.about-page-active .header-main {
 /* Enhanced Mobile Responsive */
 @media (max-width: 480px) {
   .logo-image {
-    height: 75px;
-    transform: translateY(-18px);
+    height: 80px;
+    transform: translateY(-18px) scale(1.1);
   }
   
   .logo-name {

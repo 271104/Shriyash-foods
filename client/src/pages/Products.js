@@ -71,7 +71,7 @@ const categorySections = [
     id: 'vegetables',
     title: 'Vegetables',
     description: 'Everyday vegetable powders for flavor and nutrition.',
-    productKeys: ['tomato', 'onion']
+    productKeys: ['tomato', 'onion', 'beetroot']
   }
 ];
 

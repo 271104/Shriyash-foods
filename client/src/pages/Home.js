@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap } from 'react-icons/fi';
+import { FiShield, FiStar, FiChevronLeft, FiChevronRight, FiFeather, FiDroplet, FiZap, FiPackage, FiTarget, FiGlobe } from 'react-icons/fi';
 import './Home.css';
 
 const categories = [
@@ -121,31 +121,19 @@ const Home = () => {
           </h1>
           
           <div className="hero-value-props">
-            <div className="value-prop">
-              <div className="value-icon">
-                <img src="/icons/Layer8.png" alt="Bridge between farmers and families" />
-              </div>
+            <div className="value-prop" style={{ backgroundImage: 'url(/icons/Layer8.png)' }}>
               <p>At Shriyash Foods, we are building a bridge between hardworking farmers and health-conscious families across the world.</p>
             </div>
             
-            <div className="value-prop">
-              <div className="value-icon">
-                <img src="/icons/Layer9.png" alt="Fresh farm produce" />
-              </div>
+            <div className="value-prop" style={{ backgroundImage: 'url(/icons/Layer9.png)' }}>
               <p>By transforming fresh farm produce into premium dehydrated products, we help preserve nature's nutrition with quality and care.</p>
             </div>
             
-            <div className="value-prop">
-              <div className="value-icon">
-                <img src="/icons/Layer11.png" alt="Sustainable food solutions" />
-              </div>
+            <div className="value-prop" style={{ backgroundImage: 'url(/icons/Layer11.png)' }}>
               <p>Our vision is to create sustainable food solutions that support farmers, reduce wastage, and promote healthier lifestyles globally.</p>
             </div>
             
-            <div className="value-prop">
-              <div className="value-icon">
-                <img src="/icons/Layer22.png" alt="Innovation and authenticity" />
-              </div>
+            <div className="value-prop" style={{ backgroundImage: 'url(/icons/Layer22.png)' }}>
               <p>With innovation, hygiene, and authenticity at our core, we are shaping the future of natural food - one product at a time.</p>
             </div>
           </div>

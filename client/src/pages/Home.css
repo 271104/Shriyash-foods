@@ -46,31 +46,19 @@
 .hero-value-props {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
   margin-bottom: 30px;
 }
 
 .value-prop {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.value-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.value-icon img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  display: block;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  gap: 14px;
+  padding-left: 70px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 52px 52px;
+  min-height: 60px;
 }
 
 .value-prop p {
@@ -270,20 +258,18 @@
   width: 140px;
   height: 140px;
   margin: 0 auto 14px;
-  border-radius: 50%;
-  background: #fbfbf5;
-  border: 1px solid #eceee4;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   transition: 0.3s ease;
 }
 
 .category-image-wrap:hover {
-  border-color: #d6a86f;
   box-shadow: 0 12px 28px rgba(36, 71, 11, 0.12);
-  transform: rotate(-2deg) scale(1.04);
+  transform: scale(1.04);
 }
 
 .category-image {
@@ -678,6 +664,9 @@
   .value-prop {
     gap: 10px;
     text-align: left;
+    padding-left: 64px;
+    background-size: 48px 48px;
+    min-height: 56px;
   }
 
   .value-prop p {
@@ -748,20 +737,24 @@
     line-height: 1.2;
   }
 
+  .hero-value-props {
+    gap: 20px;
+  }
+
   .value-prop {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding-left: 0;
+    padding-top: 60px;
+    background-position: top center;
+    background-size: 48px 48px;
+    min-height: auto;
   }
 
-  .value-icon {
-    width: 44px;
-    height: 44px;
-  }
-
-  .value-icon img {
-    width: 44px;
-    height: 44px;
+  .value-icon-svg svg {
+    width: 32px;
+    height: 32px;
   }
 
   .value-prop p {

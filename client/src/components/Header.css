@@ -81,20 +81,20 @@ body.about-page-active .header-main {
 .logo {
   text-decoration: none;
   display: flex;
-  align-items: center;
+  align-items:center;
   gap: 12px;
   padding: 5px 0;
   flex: 0 0 auto;
   position: relative;
   z-index: 2;
-  margin-left: 34px;
+  margin-left:px;
 }
 
 .logo-image {
-  height: 90px;
+  height: 60px;
   width: auto;
   object-fit: contain;
-  transform: translateY(-24px) scale(2.2);
+  transform: translateY(-30px) scale(2);
   transform-origin: left center;
 }
 

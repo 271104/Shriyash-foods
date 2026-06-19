@@ -1,5 +1,6 @@
 import React from 'react';
-import { FiFacebook, FiInstagram, FiMail, FiYoutube } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiFacebook, FiInstagram, FiMail } from 'react-icons/fi';
 import './Footer.css';
 
 const Footer = () => {
@@ -12,35 +13,34 @@ const Footer = () => {
             <p>Pure by Nature,</p>
             <p>Nourished by Choice.</p>
             <div className="footer-socials">
-              <a href="/" aria-label="Facebook"><FiFacebook /></a>
-              <a href="/" aria-label="Instagram"><FiInstagram /></a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FiFacebook /></a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FiInstagram /></a>
               <a href="mailto:shriyashfoods01@gmail.com" aria-label="Email"><FiMail /></a>
-              <a href="/" aria-label="YouTube"><FiYoutube /></a>
             </div>
           </div>
 
           <div className="footer-section">
             <h4>Quick Links</h4>
-            <a href="/">Home</a>
-            <a href="/products">Shop</a>
-            <a href="/about">About Us</a>
-            <a href="/contact">Contact Us</a>
+            <Link to="/">Home</Link>
+            <Link to="/products">Shop</Link>
+            <Link to="/about">About Us</Link>
+            <Link to="/contact">Contact Us</Link>
           </div>
 
           <div className="footer-section">
             <h4>Customer Service</h4>
-            <a href="/orders">Track Order</a>
-            <a href="/shipping-policy">Shipping Policy</a>
-            <a href="/refund-policy">Returns & Refund</a>
-            <a href="/terms-conditions">Terms & Conditions</a>
-            <a href="/privacy-policy">Privacy Policy</a>
+            <Link to="/orders">Track Order</Link>
+            <Link to="/shipping-policy">Shipping Policy</Link>
+            <Link to="/refund-policy">Returns & Refund</Link>
+            <Link to="/terms-conditions">Terms & Conditions</Link>
+            <Link to="/privacy-policy">Privacy Policy</Link>
           </div>
 
           <div className="footer-section">
             <h4>Categories</h4>
-            <a href="/products">Vegetable Powders</a>
-            <a href="/products">Fruit Powders</a>
-            <a href="/products">Green Powders</a>
+            <Link to="/products#vegetables">Vegetable Powders</Link>
+            <Link to="/products#fruits">Fruit Powders</Link>
+            <Link to="/products#green-powder">Green Powders</Link>
           </div>
 
           <div className="footer-newsletter">

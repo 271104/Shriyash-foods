@@ -57,9 +57,10 @@ body.about-page-active .header {
 }
 
 .header-main {
-  padding: 10px 0;
+  padding: 0;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(10px);
+  overflow: visible;
 }
 
 body.about-page-active .header-main {
@@ -75,27 +76,28 @@ body.about-page-active .header-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 70px;
+  min-height: 80px;
+  max-height: 90px;
+  overflow: visible;
 }
 
 .logo {
   text-decoration: none;
   display: flex;
-  align-items:center;
+  align-items: center;
   gap: 12px;
-  padding: 5px 0;
+  padding: 0;
   flex: 0 0 auto;
   position: relative;
   z-index: 2;
-  margin-left:px;
+  margin-left: 0;
+  overflow: visible;
 }
 
 .logo-image {
-  height: 60px;
+  height: 200px;
   width: auto;
   object-fit: contain;
-  transform: translateY(-30px) scale(2);
-  transform-origin: left center;
 }
 
 .logo-icon {
@@ -358,7 +360,7 @@ body.about-page-active .header-main {
   }
 
   .header-content {
-    min-height: 68px;
+    min-height: 55px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -367,12 +369,12 @@ body.about-page-active .header-main {
   .logo {
     margin-left: 0;
     flex: 1;
+    padding: 0;
   }
 
   .logo-image {
-    height: 85px;
+    height: 120px;
     width: auto;
-    transform: translateY(-15px) scale(1.15);
   }
 
   .header-top-content {
@@ -540,8 +542,7 @@ body.about-page-active .header-main {
 /* Enhanced Mobile Responsive */
 @media (max-width: 480px) {
   .logo-image {
-    height: 80px;
-    transform: translateY(-18px) scale(1.1);
+    height: 110px;
   }
   
   .logo-name {
@@ -553,11 +554,11 @@ body.about-page-active .header-main {
   }
   
   .header-main {
-    padding: 6px 0;
+    padding: 0;
   }
 
   .header-content {
-    min-height: 56px;
+    min-height: 45px;
   }
 
   .nav {

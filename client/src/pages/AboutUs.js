@@ -1,33 +1,71 @@
 import React, { useEffect } from 'react';
-import { FiAward, FiHeart, FiTrendingUp, FiUsers } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import {
+  FiAward,
+  FiCheckCircle,
+  FiEye,
+  FiFeather,
+  FiPackage,
+  FiShield,
+  FiTarget,
+  FiTruck,
+  FiUsers,
+  FiZap
+} from 'react-icons/fi';
 import './AboutUs.css';
 
-const beliefs = [
+const whyChoose = [
   {
-    number: '01',
-    title: 'Empowering Farmers & Rural Communities',
-    text: 'We create better opportunities for farmers by adding value to fresh farm produce.',
+    icon: FiFeather,
+    title: '100% Natural Ingredients',
+    text: 'No chemicals or additives. Just pure fruits and vegetables in every scoop.'
   },
   {
-    number: '02',
-    title: 'Sustainable & Responsible Food Processing',
-    text: 'We work to reduce food wastage and make natural nutrition more accessible.',
+    icon: FiUsers,
+    title: 'Supporting Farmers',
+    text: 'We empower local farmers through fair sourcing and sustainable practices.'
   },
   {
-    number: '03',
-    title: 'Hygienic Manufacturing Standards',
-    text: 'Every product is processed with care, cleanliness, and consistent quality controls.',
+    icon: FiShield,
+    title: 'Hygienic Processing',
+    text: 'Advanced dehydration and grinding technology helps preserve purity and safety.'
   },
   {
-    number: '04',
-    title: 'Natural Nutrition for Modern Lifestyles',
-    text: 'We craft convenient food solutions for families seeking pure and trustworthy nutrition.',
+    icon: FiCheckCircle,
+    title: 'Sustainable Vision',
+    text: 'Committed to reducing food waste and building a healthier future for all.'
+  }
+];
+
+const processSteps = [
+  { icon: FiFeather, title: 'Farm Fresh', text: 'We source quality fruits and vegetables from trusted farmers.' },
+  { icon: FiCheckCircle, title: 'Careful Selection', text: 'Only fresh produce is handpicked and inspected.' },
+  { icon: FiZap, title: 'Dehydration', text: 'Low-moisture processing locks in nutrition and flavor.' },
+  { icon: FiPackage, title: 'Grinding', text: 'Dried produce is finely ground into premium powder.' },
+  { icon: FiAward, title: 'Packaging', text: 'Packed hygienically to retain freshness and quality.' },
+  { icon: FiTruck, title: 'Delivered', text: 'Delivered to your doorstep with care and convenience.' }
+];
+
+const certifications = [
+  { title: 'FSSAI Certified', text: 'Food Safety & Standards Authority of India', icon: FiAward },
+  { title: 'ISO 22000:2018', text: 'Food safety management standard', icon: FiShield },
+  { title: 'Lab Tested', text: 'Every batch is tested for purity and quality', icon: FiZap },
+  { title: 'GMP Certified', text: 'Good Manufacturing Practices certified', icon: FiCheckCircle }
+];
+
+const productRanges = [
+  {
+    title: 'Green Powders',
+    items: ['Moringa Powder']
   },
   {
-    number: '05',
-    title: 'Innovation with Purpose',
-    text: 'Our innovation is focused on real impact for farmers, consumers, and the future of food.',
+    title: 'Vegetable Powders',
+    items: ['Tomato Powder', 'Onion Powder']
   },
+  {
+    title: 'Fruit Powders',
+    items: ['Banana Powder', 'ABC Powder', 'More coming soon']
+  }
 ];
 
 const AboutUs = () => {
@@ -42,30 +80,112 @@ const AboutUs = () => {
   return (
     <div className="about-page">
       <section className="about-hero">
-        <div className="container">
-          <h1>About Shriyash Foods</h1>
-          <p className="hero-subtitle">Pure by Nature, Nourished by Choice</p>
+        <div className="about-leaf about-leaf-left" aria-hidden="true"></div>
+        <div className="about-leaf about-leaf-right" aria-hidden="true"></div>
+
+        <div className="container about-hero-grid">
+          <div className="about-hero-copy">
+            <p className="about-kicker">About Us</p>
+            <h1>From Farms to the Future</h1>
+            <p>
+              Transforming fresh produce into premium dehydrated powders while supporting
+              farmers and delivering natural nutrition worldwide.
+            </p>
+            <Link to="/products" className="about-primary-link">
+              Explore Our Products
+              <span aria-hidden="true">-&gt;</span>
+            </Link>
+          </div>
+
+          <div className="about-hero-collage" aria-label="Shriyash Foods natural products and process">
+            <img className="collage-main" src="/about-journey.png" alt="Fresh farm produce and Shriyash Foods products" />
+            <img className="collage-small" src="/green_powder.png" alt="Green powder product display" />
+            <img className="collage-small" src="/banner_our_journey.png" alt="Food processing facility" />
+          </div>
         </div>
       </section>
 
       <section className="our-story">
+        <div className="container story-content">
+          <div className="story-image">
+            <img src="/about-journey-shriyash.png" alt="Shriyash Foods journey from farms to natural nutrition" />
+          </div>
+          <div className="story-text">
+            <p className="about-kicker">Our Story</p>
+            <h2>A Passion for Purity and People</h2>
+            <p>Shriyash Foods began with a simple mission: reduce food wastage, support local farmers, and make natural nutrition convenient for every home.</p>
+            <p>We work closely with farmers to source fresh fruits and vegetables, which are carefully dehydrated and ground into fine powders under strict quality standards.</p>
+            <p>Today, our products are trusted by families who want pure, convenient, and trustworthy nutrition without compromising taste or quality.</p>
+            <Link to="/our-journey" className="about-secondary-link">
+              Know More About Our Process
+              <span aria-hidden="true">-&gt;</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-feature-section">
         <div className="container">
-          <div className="story-content">
-            <div className="story-text">
-              <h2>Our Journey</h2>
-              <h3>From Farms to the Future</h3>
-              <p>Shriyash Foods was founded in Solapur, Maharashtra with a vision to create sustainable food solutions while supporting the hardworking farmers who are the true strength of our country.</p>
-              <p>Started by a passionate young entrepreneur at the age of 20, Shriyash Foods is not just a business. It is a mission driven by innovation, purpose, and the dream of creating real impact in the agricultural and food industry.</p>
-              <p>Coming from a region deeply connected to farming, we closely witnessed the challenges faced by farmers, including crop wastage, unstable market prices, and limited opportunities to increase the value of their produce.</p>
-              <p>With the aim of solving these problems, Shriyash Foods began transforming fresh farm produce into premium dehydrated products that help preserve nutrition, increase shelf life, and create better opportunities for farmers.</p>
-              <p>At Shriyash Foods, we carefully source natural ingredients and process them hygienically using modern dehydration techniques to maintain authentic taste, natural quality, and essential nutrients.</p>
-              <p>Our products are crafted for health-conscious families looking for pure, convenient, and trustworthy food solutions.</p>
-              <p>Our vision goes beyond building a brand. We aim to create a strong bridge between farmers and consumers by promoting sustainable agriculture, reducing food wastage, and bringing high-quality natural products from Indian farms to homes across the country and around the world.</p>
-              <p>With quality, innovation, and authenticity at our core, we are committed to shaping the future of natural nutrition, one product at a time.</p>
-            </div>
-            <div className="story-image">
-              <img src="/about-journey-shriyash.png" alt="Shriyash Foods journey from farms to natural nutrition" />
-            </div>
+          <p className="about-kicker centered">Why Choose Us</p>
+          <h2>Good for You, Good for the Planet</h2>
+          <div className="feature-grid">
+            {whyChoose.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <article className="feature-card" key={item.title}>
+                  <div className="feature-icon">
+                    <Icon />
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="process-section">
+        <div className="container">
+          <p className="about-kicker centered">Our Process</p>
+          <h2>From Farm to Pack</h2>
+          <div className="process-row">
+            {processSteps.map((step, index) => {
+              const Icon = step.icon;
+
+              return (
+                <article className="process-step" key={step.title}>
+                  <div className="process-icon">
+                    <Icon />
+                  </div>
+                  <h3>{index + 1}. {step.title}</h3>
+                  <p>{step.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="certification-section">
+        <div className="container">
+          <p className="about-kicker centered">Certifications</p>
+          <h2>Quality You Can Trust</h2>
+          <div className="cert-grid">
+            {certifications.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <article className="cert-card" key={item.title}>
+                  <div className="cert-icon">
+                    <Icon />
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -75,55 +195,23 @@ const AboutUs = () => {
           <div className="mv-grid">
             <div className="mv-card">
               <div className="mv-icon">
-                <FiHeart />
+                <FiTarget />
               </div>
-              <h3>Our Mission</h3>
-              <p>To support farmers by creating value-added natural food products that promote healthy living, sustainability, and long-term agricultural growth.</p>
+              <div>
+                <p className="about-kicker">Our Mission</p>
+                <h3>Natural nutrition for every home</h3>
+                <p>To deliver natural, nutritious, and high-quality food products while supporting farmers and promoting healthier lifestyles.</p>
+              </div>
             </div>
             <div className="mv-card">
               <div className="mv-icon">
-                <FiTrendingUp />
+                <FiEye />
               </div>
-              <h3>Our Vision</h3>
-              <p>To build a globally trusted food brand from Solapur, Maharashtra that connects farmers to the future through innovation, sustainability, and natural nutrition.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="our-values">
-        <div className="container">
-          <h2>What We Believe In</h2>
-          <div className="values-grid values-grid-beliefs">
-            {beliefs.map((belief) => (
-              <div className="value-card" key={belief.title}>
-                <div className="value-icon">{belief.number}</div>
-                <h3>{belief.title}</h3>
-                <p>{belief.text}</p>
+              <div>
+                <p className="about-kicker">Our Vision</p>
+                <h3>A trusted global food brand</h3>
+                <p>To be a globally trusted brand in dehydrated food products, known for purity, innovation, and commitment toward people and the planet.</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="why-choose">
-        <div className="container">
-          <h2>Why Choose Shriyash Foods?</h2>
-          <div className="choose-grid">
-            <div className="choose-item">
-              <FiAward className="choose-icon" />
-              <h3>Premium Quality</h3>
-              <p>Handpicked ingredients processed with care to retain maximum nutrition and authentic taste.</p>
-            </div>
-            <div className="choose-item">
-              <FiUsers className="choose-icon" />
-              <h3>Farmer-Focused Purpose</h3>
-              <p>Every product supports our larger mission of creating value for farmers and rural communities.</p>
-            </div>
-            <div className="choose-item">
-              <FiHeart className="choose-icon" />
-              <h3>Made with Care</h3>
-              <p>Our natural powders are crafted for families who want pure, convenient, and trustworthy nutrition.</p>
             </div>
           </div>
         </div>
@@ -134,40 +222,31 @@ const AboutUs = () => {
           <h2>Our Product Range</h2>
           <p className="section-subtitle">From nature's bounty to your wellness routine</p>
           <div className="products-showcase">
-            <div className="product-category">
-              <h3>Superfood Powders</h3>
-              <ul>
-                <li>ABC Powder (Amla, Beetroot, Carrot)</li>
-                <li>Moringa Powder</li>
-                <li>Beetroot Powder</li>
-              </ul>
-            </div>
-            <div className="product-category">
-              <h3>Vegetable Powders</h3>
-              <ul>
-                <li>Carrot Powder</li>
-                <li>Onion Powder</li>
-                <li>Tomato Powder</li>
-              </ul>
-            </div>
-            <div className="product-category">
-              <h3>Fruit Powders</h3>
-              <ul>
-                <li>Banana Powder</li>
-                <li>And more coming soon...</li>
-              </ul>
-            </div>
+            {productRanges.map((range) => (
+              <article className="product-category" key={range.title}>
+                <h3>{range.title}</h3>
+                <ul>
+                  {range.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="about-cta">
-        <div className="container">
-          <h2>Join the Wellness Revolution</h2>
-          <p>Experience the difference of pure, natural nutrition</p>
-          <a href="/products" className="btn btn-primary btn-large">
-            Explore Our Products
-          </a>
+        <div className="container cta-panel">
+          <img src="/green_powder.png" alt="Moringa powder bowl" />
+          <div>
+            <h2>Ready to Experience Natural Nutrition?</h2>
+            <p>Explore our wide range of wholesome powders made with nature's finest ingredients.</p>
+          </div>
+          <Link to="/products" className="about-cta-link">
+            Shop Now
+            <span aria-hidden="true">-&gt;</span>
+          </Link>
         </div>
       </section>
     </div>

@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import {
+  FiChevronDown,
+  FiFilter,
+} from 'react-icons/fi';
 import './Products.css';
 
 const fallbackProducts = [
@@ -10,7 +14,7 @@ const fallbackProducts = [
     slug: 'tomato-powder',
     description: 'Premium Tomato Powder - Rich in lycopene & antioxidants that supports immunity, enhances flavor naturally, and serves as a convenient replacement for fresh tomato.',
     images: [{ url: '/tomato-removebg-preview.png' }],
-    variants: [{ price: 10, mrp: 249 }],
+    variants: [{ price: 10, mrp: 249 }]
   },
   {
     _id: 'beetroot-powder',
@@ -18,7 +22,7 @@ const fallbackProducts = [
     slug: 'beetroot-powder',
     description: 'Natural Beetroot Powder - Rich in iron & antioxidants that helps boost immunity, supports stamina & blood circulation, and increases energy naturally.',
     images: [{ url: '/beetroot-removebg-preview.png' }],
-    variants: [{ price: 199, mrp: 249 }],
+    variants: [{ price: 199, mrp: 249 }]
   },
   {
     _id: 'banana-powder',
@@ -26,7 +30,7 @@ const fallbackProducts = [
     slug: 'banana-powder',
     description: 'Natural Banana Powder - A rich source of natural energy and potassium that supports digestion, helps in healthy weight management, and is naturally sweet & nutritious.',
     images: [{ url: '/banana-removebg-preview.png' }],
-    variants: [{ price: 199, mrp: 249 }],
+    variants: [{ price: 199, mrp: 249 }]
   },
   {
     _id: 'moringa-powder',
@@ -34,7 +38,7 @@ const fallbackProducts = [
     slug: 'moringa-powder',
     description: 'Pure Moringa Powder - A nutrient-rich superfood packed with vitamins & minerals that supports overall wellness, improves energy naturally, and boosts immunity.',
     images: [{ url: '/moringa-removebg-preview.png' }],
-    variants: [{ price: 249, mrp: 299 }],
+    variants: [{ price: 249, mrp: 299 }]
   },
   {
     _id: 'onion-powder',
@@ -42,7 +46,7 @@ const fallbackProducts = [
     slug: 'onion-powder',
     description: 'Premium Onion Powder - Enhances flavor naturally, rich in antioxidants, supports heart health, and serves as a convenient substitute for fresh onion.',
     images: [{ url: '/onion-removebg-preview.png' }],
-    variants: [{ price: 199, mrp: 249 }],
+    variants: [{ price: 199, mrp: 249 }]
   },
   {
     _id: 'abc-powder',
@@ -50,40 +54,86 @@ const fallbackProducts = [
     slug: 'abc-powder',
     description: 'ABC Powder (Apple + Beetroot + Carrot) - A powerful blend rich in antioxidants & vitamins that supports immunity, improves energy levels, and promotes overall wellness.',
     images: [{ url: '/abc-removebg-preview.png' }],
-    variants: [{ price: 249, mrp: 299 }],
-  },
+    variants: [{ price: 249, mrp: 299 }]
+  }
 ];
 
 const categorySections = [
   {
     id: 'green-powder',
-    title: 'Green Powder',
-    description: 'Nutrient-rich green superfood powders.',
+    title: 'Green Powders',
+    sidebarLabel: 'Green Powders',
     productKeys: ['moringa']
   },
   {
     id: 'fruits',
-    title: 'Fruits',
-    description: 'Naturally sweet and wholesome fruit-based powders.',
+    title: 'Fruit Powders',
+    sidebarLabel: 'Fruit Powders',
     productKeys: ['apple', 'banana', 'tomato', 'abc']
   },
   {
     id: 'vegetables',
-    title: 'Vegetables',
-    description: 'Everyday vegetable powders for flavor and nutrition.',
+    title: 'Vegetable Powders',
+    sidebarLabel: 'Vegetable Powders',
     productKeys: ['tomato', 'onion', 'beetroot']
   }
 ];
 
+const PRICE_MIN = 110;
+const PRICE_MAX = 500;
+const FILTER_STORAGE_KEY = 'shriyash-products-filters';
+
+const getSavedFilters = () => {
+  if (typeof window === 'undefined') {
+    return {
+      activeCategory: 'all',
+      priceMax: PRICE_MAX,
+      sortBy: 'featured'
+    };
+  }
+
+  try {
+    const savedFilters = JSON.parse(window.localStorage.getItem(FILTER_STORAGE_KEY) || '{}');
+    const validCategory = ['all', ...categorySections.map(category => category.id)].includes(savedFilters.activeCategory);
+    const savedPriceMax = Number(savedFilters.priceMax);
+
+    return {
+      activeCategory: validCategory ? savedFilters.activeCategory : 'all',
+      priceMax: savedPriceMax >= PRICE_MIN && savedPriceMax <= PRICE_MAX ? savedPriceMax : PRICE_MAX,
+      sortBy: ['featured', 'price-low', 'price-high', 'discount', 'name'].includes(savedFilters.sortBy)
+        ? savedFilters.sortBy
+        : 'featured'
+    };
+  } catch (error) {
+    return {
+      activeCategory: 'all',
+      priceMax: PRICE_MAX,
+      sortBy: 'featured'
+    };
+  }
+};
+
 const Products = () => {
+  const savedFilters = getSavedFilters();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [highlightedCategory, setHighlightedCategory] = useState('');
+  const [activeCategory, setActiveCategory] = useState(savedFilters.activeCategory);
+  const [priceMax, setPriceMax] = useState(savedFilters.priceMax);
+  const [sortBy, setSortBy] = useState(savedFilters.sortBy);
   const location = useLocation();
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify({
+      activeCategory,
+      priceMax,
+      sortBy
+    }));
+  }, [activeCategory, priceMax, sortBy]);
 
   useEffect(() => {
     if (loading || !location.hash) return undefined;
@@ -155,8 +205,85 @@ const Products = () => {
       .filter(Boolean);
   };
 
+  const getProductVariants = (product) => {
+    return product.variants?.length ? product.variants : [{ price: 0, mrp: 0 }];
+  };
+
+  const isVariantInPriceRange = (variant) => {
+    const price = Number(variant.price || 0);
+    return price >= PRICE_MIN && price <= priceMax;
+  };
+
+  const productMatchesPriceRange = (product) => {
+    return getProductVariants(product).some(isVariantInPriceRange);
+  };
+
+  const getMatchingVariant = (product) => {
+    const variants = getProductVariants(product);
+    return variants.find(isVariantInPriceRange) || variants[0];
+  };
+
+  const getProductPrice = (product) => Number(getMatchingVariant(product)?.price || 0);
+  const getProductMrp = (product) => Number(getMatchingVariant(product)?.mrp || 0);
+  const getProductDiscount = (product) => {
+    const price = getProductPrice(product);
+    const mrp = getProductMrp(product);
+
+    return mrp > price ? calculateDiscount(mrp, price) : 0;
+  };
+
+  const sortProducts = (items) => {
+    return [...items].sort((a, b) => {
+      if (sortBy === 'price-low') return getProductPrice(a) - getProductPrice(b);
+      if (sortBy === 'price-high') return getProductPrice(b) - getProductPrice(a);
+      if (sortBy === 'discount') return getProductDiscount(b) - getProductDiscount(a);
+      if (sortBy === 'name') return a.name.localeCompare(b.name);
+      return 0;
+    });
+  };
+
+  const filteredSections = categorySections
+    .map(category => ({
+      ...category,
+      products: sortProducts(
+        getCategoryProducts(category.productKeys)
+          .filter(productMatchesPriceRange)
+      )
+    }))
+    .filter(category => category.products.length > 0);
+
+  const visibleSections = activeCategory === 'all'
+    ? filteredSections
+    : filteredSections.filter(category => category.id === activeCategory);
+
+  const visibleProductCount = new Set(
+    visibleSections.flatMap(section => section.products.map(product => product._id || product.slug))
+  ).size;
+
+  const totalFilteredProductCount = new Set(
+    filteredSections.flatMap(section => section.products.map(product => product._id || product.slug))
+  ).size;
+
+  const getCategoryCount = (categoryId) => {
+    return filteredSections.find(category => category.id === categoryId)?.products.length || 0;
+  };
+
+  const handleCategoryChange = (categoryId) => {
+    setActiveCategory(categoryId);
+    setHighlightedCategory(categoryId === 'all' ? '' : categoryId);
+
+    const targetId = categoryId === 'all' ? 'all-products' : categoryId;
+    setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+
+    if (categoryId !== 'all') {
+      setTimeout(() => setHighlightedCategory(''), 1800);
+    }
+  };
+
   const renderProductCard = (product, isHighlighted = false) => {
-    const variant = product.variants[0];
+    const variant = getMatchingVariant(product);
     const discount = variant.mrp > variant.price ? calculateDiscount(variant.mrp, variant.price) : 0;
 
     return (
@@ -169,24 +296,21 @@ const Products = () => {
           <div className="product-badge">{discount}% OFF</div>
         )}
         <div className="product-image">
-          <img
-            src={product.images[0]?.url || '/placeholder.jpg'}
-            alt={product.name}
-          />
+          <img src={product.images?.[0]?.url || '/placeholder.jpg'} alt={product.name} />
         </div>
         <div className="product-info">
           <h3>{product.name}</h3>
           <p className="product-desc">{product.description}</p>
           <div className="product-price">
-            <span className="price">₹{variant.price}</span>
+            <span className="price">&#8377;{variant.price}</span>
             {variant.mrp > variant.price && (
               <>
-                <span className="mrp">₹{variant.mrp}</span>
-                <span className="discount-badge">SAVE ₹{variant.mrp - variant.price}</span>
+                <span className="mrp">&#8377;{variant.mrp}</span>
+                <span className="discount-badge">{discount}% OFF</span>
               </>
             )}
           </div>
-          <button className="btn btn-primary btn-block">View Details &rarr;</button>
+          <span className="product-card-link">View Details -&gt;</span>
         </div>
       </Link>
     );
@@ -202,44 +326,114 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <div className="container">
-        <div className="products-header">
-          <h1>Our Premium Products</h1>
-          <p className="subtitle">Handpicked health powders for your wellness journey</p>
-        </div>
+      <section className="products-banner">
+        <img src="/productBanner.png" alt="Our Premium Products by Shriyash Foods" />
+      </section>
 
-        <div className="product-categories">
-          {categorySections.map((category) => {
-            const categoryProducts = getCategoryProducts(category.productKeys);
+      <section className="products-catalog">
+        <div className="container products-layout">
+          <aside className="filter-panel">
+            <h2><FiFilter /> Filter By</h2>
+            <div className="filter-group">
+              <h3>Categories</h3>
+              <button
+                type="button"
+                className={`filter-option ${activeCategory === 'all' ? 'active' : ''}`}
+                onClick={() => handleCategoryChange('all')}
+              >
+                <span>All Products</span>
+                <small>({totalFilteredProductCount})</small>
+              </button>
+              {categorySections.map((category) => (
+                <button
+                  type="button"
+                  className={`filter-option ${activeCategory === category.id ? 'active' : ''}`}
+                  key={category.id}
+                  onClick={() => handleCategoryChange(category.id)}
+                  disabled={getCategoryCount(category.id) === 0}
+                >
+                  <span>{category.sidebarLabel}</span>
+                  <small>({getCategoryCount(category.id)})</small>
+                </button>
+              ))}
+            </div>
 
-            if (categoryProducts.length === 0) return null;
+            <div className="filter-group">
+              <h3>Price Range</h3>
+              <input
+                type="range"
+                className="price-range-input"
+                min={PRICE_MIN}
+                max={PRICE_MAX}
+                step="10"
+                value={priceMax}
+                onChange={(event) => setPriceMax(Number(event.target.value))}
+              />
+              <div className="price-range-labels">
+                <small>&#8377;{PRICE_MIN}</small>
+                <small>Up to &#8377;{priceMax}</small>
+              </div>
+            </div>
 
-            return (
-              <section className="product-category" id={category.id} key={category.title}>
-                <div className="category-heading">
-                  <h2>{category.title}</h2>
-                  <p>{category.description}</p>
-                </div>
-                <div className="products-grid">
-                  {categoryProducts.map((product) => renderProductCard(
-                    product,
-                    highlightedCategory === category.id
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </div>
-        {products.length === 0 && (
-          <div className="no-products">
-            <p>No products available at the moment</p>
+            <div className="filter-group">
+              <h3>Sort By</h3>
+              <select className="filter-select" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="discount">Highest Discount</option>
+                <option value="name">Name: A to Z</option>
+              </select>
+            </div>
+          </aside>
+
+          <div className="products-main" id="all-products">
+            <div className="products-toolbar">
+              <p>Showing {visibleProductCount} products</p>
+              <label className="toolbar-sort">
+                <span>Sort by:</span>
+                <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                  <option value="featured">Popularity</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="discount">Highest Discount</option>
+                  <option value="name">Name: A to Z</option>
+                </select>
+                <FiChevronDown />
+              </label>
+            </div>
+
+            <div className="product-categories">
+              {visibleSections.map((category) => (
+                <section className="product-category" id={category.id} key={category.title}>
+                  <div className="category-heading">
+                    <h2>{category.title}</h2>
+                    {activeCategory !== category.id && (
+                      <button type="button" onClick={() => handleCategoryChange(category.id)}>
+                        View All -&gt;
+                      </button>
+                    )}
+                  </div>
+                  <div className="products-grid">
+                    {category.products.map((product) => renderProductCard(
+                      product,
+                      highlightedCategory === category.id
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+
+            {visibleProductCount === 0 && (
+              <div className="no-products">
+                <p>No products available at the moment</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   );
 };
 
 export default Products;
-
-

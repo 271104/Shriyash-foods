@@ -48,6 +48,7 @@
   display: grid;
   gap: 24px;
   grid-template-columns: 300px minmax(0, 1fr);
+  padding-left: 18px;
 }
 
 .filter-panel {
@@ -71,6 +72,71 @@
   margin: 0 0 30px;
 }
 
+.filter-toggle-row {
+  align-items: center;
+  background: var(--products-soft);
+  border: 1px solid var(--products-line);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 24px;
+  padding: 14px;
+}
+
+.filter-toggle-row strong {
+  color: var(--products-text);
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.filter-toggle-row small {
+  color: var(--products-muted);
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.filter-switch {
+  align-items: center;
+  background: #cfd8c7;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  height: 32px;
+  justify-content: flex-start;
+  padding: 3px;
+  transition: background 0.2s;
+  width: 66px;
+}
+
+.filter-switch span {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 999px;
+  color: var(--products-muted);
+  display: flex;
+  font-size: 11px;
+  font-weight: 900;
+  height: 26px;
+  justify-content: center;
+  transition: transform 0.2s, color 0.2s;
+  width: 32px;
+}
+
+.filter-switch.on {
+  background: var(--products-green);
+}
+
+.filter-switch.on span {
+  color: var(--products-green);
+  transform: translateX(28px);
+}
+
 .filter-group {
   border-bottom: 1px solid var(--products-line);
   margin-bottom: 26px;
@@ -88,6 +154,16 @@
   font-size: 16px;
   font-weight: 900;
   margin: 0 0 14px;
+}
+
+.filter-group-muted h3,
+.filter-group-muted .price-range-labels small {
+  color: #8d9b87;
+}
+
+.filter-group-muted .price-range-input {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .filter-option {
@@ -151,27 +227,56 @@
   border: 1px solid var(--products-line);
   border-radius: 8px;
   color: var(--products-text);
-  display: flex;
   font-family: inherit;
-  justify-content: space-between;
   min-height: 46px;
-  padding: 0 14px;
   width: 100%;
 }
 
-.filter-select,
-.toolbar-sort select {
+.filter-select {
   appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--products-green) 50%),
+    linear-gradient(135deg, var(--products-green) 50%, transparent 50%);
+  background-position:
+    calc(100% - 19px) 50%,
+    calc(100% - 13px) 50%;
+  background-repeat: no-repeat;
+  background-size: 6px 6px, 6px 6px;
   cursor: pointer;
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  outline: none;
+  padding: 0 42px 0 14px;
+}
+
+.filter-select:focus,
+.toolbar-sort:focus-within {
+  border-color: rgba(36, 71, 11, 0.55);
+  box-shadow: 0 0 0 3px rgba(36, 71, 11, 0.1);
+}
+
+.toolbar-sort {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto minmax(160px, 1fr) auto;
+  padding: 0 12px 0 14px;
+  width: auto;
 }
 
 .toolbar-sort select {
+  appearance: none;
   background: transparent;
   border: 0;
   color: var(--products-text);
+  cursor: pointer;
   font-family: inherit;
+  font-size: 14px;
   font-weight: 800;
+  min-height: 44px;
   outline: none;
+  padding: 0;
+  width: 100%;
 }
 
 /* Main */
@@ -193,13 +298,16 @@
   width: auto;
 }
 
-.toolbar-sort {
-  gap: 8px;
-  width: auto;
-}
-
 .toolbar-sort span {
   color: var(--products-muted);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.toolbar-sort svg {
+  color: var(--products-green);
+  pointer-events: none;
 }
 
 .product-categories {
@@ -343,20 +451,22 @@
   margin-top: auto;
 }
 
-.price {
+.products-page .product-price .price {
   color: var(--products-text);
   font-size: 22px;
   font-weight: 900;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
 }
 
-.mrp {
+.products-page .product-price .mrp {
   color: #9aa896;
   font-size: 15px;
   font-weight: 800;
-  text-decoration: line-through;
+  text-decoration: line-through !important;
 }
 
-.discount-badge {
+.products-page .product-price .discount-badge {
   align-items: center;
   background: var(--products-soft);
   border-radius: 6px;
@@ -439,9 +549,12 @@
 @media (max-width: 1080px) {
   .products-layout {
     grid-template-columns: 1fr;
+    padding: 0 18px;
   }
 
   .filter-panel {
+    border-left: 1px solid var(--products-line);
+    border-radius: 12px;
     position: static;
   }
 }

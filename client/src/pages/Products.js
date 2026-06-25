@@ -82,10 +82,18 @@ const categorySections = [
 const PRICE_MIN = 110;
 const PRICE_MAX = 500;
 const FILTER_STORAGE_KEY = 'shriyash-products-filters';
+const SORT_OPTIONS = [
+  { value: 'featured', label: 'Featured' },
+  { value: 'price-low', label: 'Price: Low to High' },
+  { value: 'price-high', label: 'Price: High to Low' },
+  { value: 'discount', label: 'Highest Discount' },
+  { value: 'name', label: 'Name: A to Z' }
+];
 
 const getSavedFilters = () => {
   if (typeof window === 'undefined') {
     return {
+      filtersEnabled: false,
       activeCategory: 'all',
       priceMax: PRICE_MAX,
       sortBy: 'featured'
@@ -96,16 +104,19 @@ const getSavedFilters = () => {
     const savedFilters = JSON.parse(window.localStorage.getItem(FILTER_STORAGE_KEY) || '{}');
     const validCategory = ['all', ...categorySections.map(category => category.id)].includes(savedFilters.activeCategory);
     const savedPriceMax = Number(savedFilters.priceMax);
+    const filtersEnabled = savedFilters.filtersEnabled === true;
 
     return {
-      activeCategory: validCategory ? savedFilters.activeCategory : 'all',
+      filtersEnabled,
+      activeCategory: filtersEnabled && validCategory ? savedFilters.activeCategory : 'all',
       priceMax: savedPriceMax >= PRICE_MIN && savedPriceMax <= PRICE_MAX ? savedPriceMax : PRICE_MAX,
-      sortBy: ['featured', 'price-low', 'price-high', 'discount', 'name'].includes(savedFilters.sortBy)
+      sortBy: SORT_OPTIONS.some(option => option.value === savedFilters.sortBy)
         ? savedFilters.sortBy
         : 'featured'
     };
   } catch (error) {
     return {
+      filtersEnabled: false,
       activeCategory: 'all',
       priceMax: PRICE_MAX,
       sortBy: 'featured'
@@ -118,6 +129,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [highlightedCategory, setHighlightedCategory] = useState('');
+  const [filtersEnabled, setFiltersEnabled] = useState(savedFilters.filtersEnabled);
   const [activeCategory, setActiveCategory] = useState(savedFilters.activeCategory);
   const [priceMax, setPriceMax] = useState(savedFilters.priceMax);
   const [sortBy, setSortBy] = useState(savedFilters.sortBy);
@@ -129,11 +141,12 @@ const Products = () => {
 
   useEffect(() => {
     window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify({
+      filtersEnabled,
       activeCategory,
       priceMax,
       sortBy
     }));
-  }, [activeCategory, priceMax, sortBy]);
+  }, [filtersEnabled, activeCategory, priceMax, sortBy]);
 
   useEffect(() => {
     if (loading || !location.hash) return undefined;
@@ -210,6 +223,7 @@ const Products = () => {
   };
 
   const isVariantInPriceRange = (variant) => {
+    if (!filtersEnabled) return true;
     const price = Number(variant.price || 0);
     return price >= PRICE_MIN && price <= priceMax;
   };
@@ -218,9 +232,32 @@ const Products = () => {
     return getProductVariants(product).some(isVariantInPriceRange);
   };
 
+  const getMatchingVariants = (product) => {
+    return getProductVariants(product).filter(isVariantInPriceRange);
+  };
+
+  const getVariantDiscount = (variant) => {
+    const price = Number(variant?.price || 0);
+    const mrp = Number(variant?.mrp || 0);
+    return mrp > price ? calculateDiscount(mrp, price) : 0;
+  };
+
   const getMatchingVariant = (product) => {
-    const variants = getProductVariants(product);
-    return variants.find(isVariantInPriceRange) || variants[0];
+    const variants = getMatchingVariants(product);
+    const fallbackVariant = getProductVariants(product)[0];
+
+    if (!variants.length) return fallbackVariant;
+    if (sortBy === 'price-low') {
+      return [...variants].sort((a, b) => Number(a.price || 0) - Number(b.price || 0))[0];
+    }
+    if (sortBy === 'price-high') {
+      return [...variants].sort((a, b) => Number(b.price || 0) - Number(a.price || 0))[0];
+    }
+    if (sortBy === 'discount') {
+      return [...variants].sort((a, b) => getVariantDiscount(b) - getVariantDiscount(a))[0];
+    }
+
+    return variants[0];
   };
 
   const getProductPrice = (product) => Number(getMatchingVariant(product)?.price || 0);
@@ -237,7 +274,7 @@ const Products = () => {
       if (sortBy === 'price-low') return getProductPrice(a) - getProductPrice(b);
       if (sortBy === 'price-high') return getProductPrice(b) - getProductPrice(a);
       if (sortBy === 'discount') return getProductDiscount(b) - getProductDiscount(a);
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
+      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
       return 0;
     });
   };
@@ -254,7 +291,9 @@ const Products = () => {
 
   const visibleSections = activeCategory === 'all'
     ? filteredSections
-    : filteredSections.filter(category => category.id === activeCategory);
+    : filtersEnabled
+      ? filteredSections.filter(category => category.id === activeCategory)
+      : filteredSections;
 
   const visibleProductCount = new Set(
     visibleSections.flatMap(section => section.products.map(product => product._id || product.slug))
@@ -269,6 +308,10 @@ const Products = () => {
   };
 
   const handleCategoryChange = (categoryId) => {
+    if (!filtersEnabled && categoryId !== 'all') {
+      setFiltersEnabled(true);
+    }
+
     setActiveCategory(categoryId);
     setHighlightedCategory(categoryId === 'all' ? '' : categoryId);
 
@@ -280,6 +323,17 @@ const Products = () => {
     if (categoryId !== 'all') {
       setTimeout(() => setHighlightedCategory(''), 1800);
     }
+  };
+
+  const handleFilterToggle = () => {
+    setFiltersEnabled((enabled) => {
+      if (enabled) {
+        setActiveCategory('all');
+        setHighlightedCategory('');
+      }
+
+      return !enabled;
+    });
   };
 
   const renderProductCard = (product, isHighlighted = false) => {
@@ -334,7 +388,21 @@ const Products = () => {
         <div className="container products-layout">
           <aside className="filter-panel">
             <h2><FiFilter /> Filter By</h2>
-            <div className="filter-group">
+            <div className="filter-toggle-row">
+              <div>
+                <strong>Enable Filters</strong>
+                <small>{filtersEnabled ? 'Filters are active' : 'Showing all products'}</small>
+              </div>
+              <button
+                type="button"
+                className={`filter-switch ${filtersEnabled ? 'on' : ''}`}
+                aria-pressed={filtersEnabled}
+                onClick={handleFilterToggle}
+              >
+                <span>{filtersEnabled ? 'On' : 'Off'}</span>
+              </button>
+            </div>
+            <div className={`filter-group ${!filtersEnabled ? 'filter-group-muted' : ''}`}>
               <h3>Categories</h3>
               <button
                 type="button"
@@ -347,7 +415,7 @@ const Products = () => {
               {categorySections.map((category) => (
                 <button
                   type="button"
-                  className={`filter-option ${activeCategory === category.id ? 'active' : ''}`}
+                  className={`filter-option ${filtersEnabled && activeCategory === category.id ? 'active' : ''}`}
                   key={category.id}
                   onClick={() => handleCategoryChange(category.id)}
                   disabled={getCategoryCount(category.id) === 0}
@@ -358,7 +426,7 @@ const Products = () => {
               ))}
             </div>
 
-            <div className="filter-group">
+            <div className={`filter-group ${!filtersEnabled ? 'filter-group-muted' : ''}`}>
               <h3>Price Range</h3>
               <input
                 type="range"
@@ -368,6 +436,7 @@ const Products = () => {
                 step="10"
                 value={priceMax}
                 onChange={(event) => setPriceMax(Number(event.target.value))}
+                disabled={!filtersEnabled}
               />
               <div className="price-range-labels">
                 <small>&#8377;{PRICE_MIN}</small>
@@ -377,12 +446,15 @@ const Products = () => {
 
             <div className="filter-group">
               <h3>Sort By</h3>
-              <select className="filter-select" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="discount">Highest Discount</option>
-                <option value="name">Name: A to Z</option>
+              <select
+                aria-label="Sort products"
+                className="filter-select"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+              >
+                {SORT_OPTIONS.map(option => (
+                  <option value={option.value} key={option.value}>{option.label}</option>
+                ))}
               </select>
             </div>
           </aside>
@@ -392,12 +464,14 @@ const Products = () => {
               <p>Showing {visibleProductCount} products</p>
               <label className="toolbar-sort">
                 <span>Sort by:</span>
-                <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-                  <option value="featured">Popularity</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="discount">Highest Discount</option>
-                  <option value="name">Name: A to Z</option>
+                <select
+                  aria-label="Sort products"
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                >
+                  {SORT_OPTIONS.map(option => (
+                    <option value={option.value} key={option.value}>{option.label}</option>
+                  ))}
                 </select>
                 <FiChevronDown />
               </label>

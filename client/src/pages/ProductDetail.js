@@ -7,7 +7,6 @@ import {
   FiArrowRight,
   FiAward,
   FiCheck,
-  FiChevronLeft,
   FiChevronRight,
   FiClock,
   FiHeart,
@@ -457,30 +456,6 @@ const ProductDetail = () => {
             <div className="best-time">Best time to consume: Morning or before meals</div>
           </article>
 
-          <article className="detail-card nutrition-card">
-            <h2>Nutritional Highlights</h2>
-            <div className="nutrition-grid">
-              {productTone.nutrients.map(([label, value]) => (
-                <div key={label}>
-                  <span>{label}</span>
-                  <strong>{value}</strong>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="detail-card review-card">
-            <h2>What Our Customers Say</h2>
-            <div className="review-content">
-              <button type="button"><FiChevronLeft /></button>
-              <blockquote>
-                <div className="review-stars">{[1, 2, 3, 4, 5].map(star => <FiStar key={star} />)}</div>
-                <p>Excellent quality and very fresh. I feel more energetic and healthy after using this daily.</p>
-                <cite>- Priya S.</cite>
-              </blockquote>
-              <button type="button"><FiChevronRight /></button>
-            </div>
-          </article>
         </section>
 
         {relatedProducts.length > 0 && (

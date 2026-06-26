@@ -104,6 +104,13 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const changeCartItemVariant = async (item, nextVariant) => {
+    if (!item || !nextVariant || item.variant === nextVariant) return;
+
+    await addToCart(item.product._id, nextVariant, item.quantity || 1);
+    await removeFromCart(item._id);
+  };
+
   const updateCartQuantity = async (itemId, quantity) => {
     try {
       if (quantity <= 0) {
@@ -200,6 +207,7 @@ export const CartProvider = ({ children }) => {
     loading,
     addToCart,
     removeFromCart,
+    changeCartItemVariant,
     updateCartQuantity,
     clearCart,
     fetchCart,

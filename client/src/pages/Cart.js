@@ -1,12 +1,25 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { FiTrash2, FiShoppingBag } from 'react-icons/fi';
+import { FiMinus, FiPlus, FiShoppingBag, FiTrash2 } from 'react-icons/fi';
 import './Cart.css';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cartItems, removeFromCart, cartTotal } = useCart();
+  const { cartItems, changeCartItemVariant, updateCartQuantity, cartTotal } = useCart();
+
+  const getVariantPrice = (product, variantWeight) => {
+    return product.variants?.find(variant => variant.weight === variantWeight)?.price || 0;
+  };
+
+  const handleQuantityChange = (item, nextQuantity) => {
+    const quantity = Math.max(1, Number(nextQuantity) || 1);
+    updateCartQuantity(item._id, quantity);
+  };
+
+  const handleRemoveOne = (item) => {
+    updateCartQuantity(item._id, (item.quantity || 1) - 1);
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -27,35 +40,80 @@ const Cart = () => {
         <div className="cart-grid">
           <div className="cart-items">
             {cartItems.map(item => (
-                <div key={item._id} className="cart-item">
-                  <img 
-                    src={item.product.images?.[0]?.url || '/placeholder.jpg'} 
-                    alt={item.product.name || 'Product'}
-                  />
-                  <div className="item-details">
-                    <h3>{item.product.name}</h3>
-                    <p>Variant: {item.variant}</p>
-                    <p className="item-price">₹{item.price} × {item.quantity}</p>
+              <div key={item._id} className="cart-item">
+                <img
+                  src={item.product.images?.[0]?.url || '/placeholder.jpg'}
+                  alt={item.product.name || 'Product'}
+                />
+
+                <div className="item-details">
+                  <h3>{item.product.name}</h3>
+                  <div className="cart-edit-grid">
+                    <label>
+                      <span>Weight</span>
+                      <select
+                        value={item.variant}
+                        onChange={(event) => changeCartItemVariant(item, event.target.value)}
+                      >
+                        {item.product.variants?.map((variant) => (
+                          <option value={variant.weight} key={variant.weight}>
+                            {variant.weight} - &#8377;{variant.price}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      <span>Quantity</span>
+                      <div className="cart-quantity-control">
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange(item, (item.quantity || 1) - 1)}
+                          aria-label={`Decrease ${item.product.name} quantity`}
+                        >
+                          <FiMinus />
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(event) => handleQuantityChange(item, event.target.value)}
+                          aria-label={`${item.product.name} quantity`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange(item, (item.quantity || 1) + 1)}
+                          aria-label={`Increase ${item.product.name} quantity`}
+                        >
+                          <FiPlus />
+                        </button>
+                      </div>
+                    </label>
                   </div>
-                  <div className="item-actions">
-                    <span className="item-total">₹{item.price * item.quantity}</span>
-                    <button 
-                      onClick={() => removeFromCart(item._id)}
-                      className="btn-remove"
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </div>
+                  <p className="item-price">&#8377;{getVariantPrice(item.product, item.variant) || item.price} each</p>
                 </div>
+
+                <div className="item-actions">
+                  <span className="item-total">&#8377;{item.price * item.quantity}</span>
+                  <button
+                    onClick={() => handleRemoveOne(item)}
+                    className="btn-remove"
+                    title="Remove one item"
+                    aria-label={`Remove one ${item.product.name}`}
+                  >
+                    <FiTrash2 />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
 
           <div className="cart-summary">
             <h2>Order Summary</h2>
-            
+
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>₹{cartTotal}</span>
+              <span>&#8377;{cartTotal}</span>
             </div>
 
             <div className="summary-row">
@@ -70,7 +128,7 @@ const Cart = () => {
               <span>&#8377;{cartTotal}</span>
             </div>
 
-            <button 
+            <button
               onClick={() => navigate('/checkout')}
               className="btn btn-primary btn-block"
             >
@@ -88,4 +146,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

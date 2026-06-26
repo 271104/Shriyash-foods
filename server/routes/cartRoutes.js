@@ -184,6 +184,7 @@ router.post('/add', optional, async (req, res) => {
 router.put('/update/:itemId', optional, async (req, res) => {
   try {
     const { quantity } = req.body;
+    const nextQuantity = Number(quantity);
     const { customerType, user, guestUser, sessionId } = await getCustomerContext(req);
     const cart = await findCartForRequest(req, customerType, user, sessionId);
 
@@ -197,10 +198,34 @@ router.put('/update/:itemId', optional, async (req, res) => {
     }
 
     const previousQuantity = item.quantity;
-    item.quantity = quantity;
-    item.lastUpdatedAt = new Date();
-
     const product = await Product.findById(item.product);
+
+    if (nextQuantity <= 0) {
+      logCartActivity(
+        cart,
+        'REMOVE',
+        {
+          productId: item.product,
+          productName: product?.name,
+          variant: item.variant,
+          quantity: 1,
+          previousQuantity,
+          price: item.price,
+          itemCountAfter: cart.items.reduce((sum, entry) => sum + entry.quantity, 0) - 1
+        },
+        req,
+        customerType
+      );
+
+      cart.items = cart.items.filter((entry) => entry._id.toString() !== req.params.itemId);
+      await cart.save();
+      await cart.populate('items.product');
+
+      return res.json({ success: true, cart });
+    }
+
+    item.quantity = nextQuantity;
+    item.lastUpdatedAt = new Date();
 
     logCartActivity(
       cart,
@@ -209,7 +234,7 @@ router.put('/update/:itemId', optional, async (req, res) => {
         productId: item.product,
         productName: product?.name,
         variant: item.variant,
-        quantity,
+        quantity: nextQuantity,
         previousQuantity,
         price: item.price,
         itemCountAfter: cart.items.reduce((sum, entry) => sum + entry.quantity, 0)
@@ -225,7 +250,7 @@ router.put('/update/:itemId', optional, async (req, res) => {
       productId: item.product,
       productName: product?.name,
       variant: item.variant,
-      quantity,
+      quantity: nextQuantity,
       previousQuantity
     };
 

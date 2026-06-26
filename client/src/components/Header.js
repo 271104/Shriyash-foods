@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { FiShoppingCart, FiUser, FiMenu, FiX, FiCheckCircle, FiDroplet, FiShield, FiHeadphones, FiHelpCircle, FiPhone } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -104,10 +104,10 @@ const Header = () => {
               </button>
               
               <nav className={`nav ${showMenu ? 'nav-open' : ''}`}>
-                <Link to="/" onClick={() => setShowMenu(false)}>Home</Link>
-                <Link to="/products" onClick={() => setShowMenu(false)}>Products</Link>
-                <Link to="/about" onClick={() => setShowMenu(false)}>About Us</Link>
-                <Link to="/contact" onClick={() => setShowMenu(false)}>Contact Us</Link>
+                <NavLink to="/" end onClick={() => setShowMenu(false)}>Home</NavLink>
+                <NavLink to="/products" onClick={() => setShowMenu(false)}>Products</NavLink>
+                <NavLink to="/about" onClick={() => setShowMenu(false)}>About Us</NavLink>
+                <NavLink to="/contact" onClick={() => setShowMenu(false)}>Contact Us</NavLink>
                 
                 <div className="nav-icons">
                   <Link to="/cart" className="cart-icon" onClick={() => setShowMenu(false)}>

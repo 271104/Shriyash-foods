@@ -41,6 +41,18 @@ const fallbackProducts = [
     variants: [{ price: 249, mrp: 299 }]
   },
   {
+    _id: 'curry-leaves-powder',
+    name: 'Curry Leaves Powder',
+    slug: 'curry-leaves-powder',
+    description: 'Natural Curry Leaves Powder - A flavorful green powder made for daily cooking, seasoning, and traditional wellness routines.',
+    images: [{ url: '/Curry-Leaves.PNG' }],
+    variants: [
+      { weight: '150gm', price: 129, mrp: 159 },
+      { weight: '250gm', price: 189, mrp: 229 },
+      { weight: '500gm', price: 249, mrp: 299 }
+    ]
+  },
+  {
     _id: 'onion-powder',
     name: 'Onion Powder',
     slug: 'onion-powder',
@@ -63,7 +75,7 @@ const categorySections = [
     id: 'green-powder',
     title: 'Green Powders',
     sidebarLabel: 'Green Powders',
-    productKeys: ['moringa']
+    productKeys: ['moringa', 'curry']
   },
   {
     id: 'fruits',
@@ -137,7 +149,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify({
@@ -194,7 +206,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get('/products');
-      setProducts(data.products?.length ? data.products : fallbackProducts);
+      setProducts(mergeFallbackProducts(data.products?.length ? data.products : fallbackProducts));
     } catch (error) {
       console.error('Error fetching products:', error);
       setProducts(fallbackProducts);
@@ -210,6 +222,17 @@ const Products = () => {
   const productMatchesKey = (product, key) => {
     const searchable = `${product.slug || ''} ${product.name || ''}`.toLowerCase();
     return searchable.includes(key);
+  };
+
+  const mergeFallbackProducts = (items) => {
+    const productsBySlug = new Map(items.map(product => [product.slug, product]));
+    fallbackProducts.forEach((product) => {
+      if (!productsBySlug.has(product.slug)) {
+        productsBySlug.set(product.slug, product);
+      }
+    });
+
+    return Array.from(productsBySlug.values());
   };
 
   const getCategoryProducts = (productKeys) => {

@@ -109,6 +109,7 @@ const ContactUs = () => {
       <section className="contact-hero">
         <div className="contact-leaf contact-leaf-left" aria-hidden="true"></div>
         <div className="contact-leaf contact-leaf-right" aria-hidden="true"></div>
+        <img className="contact-hero-banner" src="/ContactUsBanner.png" alt="Shriyash Foods contact support" />
 
         <div className="container contact-hero-grid">
           <div className="contact-hero-copy">
@@ -146,11 +147,6 @@ const ContactUs = () => {
             </Link>
           </div>
 
-          <div className="contact-hero-collage">
-            <img className="contact-collage-main" src="/green_powder.png" alt="Shriyash Foods powder products" />
-            <img src="/about-journey.png" alt="Farmer holding fresh greens" />
-            <img src="/banner_our_journey.png" alt="Food processing facility" />
-          </div>
         </div>
       </section>
 

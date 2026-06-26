@@ -95,10 +95,7 @@
 }
 
 .about-hero-collage {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: 1.1fr 0.9fr;
-  grid-template-rows: 1fr 1fr;
+  display: block;
   min-height: 420px;
 }
 
@@ -112,12 +109,7 @@
 }
 
 .collage-main {
-  grid-row: 1 / span 2;
-  height: 100%;
-}
-
-.collage-small {
-  height: 100%;
+  height: 420px;
 }
 
 .about-leaf {
@@ -202,6 +194,11 @@
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cert-grid {
+  grid-template-columns: repeat(3, minmax(240px, 300px));
+  justify-content: center;
 }
 
 .feature-card,
@@ -331,6 +328,11 @@
 }
 
 .cert-card {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 238px;
   padding: 28px 22px;
   text-align: center;
 }
@@ -481,13 +483,11 @@
   }
 
   .about-hero-collage {
-    grid-template-columns: 1fr 1fr;
     min-height: auto;
   }
 
   .collage-main {
-    grid-column: 1 / -1;
-    grid-row: auto;
+    height: auto;
     max-height: 420px;
   }
 
@@ -503,9 +503,12 @@
 
 @media (max-width: 900px) {
   .feature-grid,
-  .cert-grid,
   .products-showcase {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cert-grid {
+    grid-template-columns: repeat(2, minmax(0, 300px));
   }
 
   .process-row {

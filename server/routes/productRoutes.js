@@ -56,6 +56,26 @@ const fallbackProducts = [
     isActive: true
   },
   {
+    _id: 'curry-leaves-powder',
+    name: 'Curry Leaves Powder',
+    slug: 'curry-leaves-powder',
+    description: 'Natural curry leaves powder for everyday cooking, seasoning, and traditional green nutrition routines.',
+    category: 'powder',
+    variants: [
+      { weight: '150gm', price: 129, mrp: 159, stock: 100, sku: 'CUR-150' },
+      { weight: '250gm', price: 189, mrp: 229, stock: 100, sku: 'CUR-250' },
+      { weight: '500gm', price: 249, mrp: 299, stock: 100, sku: 'CUR-500' }
+    ],
+    images: [
+      { url: '/Curry-Leaves.PNG' },
+      { url: '/curry-Leaves-back.PNG' }
+    ],
+    benefits: ['Adds natural flavor', 'Useful in everyday cooking', 'Green powder convenience'],
+    usage: 'Use in curries, chutneys, seasoning mixes, soups, and traditional recipes.',
+    shelfLife: '12 months from manufacturing',
+    isActive: true
+  },
+  {
     _id: 'onion-powder',
     name: 'Onion Powder',
     slug: 'onion-powder',
@@ -83,12 +103,23 @@ const fallbackProducts = [
   }
 ];
 
+const mergeFallbackProducts = (products) => {
+  const productsBySlug = new Map(products.map(product => [product.slug, product]));
+  fallbackProducts.forEach((product) => {
+    if (!productsBySlug.has(product.slug)) {
+      productsBySlug.set(product.slug, product);
+    }
+  });
+
+  return Array.from(productsBySlug.values());
+};
+
 // @route   GET /api/products
 // @desc    Get all products
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({ isActive: true });
-    res.json({ success: true, products: products.length ? products : fallbackProducts });
+    res.json({ success: true, products: products.length ? mergeFallbackProducts(products) : fallbackProducts });
   } catch (error) {
     res.json({ success: true, products: fallbackProducts, source: 'fallback' });
   }

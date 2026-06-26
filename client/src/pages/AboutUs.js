@@ -17,46 +17,45 @@ import './AboutUs.css';
 const whyChoose = [
   {
     icon: FiFeather,
-    title: '100% Natural Ingredients',
-    text: 'No chemicals or additives. Just pure fruits and vegetables in every scoop.'
+    title: 'Built Around Real Produce',
+    text: 'Our powders begin with recognizable fruits, vegetables, and greens selected for everyday use.'
   },
   {
     icon: FiUsers,
-    title: 'Supporting Farmers',
-    text: 'We empower local farmers through fair sourcing and sustainable practices.'
+    title: 'Rooted in Local Sourcing',
+    text: 'We work toward creating a dependable bridge between farm harvests and modern kitchens.'
   },
   {
     icon: FiShield,
-    title: 'Hygienic Processing',
-    text: 'Advanced dehydration and grinding technology helps preserve purity and safety.'
+    title: 'Care at Every Stage',
+    text: 'From sorting to packing, our process is designed to keep each batch consistent and clean.'
   },
   {
     icon: FiCheckCircle,
-    title: 'Sustainable Vision',
-    text: 'Committed to reducing food waste and building a healthier future for all.'
+    title: 'Practical Nutrition',
+    text: 'We make shelf-stable powders that are easy to store, measure, mix, and use daily.'
   }
 ];
 
 const processSteps = [
-  { icon: FiFeather, title: 'Farm Fresh', text: 'We source quality fruits and vegetables from trusted farmers.' },
-  { icon: FiCheckCircle, title: 'Careful Selection', text: 'Only fresh produce is handpicked and inspected.' },
-  { icon: FiZap, title: 'Dehydration', text: 'Low-moisture processing locks in nutrition and flavor.' },
-  { icon: FiPackage, title: 'Grinding', text: 'Dried produce is finely ground into premium powder.' },
-  { icon: FiAward, title: 'Packaging', text: 'Packed hygienically to retain freshness and quality.' },
-  { icon: FiTruck, title: 'Delivered', text: 'Delivered to your doorstep with care and convenience.' }
+  { icon: FiFeather, title: 'Sourcing', text: 'Produce is selected with attention to freshness, season, and suitability for powder making.' },
+  { icon: FiCheckCircle, title: 'Inspection', text: 'Raw material is checked and cleaned before it enters the processing workflow.' },
+  { icon: FiZap, title: 'Drying', text: 'Moisture is reduced carefully to improve shelf life while retaining natural character.' },
+  { icon: FiPackage, title: 'Milling', text: 'Dried produce is ground into a fine, convenient powder for everyday use.' },
+  { icon: FiAward, title: 'Batch Care', text: 'Each batch is packed with hygiene, consistency, and traceability in mind.' },
+  { icon: FiTruck, title: 'Dispatch', text: 'Products are prepared for delivery so they reach customers in usable condition.' }
 ];
 
 const certifications = [
-  { title: 'FSSAI Certified', text: 'Food Safety & Standards Authority of India', icon: FiAward },
-  { title: 'ISO 22000:2018', text: 'Food safety management standard', icon: FiShield },
-  { title: 'Lab Tested', text: 'Every batch is tested for purity and quality', icon: FiZap },
-  { title: 'GMP Certified', text: 'Good Manufacturing Practices certified', icon: FiCheckCircle }
+  { title: 'FSSAI Registered', text: 'Operating under Indian food safety compliance requirements', icon: FiAward },
+  { title: 'Food Safety Focus', text: 'Process decisions are guided by hygiene, documentation, and batch control', icon: FiShield },
+  { title: 'Quality Checks', text: 'Products are reviewed for consistency before they move toward dispatch', icon: FiZap },
 ];
 
 const productRanges = [
   {
     title: 'Green Powders',
-    items: ['Moringa Powder']
+    items: ['Moringa Powder', 'Curry Leaves Powder']
   },
   {
     title: 'Vegetable Powders',
@@ -86,10 +85,10 @@ const AboutUs = () => {
         <div className="container about-hero-grid">
           <div className="about-hero-copy">
             <p className="about-kicker">About Us</p>
-            <h1>From Farms to the Future</h1>
+            <h1>Making Natural Powders More Useful</h1>
             <p>
-              Transforming fresh produce into premium dehydrated powders while supporting
-              farmers and delivering natural nutrition worldwide.
+              Shriyash Foods creates dehydrated fruit, vegetable, and green powders for
+              homes that want convenient ingredients without moving away from real food.
             </p>
             <Link to="/products" className="about-primary-link">
               Explore Our Products
@@ -98,9 +97,7 @@ const AboutUs = () => {
           </div>
 
           <div className="about-hero-collage" aria-label="Shriyash Foods natural products and process">
-            <img className="collage-main" src="/about-journey.png" alt="Fresh farm produce and Shriyash Foods products" />
-            <img className="collage-small" src="/green_powder.png" alt="Green powder product display" />
-            <img className="collage-small" src="/banner_our_journey.png" alt="Food processing facility" />
+            <img className="collage-main" src="/aboutus1.png" alt="Shriyash Foods natural farm story" />
           </div>
         </div>
       </section>
@@ -112,10 +109,10 @@ const AboutUs = () => {
           </div>
           <div className="story-text">
             <p className="about-kicker">Our Story</p>
-            <h2>A Passion for Purity and People</h2>
-            <p>Shriyash Foods began with a simple mission: reduce food wastage, support local farmers, and make natural nutrition convenient for every home.</p>
-            <p>We work closely with farmers to source fresh fruits and vegetables, which are carefully dehydrated and ground into fine powders under strict quality standards.</p>
-            <p>Today, our products are trusted by families who want pure, convenient, and trustworthy nutrition without compromising taste or quality.</p>
+            <h2>Small Ingredients, Bigger Everyday Value</h2>
+            <p>Shriyash Foods was started with a clear idea: good produce should not be limited by season, storage, or busy routines.</p>
+            <p>Based in Solapur, Maharashtra, we focus on turning selected farm produce into powders that are simple to carry, measure, cook with, and add to daily meals.</p>
+            <p>Our work sits between agriculture and modern food habits, helping customers use familiar ingredients in a more convenient form.</p>
             <Link to="/our-journey" className="about-secondary-link">
               Know More About Our Process
               <span aria-hidden="true">-&gt;</span>
@@ -126,8 +123,8 @@ const AboutUs = () => {
 
       <section className="about-feature-section">
         <div className="container">
-          <p className="about-kicker centered">Why Choose Us</p>
-          <h2>Good for You, Good for the Planet</h2>
+          <p className="about-kicker centered">What Defines Us</p>
+          <h2>A Company Built for Everyday Kitchens</h2>
           <div className="feature-grid">
             {whyChoose.map((item) => {
               const Icon = item.icon;
@@ -148,8 +145,8 @@ const AboutUs = () => {
 
       <section className="process-section">
         <div className="container">
-          <p className="about-kicker centered">Our Process</p>
-          <h2>From Farm to Pack</h2>
+          <p className="about-kicker centered">How We Work</p>
+          <h2>From Selection to Shelf</h2>
           <div className="process-row">
             {processSteps.map((step, index) => {
               const Icon = step.icon;
@@ -170,8 +167,8 @@ const AboutUs = () => {
 
       <section className="certification-section">
         <div className="container">
-          <p className="about-kicker centered">Certifications</p>
-          <h2>Quality You Can Trust</h2>
+          <p className="about-kicker centered">Quality Approach</p>
+          <h2>Standards Behind the Pack</h2>
           <div className="cert-grid">
             {certifications.map((item) => {
               const Icon = item.icon;
@@ -199,8 +196,8 @@ const AboutUs = () => {
               </div>
               <div>
                 <p className="about-kicker">Our Mission</p>
-                <h3>Natural nutrition for every home</h3>
-                <p>To deliver natural, nutritious, and high-quality food products while supporting farmers and promoting healthier lifestyles.</p>
+                <h3>Make real ingredients easier to use</h3>
+                <p>To create dependable natural powders that help families, food makers, and wellness-focused customers use produce more conveniently.</p>
               </div>
             </div>
             <div className="mv-card">
@@ -209,8 +206,8 @@ const AboutUs = () => {
               </div>
               <div>
                 <p className="about-kicker">Our Vision</p>
-                <h3>A trusted global food brand</h3>
-                <p>To be a globally trusted brand in dehydrated food products, known for purity, innovation, and commitment toward people and the planet.</p>
+                <h3>Grow as a responsible food brand</h3>
+                <p>To build a trusted Indian dehydrated-food brand known for useful products, steady quality, and respect for farm-grown ingredients.</p>
               </div>
             </div>
           </div>
@@ -219,8 +216,8 @@ const AboutUs = () => {
 
       <section className="our-products-section">
         <div className="container">
-          <h2>Our Product Range</h2>
-          <p className="section-subtitle">From nature's bounty to your wellness routine</p>
+          <h2>What We Make</h2>
+          <p className="section-subtitle">Simple powder formats for cooking, drinks, recipes, and daily nutrition</p>
           <div className="products-showcase">
             {productRanges.map((range) => (
               <article className="product-category" key={range.title}>
@@ -240,8 +237,8 @@ const AboutUs = () => {
         <div className="container cta-panel">
           <img src="/green_powder.png" alt="Moringa powder bowl" />
           <div>
-            <h2>Ready to Experience Natural Nutrition?</h2>
-            <p>Explore our wide range of wholesome powders made with nature's finest ingredients.</p>
+            <h2>Explore Ingredients Made for Daily Use</h2>
+            <p>Browse our current powders and find the format that fits your kitchen, routine, or recipe.</p>
           </div>
           <Link to="/products" className="about-cta-link">
             Shop Now

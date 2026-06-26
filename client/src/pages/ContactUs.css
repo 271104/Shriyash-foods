@@ -55,15 +55,18 @@
     radial-gradient(circle at left top, rgba(36, 71, 11, 0.08), transparent 34%),
     linear-gradient(180deg, #fffdf7 0%, var(--contact-white) 100%);
   overflow: hidden;
-  padding: 158px 0 72px;
+  padding: 0 0 72px;
   position: relative;
 }
 
 .contact-hero-grid {
-  align-items: center;
-  display: grid;
-  gap: 56px;
-  grid-template-columns: minmax(0, 0.82fr) minmax(500px, 1.18fr);
+  display: block;
+  padding-top: 46px;
+}
+
+.contact-hero-copy {
+  margin: 0 auto;
+  max-width: 1180px;
 }
 
 .contact-hero-copy h1 {
@@ -74,12 +77,26 @@
   margin: 0 0 20px;
 }
 
+.contact-hero-banner {
+  border: 1px solid var(--contact-line);
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+  box-shadow: 0 24px 54px rgba(23, 52, 18, 0.12);
+  display: block;
+  height: auto;
+  margin: 0;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+}
+
 .contact-hero-copy > p:not(.contact-kicker) {
   color: var(--contact-text);
   font-size: 19px;
   line-height: 1.65;
   margin: 0 0 26px;
-  max-width: 460px;
+  max-width: 620px;
 }
 
 .hero-contact-list {
@@ -122,27 +139,6 @@
   color: var(--contact-muted);
   font-size: 14px;
   overflow-wrap: anywhere;
-}
-
-.contact-hero-collage {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: 1.1fr 0.9fr;
-  grid-template-rows: 1fr 1fr;
-  min-height: 430px;
-}
-
-.contact-hero-collage img {
-  border: 1px solid var(--contact-line);
-  border-radius: 18px;
-  box-shadow: 0 24px 54px rgba(23, 52, 18, 0.12);
-  height: 100%;
-  object-fit: cover;
-  width: 100%;
-}
-
-.contact-collage-main {
-  grid-row: 1 / span 2;
 }
 
 .contact-leaf {
@@ -523,22 +519,10 @@
 }
 
 @media (max-width: 1080px) {
-  .contact-hero-grid,
   .contact-form-map,
   .support-grid,
   .contact-cta-panel {
     grid-template-columns: 1fr;
-  }
-
-  .contact-hero-collage {
-    grid-template-columns: 1fr 1fr;
-    min-height: auto;
-  }
-
-  .contact-collage-main {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    max-height: 420px;
   }
 
   .contact-cta-link {
@@ -563,15 +547,22 @@
 
 @media (max-width: 640px) {
   .contact-hero {
-    padding: 132px 0 54px;
+    padding: 0 0 54px;
+  }
+
+  .contact-hero-grid {
+    padding-top: 34px;
   }
 
   .contact-hero-copy h1 {
     font-size: 44px;
   }
 
+  .contact-hero-banner {
+    max-height: 280px;
+  }
+
   .contact-card-grid,
-  .contact-hero-collage,
   .contact-form .form-row,
   .reason-grid,
   .faq-grid {

@@ -26,21 +26,21 @@ const fallbackRelatedProducts = [
     _id: 'abc-powder',
     name: 'ABC Powder',
     slug: 'abc-powder',
-    images: [{ url: '/abc-removebg-preview.png' }],
+    images: [{ url: '/abc-removebg-preview.png' }, { url: '/ABC-Back.PNG' }],
     variants: [{ price: 249, mrp: 299 }]
   },
   {
     _id: 'beetroot-powder',
     name: 'Beetroot Powder',
     slug: 'beetroot-powder',
-    images: [{ url: '/beetroot-removebg-preview.png' }],
+    images: [{ url: '/beetroot-removebg-preview.png' }, { url: '/Beetroot-back.PNG' }],
     variants: [{ price: 199, mrp: 249 }]
   },
   {
     _id: 'banana-powder',
     name: 'Banana Powder',
     slug: 'banana-powder',
-    images: [{ url: '/banana-removebg-preview.png' }],
+    images: [{ url: '/banana-removebg-preview.png' }, { url: '/Banana-back.PNG' }],
     variants: [{ price: 199, mrp: 249 }]
   },
   {
@@ -54,17 +54,37 @@ const fallbackRelatedProducts = [
     _id: 'onion-powder',
     name: 'Onion Powder',
     slug: 'onion-powder',
-    images: [{ url: '/onion-removebg-preview.png' }],
+    images: [{ url: '/onion-removebg-preview.png' }, { url: '/Onion-back.PNG' }],
     variants: [{ price: 199, mrp: 249 }]
   },
   {
     _id: 'moringa-powder',
     name: 'Moringa Powder',
     slug: 'moringa-powder',
-    images: [{ url: '/moringa-removebg-preview.png' }],
+    images: [{ url: '/moringa-removebg-preview.png' }, { url: '/Moringa-back.PNG' }],
     variants: [{ price: 249, mrp: 299 }]
+  },
+  {
+    _id: 'curry-leaves-powder',
+    name: 'Curry Leaves Powder',
+    slug: 'curry-leaves-powder',
+    images: [{ url: '/Curry-Leaves.PNG' }, { url: '/curry-Leaves-back.PNG' }],
+    variants: [
+      { weight: '150gm', price: 129, mrp: 159 },
+      { weight: '250gm', price: 189, mrp: 229 },
+      { weight: '500gm', price: 249, mrp: 299 }
+    ]
   }
 ];
+
+const productImageAssets = {
+  'abc-powder': ['/abc-removebg-preview.png', '/ABC-Back.PNG'],
+  'banana-powder': ['/banana-removebg-preview.png', '/Banana-back.PNG'],
+  'beetroot-powder': ['/beetroot-removebg-preview.png', '/Beetroot-back.PNG'],
+  'moringa-powder': ['/moringa-removebg-preview.png', '/Moringa-back.PNG'],
+  'onion-powder': ['/onion-removebg-preview.png', '/Onion-back.PNG'],
+  'curry-leaves-powder': ['/Curry-Leaves.PNG', '/curry-Leaves-back.PNG']
+};
 
 const getDiscount = (variant) => {
   if (!variant?.mrp || variant.mrp <= variant.price) return 0;
@@ -73,7 +93,7 @@ const getDiscount = (variant) => {
 
 const getProductCategory = (product) => {
   const text = `${product?.slug || ''} ${product?.name || ''}`.toLowerCase();
-  if (text.includes('moringa')) return { label: 'Green Powders', hash: 'green-powder' };
+  if (text.includes('moringa') || text.includes('curry')) return { label: 'Green Powders', hash: 'green-powder' };
   if (text.includes('onion') || text.includes('beetroot')) return { label: 'Vegetable Powders', hash: 'vegetables' };
   return { label: 'Fruit Powders', hash: 'fruits' };
 };
@@ -105,6 +125,29 @@ const getProductTone = (productName = '') => {
         ['Calcium', '440mg'],
         ['Vitamin A', '6780 IU'],
         ['Vitamin C', '17.3mg']
+      ]
+    };
+  }
+
+  if (text.includes('curry')) {
+    return {
+      hero: '/Curry-Leaves.PNG',
+      whyTitle: 'Why Choose Curry Leaves Powder?',
+      benefits: [
+        'Adds authentic curry leaves flavor',
+        'Convenient for daily cooking',
+        'Useful in chutneys and seasoning blends',
+        'Easy to store and measure',
+        'Green powder for traditional recipes',
+        'Helps reduce prep time in the kitchen'
+      ],
+      nutrients: [
+        ['Flavor', 'Aromatic'],
+        ['Use', 'Cooking'],
+        ['Format', 'Powder'],
+        ['Storage', 'Easy'],
+        ['Recipe Fit', 'Daily'],
+        ['Convenience', 'High']
       ]
     };
   }
@@ -232,6 +275,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedImage, setSelectedImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
 
@@ -246,6 +290,7 @@ const ProductDetail = () => {
       const { data } = await axios.get(`/products/${slug}`);
       setProduct(data.product);
       setSelectedVariant(data.product.variants?.[0] || null);
+      setSelectedImage('');
       fetchRelatedProducts(data.product.slug);
     } catch (error) {
       toast.error('Product not found');
@@ -267,6 +312,12 @@ const ProductDetail = () => {
         .filter(item => item.slug !== currentSlug && !isStandaloneCarrotProduct(item))
         .slice(0, 6));
     }
+  };
+
+  const getGalleryImages = (item) => {
+    const uploadedImages = item?.images?.map(image => image.url).filter(Boolean) || [];
+    const assetImages = productImageAssets[item?.slug] || [];
+    return Array.from(new Set([...uploadedImages, ...assetImages])).filter(Boolean);
   };
 
   const handleAddToCart = async () => {
@@ -296,7 +347,11 @@ const ProductDetail = () => {
   const productTone = useMemo(() => getProductTone(product?.name), [product]);
   const category = useMemo(() => getProductCategory(product), [product]);
   const discount = getDiscount(selectedVariant);
-  const imageUrl = product?.images?.[0]?.url || productTone.hero || '/placeholder.jpg';
+  const galleryImages = useMemo(() => {
+    const images = getGalleryImages(product);
+    return images.length ? images : [productTone.hero || '/placeholder.jpg'];
+  }, [product, productTone.hero]);
+  const imageUrl = selectedImage || galleryImages[0];
   const methods = product?.howToConsume?.length
     ? product.howToConsume
     : ['Take 1 teaspoon (3-5g)', 'Mix in water, juice or smoothies', 'Drink daily for best results'];
@@ -331,8 +386,13 @@ const ProductDetail = () => {
         <section className="product-hero-detail">
           <aside className="product-thumbs" aria-label="Product images">
             <button type="button" className="thumb-arrow"><FiChevronRight /></button>
-            {[imageUrl, productTone.hero, '/green_powder.png'].map((image, index) => (
-              <button type="button" className={`thumb-card ${index === 0 ? 'active' : ''}`} key={`${image}-${index}`}>
+            {galleryImages.map((image, index) => (
+              <button
+                type="button"
+                className={`thumb-card ${imageUrl === image ? 'active' : ''}`}
+                key={`${image}-${index}`}
+                onClick={() => setSelectedImage(image)}
+              >
                 <img src={image} alt={`${product.name} view ${index + 1}`} />
               </button>
             ))}

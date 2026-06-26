@@ -23,6 +23,7 @@ import OurJourney from './pages/OurJourney';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import RefundPolicy from './pages/RefundPolicy';
+import ShippingPolicy from './pages/ShippingPolicy';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 
@@ -52,6 +53,7 @@ function App() {
                   <Route path="/our-journey" element={<OurJourney />} />
                   <Route path="/contact" element={<ContactUs />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/shipping-policy" element={<ShippingPolicy />} />
                   <Route path="/terms-conditions" element={<TermsConditions />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                 </Routes>

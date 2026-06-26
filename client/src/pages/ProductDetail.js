@@ -86,6 +86,19 @@ const productImageAssets = {
   'curry-leaves-powder': ['/Curry-Leaves.PNG', '/curry-Leaves-back.PNG']
 };
 
+const getProductImageAssets = (item) => {
+  const searchable = `${item?.slug || ''} ${item?.name || ''}`.toLowerCase();
+
+  if (searchable.includes('moringa')) return productImageAssets['moringa-powder'];
+  if (searchable.includes('beetroot')) return productImageAssets['beetroot-powder'];
+  if (searchable.includes('onion')) return productImageAssets['onion-powder'];
+  if (searchable.includes('banana')) return productImageAssets['banana-powder'];
+  if (searchable.includes('abc')) return productImageAssets['abc-powder'];
+  if (searchable.includes('curry')) return productImageAssets['curry-leaves-powder'];
+
+  return productImageAssets[item?.slug] || [];
+};
+
 const getDiscount = (variant) => {
   if (!variant?.mrp || variant.mrp <= variant.price) return 0;
   return Math.round(((variant.mrp - variant.price) / variant.mrp) * 100);
@@ -316,7 +329,7 @@ const ProductDetail = () => {
 
   const getGalleryImages = (item) => {
     const uploadedImages = item?.images?.map(image => image.url).filter(Boolean) || [];
-    const assetImages = productImageAssets[item?.slug] || [];
+    const assetImages = getProductImageAssets(item);
     return Array.from(new Set([...uploadedImages, ...assetImages])).filter(Boolean);
   };
 

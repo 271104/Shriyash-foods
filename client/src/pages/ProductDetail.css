@@ -516,6 +516,16 @@
   width: 100%;
 }
 
+.detail-stock-status {
+  width: fit-content;
+  margin: 8px 0 16px;
+  padding: 7px 14px;
+  border-radius: 4px;
+  background: #f9e7e7;
+  color: #8b1e1e;
+  font-weight: 700;
+}
+
 .detail-card {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--detail-line);

@@ -96,6 +96,9 @@ router.post('/add', optional, async (req, res) => {
       console.error('🛒 [CART] Product not found:', productId);
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
+    if (['banana-powder', 'abc-powder', 'tomato-powder'].includes(product.slug)) {
+      return res.status(409).json({ success: false, message: 'This product is currently out of stock' });
+    }
     console.log('🛒 [CART] Product found:', { name: product.name, variants: product.variants.length });
     console.log('🛒 [CART] Product variants:', product.variants.map(v => ({ weight: v.weight, price: v.price })));
 
@@ -104,6 +107,9 @@ router.post('/add', optional, async (req, res) => {
     if (!variantData) {
       console.error('🛒 [CART] Invalid variant:', { requested: variant, available: product.variants.map(v => v.weight) });
       return res.status(400).json({ success: false, message: 'Invalid variant' });
+    }
+    if (Number(variantData.stock) <= 0) {
+      return res.status(409).json({ success: false, message: 'This product is currently out of stock' });
     }
 
     if (customerType === 'guest' && !sessionId) {

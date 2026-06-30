@@ -393,6 +393,11 @@
   z-index: 3;
 }
 
+.product-badge.out-of-stock-badge {
+  background: #8b1e1e;
+  min-width: 112px;
+}
+
 .product-image {
   align-items: center;
   background: linear-gradient(135deg, #ffffff 0%, #f1f7ec 100%);

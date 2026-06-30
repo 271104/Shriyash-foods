@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 
+const temporarilyOutOfStockSlugs = new Set(['banana-powder', 'abc-powder', 'tomato-powder']);
+
+const applyStockOverrides = (product) => {
+  const plainProduct = product?.toObject ? product.toObject() : { ...product };
+  if (!temporarilyOutOfStockSlugs.has(plainProduct.slug)) return plainProduct;
+  return {
+    ...plainProduct,
+    variants: (plainProduct.variants || []).map(variant => ({ ...variant, stock: 0 }))
+  };
+};
+
 const fallbackProducts = [
   {
     _id: 'tomato-powder',
@@ -111,7 +122,7 @@ const mergeFallbackProducts = (products) => {
     }
   });
 
-  return Array.from(productsBySlug.values());
+  return Array.from(productsBySlug.values()).map(applyStockOverrides);
 };
 
 // @route   GET /api/products
@@ -119,7 +130,7 @@ const mergeFallbackProducts = (products) => {
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({ isActive: true });
-    res.json({ success: true, products: products.length ? mergeFallbackProducts(products) : fallbackProducts });
+    res.json({ success: true, products: products.length ? mergeFallbackProducts(products) : fallbackProducts.map(applyStockOverrides) });
   } catch (error) {
     res.json({ success: true, products: fallbackProducts, source: 'fallback' });
   }
@@ -140,7 +151,7 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
     
-    res.json({ success: true, product });
+    res.json({ success: true, product: applyStockOverrides(product) });
   } catch (error) {
     const fallbackProduct = fallbackProducts.find(item => item.slug === req.params.slug);
     if (fallbackProduct) {

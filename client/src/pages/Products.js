@@ -362,6 +362,8 @@ const Products = () => {
   const renderProductCard = (product, isHighlighted = false) => {
     const variant = getMatchingVariant(product);
     const discount = variant.mrp > variant.price ? calculateDiscount(variant.mrp, variant.price) : 0;
+    const isOutOfStock = ['banana-powder', 'abc-powder', 'tomato-powder'].includes(product.slug)
+      || (product.variants?.length > 0 && product.variants.every(item => Number(item.stock) <= 0));
 
     return (
       <Link
@@ -369,7 +371,9 @@ const Products = () => {
         key={`${product._id}-${product.slug}`}
         className={`product-card ${isHighlighted ? 'product-card-highlight' : ''}`}
       >
-        {discount > 0 && (
+        {isOutOfStock ? (
+          <div className="product-badge out-of-stock-badge">Out of Stock</div>
+        ) : discount > 0 && (
           <div className="product-badge">{discount}% OFF</div>
         )}
         <div className="product-image">
@@ -387,7 +391,7 @@ const Products = () => {
               </>
             )}
           </div>
-          <span className="product-card-link">View Details -&gt;</span>
+          <span className="product-card-link">{isOutOfStock ? 'View Product' : 'View Details ->'}</span>
         </div>
       </Link>
     );

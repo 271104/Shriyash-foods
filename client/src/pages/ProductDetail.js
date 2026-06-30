@@ -339,6 +339,11 @@ const ProductDetail = () => {
       return false;
     }
 
+    if (['banana-powder', 'abc-powder', 'tomato-powder'].includes(product.slug) || Number(selectedVariant.stock) <= 0) {
+      toast.error('This product is currently out of stock');
+      return false;
+    }
+
     setAdding(true);
     try {
       await addToCart(product._id, selectedVariant.weight, quantity);
@@ -360,6 +365,8 @@ const ProductDetail = () => {
   const productTone = useMemo(() => getProductTone(product?.name), [product]);
   const category = useMemo(() => getProductCategory(product), [product]);
   const discount = getDiscount(selectedVariant);
+  const isOutOfStock = ['banana-powder', 'abc-powder', 'tomato-powder'].includes(product?.slug)
+    || (selectedVariant && Number(selectedVariant.stock) <= 0);
   const galleryImages = useMemo(() => {
     const images = getGalleryImages(product);
     return images.length ? images : [productTone.hero || '/placeholder.jpg'];
@@ -449,6 +456,7 @@ const ProductDetail = () => {
               </div>
             )}
             <p className="tax-note">(Inclusive of all taxes)</p>
+            {isOutOfStock && <p className="detail-stock-status">Out of Stock</p>}
 
             <div className="variant-selector">
               <label>Select Size:</label>
@@ -476,11 +484,11 @@ const ProductDetail = () => {
             </div>
 
             <div className="product-actions">
-              <button onClick={handleAddToCart} disabled={adding} className="detail-cart-btn" type="button">
+              <button onClick={handleAddToCart} disabled={adding || isOutOfStock} className="detail-cart-btn" type="button">
                 <FiShoppingCart />
-                {adding ? 'Adding...' : 'Add to Cart'}
+                {isOutOfStock ? 'Out of Stock' : adding ? 'Adding...' : 'Add to Cart'}
               </button>
-              <button onClick={handleBuyNow} disabled={adding} className="detail-buy-btn" type="button">
+              <button onClick={handleBuyNow} disabled={adding || isOutOfStock} className="detail-buy-btn" type="button">
                 <FiZap />
                 Buy Now
               </button>

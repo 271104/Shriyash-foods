@@ -1,5 +1,12 @@
 .journey-page {
-  background: white;
+  --journey-green-900: #1c4f22;
+  --journey-green-700: #2f7d38;
+  --journey-green-600: #3f9b48;
+  --journey-green-100: #e9f7eb;
+  --journey-green-50: #f5fcf6;
+  --journey-text: #1f2a21;
+  --journey-muted: #4b5f4f;
+  background: #ffffff;
 }
 
 /* Hero Section */
@@ -14,7 +21,7 @@
 /* Journey Story */
 .journey-story {
   padding: 100px 0;
-  background: white;
+  background: linear-gradient(180deg, #ffffff 0%, var(--journey-green-50) 100%);
 }
 
 .story-content {
@@ -26,14 +33,14 @@
 
 .story-text h2 {
   font-size: 42px;
-  color: var(--dark);
+  color: var(--journey-green-900);
   margin-bottom: 12px;
   font-weight: 700;
 }
 
 .story-text h3 {
   font-size: 24px;
-  color: var(--primary);
+  color: var(--journey-green-700);
   margin-bottom: 22px;
   font-weight: 700;
 }
@@ -41,22 +48,23 @@
 .story-text p {
   font-size: 17px;
   line-height: 1.75;
-  color: var(--gray);
+  color: var(--journey-muted);
   margin-bottom: 16px;
 }
 
 .journey-tagline {
-  background: var(--cream);
+  background: #ffffff;
   padding: 20px;
   border-radius: 8px;
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid var(--journey-green-600);
+  border: 1px solid #d6ecd9;
   margin-top: 24px;
   text-align: center;
 }
 
 .journey-tagline strong {
   font-size: 20px;
-  color: var(--primary);
+  color: var(--journey-green-700);
   font-weight: 700;
 }
 
@@ -74,19 +82,20 @@
   aspect-ratio: auto;
   object-fit: contain;
   border-radius: 16px;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 18px 48px rgba(47, 125, 56, 0.2);
+  border: 1px solid #dceddf;
 }
 
 /* Journey Values */
 .journey-values {
   padding: 100px 0;
-  background: var(--cream);
+  background: var(--journey-green-100);
 }
 
 .journey-values h2 {
   text-align: center;
   font-size: 42px;
-  color: var(--dark);
+  color: var(--journey-green-900);
   margin-bottom: 60px;
   font-weight: 700;
 }
@@ -98,23 +107,24 @@
 }
 
 .value-card {
-  background: white;
+  background: #ffffff;
   padding: 40px 30px;
   border-radius: 16px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(28, 79, 34, 0.1);
+  border: 1px solid #d6ecd9;
   transition: all 0.3s;
 }
 
 .value-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 10px 30px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 10px 30px rgba(47, 125, 56, 0.2);
 }
 
 .value-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--journey-green-600) 0%, var(--journey-green-900) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -126,7 +136,7 @@
 
 .value-card h3 {
   font-size: 22px;
-  color: var(--dark);
+  color: var(--journey-green-900);
   margin-bottom: 12px;
   font-weight: 600;
 }
@@ -134,13 +144,13 @@
 .value-card p {
   font-size: 15px;
   line-height: 1.6;
-  color: var(--gray);
+  color: var(--journey-muted);
 }
 
 /* CTA Section */
 .journey-cta {
   padding: 100px 0;
-  background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--journey-green-700) 0%, var(--journey-green-900) 100%);
   text-align: center;
   color: white;
 }

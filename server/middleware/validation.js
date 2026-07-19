@@ -80,10 +80,10 @@ const validateOrderData = (req, res, next) => {
   }
 
   // Validate payment method
-  if (!paymentMethod || !['COD', 'PREPAID'].includes(paymentMethod)) {
+  if (paymentMethod !== 'PREPAID') {
     return res.status(400).json({ 
       success: false, 
-      message: 'Please select a valid payment method' 
+      message: 'Only prepaid payment is supported' 
     });
   }
 

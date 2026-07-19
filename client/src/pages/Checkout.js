@@ -33,12 +33,11 @@ const Checkout = () => {
     addressLine2: '',
     landmark: '',
     city: '',
-    state: '',
-    paymentMethod: 'PREPAID'
+    state: ''
   });
 
   const shipping = shippingQuote;
-  const discount = formData.paymentMethod === 'PREPAID' ? 25 : 0;
+  const discount = 25;
   const total = cartTotal + (shipping ?? 0) - discount;
 
   const getCartWeight = () => {
@@ -258,7 +257,7 @@ const Checkout = () => {
           state: formData.state,
           pincode: formData.pincode
         },
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: 'PREPAID',
         isGuestOrder: isGuestCheckout,
         guestVerificationToken: isGuestCheckout ? guestVerificationToken : undefined,
         guestDetails: isGuestCheckout ? {
@@ -270,88 +269,82 @@ const Checkout = () => {
 
       const { data } = await axios.post('/orders/create', orderData);
 
-      if (formData.paymentMethod === 'PREPAID') {
-        // Initiate Razorpay payment
-        const paymentData = await axios.post('/payment/create-order', {
-          orderId: data.order.orderId,
-          amount: data.order.pricing.total
-        });
+      // Initiate Razorpay payment
+      const paymentData = await axios.post('/payment/create-order', {
+        orderId: data.order.orderId,
+        amount: data.order.pricing.total
+      });
 
-        const options = {
-          key: paymentData.data.keyId,
-          amount: paymentData.data.amount,
-          currency: 'INR',
-          name: 'Shriyash Foods',
-          description: 'Health Powders',
-          order_id: paymentData.data.razorpayOrderId,
-          prefill: {
-            name: formData.fullName,
-            email: formData.email,
-            contact: formData.phone
-          },
-          theme: { color: '#24470b' },
-          handler: async function (response) {
+      const options = {
+        key: paymentData.data.keyId,
+        amount: paymentData.data.amount,
+        currency: 'INR',
+        name: 'Shriyash Foods',
+        description: 'Health Powders',
+        order_id: paymentData.data.razorpayOrderId,
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone
+        },
+        theme: { color: '#24470b' },
+        handler: async function (response) {
+          try {
+            const verifyResponse = await axios.post('/payment/verify', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId: data.order.orderId
+            });
+            
+            if (verifyResponse.data.success) {
+              clearCart();
+              navigate(`/order-success/${data.order.orderId}`);
+            } else {
+              throw new Error(verifyResponse.data.message || 'Verification failed');
+            }
+          } catch (error) {
+            console.error('❌ Payment verification error:', error);
+            toast.error(error.response?.data?.message || 'Payment verification failed');
+            // Record the failed payment
             try {
-              const verifyResponse = await axios.post('/payment/verify', {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                orderId: data.order.orderId
+              await axios.post('/payment/failed', {
+                orderId: data.order.orderId,
+                error: error.message
               });
-              
-              if (verifyResponse.data.success) {
-                clearCart();
-                navigate(`/order-success/${data.order.orderId}`);
-              } else {
-                throw new Error(verifyResponse.data.message || 'Verification failed');
-              }
-            } catch (error) {
-              console.error('❌ Payment verification error:', error);
-              toast.error(error.response?.data?.message || 'Payment verification failed');
-              // Record the failed payment
-              try {
-                await axios.post('/payment/failed', {
-                  orderId: data.order.orderId,
-                  error: error.message
-                });
-              } catch (e) {
-                console.error('Failed to record payment error:', e);
-              }
-              setLoading(false);
+            } catch (e) {
+              console.error('Failed to record payment error:', e);
             }
-          },
-          modal: {
-            ondismiss: function() {
-              toast.info('Payment cancelled');
-              setLoading(false);
-            }
+            setLoading(false);
           }
-        };
-
-        // Add error handler for Razorpay errors
-        if (!window.Razorpay) {
-          toast.error('Payment gateway not loaded. Please refresh the page.');
-          setLoading(false);
-          return;
+        },
+        modal: {
+          ondismiss: function() {
+            toast.info('Payment cancelled');
+            setLoading(false);
+          }
         }
+      };
 
-        const razorpay = new window.Razorpay(options);
-        razorpay.on('payment.failed', function(response) {
-          console.error('❌ Razorpay payment failed:', response.error);
-          toast.error(`Payment failed: ${response.error.description || response.error.reason}`);
-          setLoading(false);
-          // Record the failed payment
-          axios.post('/payment/failed', {
-            orderId: data.order.orderId,
-            error: response.error.description
-          }).catch(e => console.error('Failed to record payment error:', e));
-        });
-        razorpay.open();
-      } else {
-        // COD order
-        clearCart();
-        navigate(`/order-success/${data.order.orderId}`);
+      // Add error handler for Razorpay errors
+      if (!window.Razorpay) {
+        toast.error('Payment gateway not loaded. Please refresh the page.');
+        setLoading(false);
+        return;
       }
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function(response) {
+        console.error('❌ Razorpay payment failed:', response.error);
+        toast.error(`Payment failed: ${response.error.description || response.error.reason}`);
+        setLoading(false);
+        // Record the failed payment
+        axios.post('/payment/failed', {
+          orderId: data.order.orderId,
+          error: response.error.description
+        }).catch(e => console.error('Failed to record payment error:', e));
+      });
+      razorpay.open();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Order creation failed');
     } finally {

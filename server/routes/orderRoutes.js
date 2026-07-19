@@ -28,13 +28,12 @@ const getOrderWeightKg = (items) => {
   return Math.max(weight, 0.5);
 };
 
-const getShiprocketShippingCharge = async (shippingAddress, items, paymentMethod) => {
-  const cod = paymentMethod === 'COD' ? 1 : 0;
+const getShiprocketShippingCharge = async (shippingAddress, items) => {
   const result = await shippingService.checkServiceability(
     PICKUP_POSTCODE,
     shippingAddress.pincode,
     getOrderWeightKg(items),
-    cod
+    0
   );
 
   if (!result.serviceable || !result.couriers?.length) {
@@ -45,12 +44,7 @@ const getShiprocketShippingCharge = async (shippingAddress, items, paymentMethod
 
   const cheapestCourier = result.couriers
     .filter(courier => Number.isFinite(Number(courier.freightCharges)) && Number(courier.freightCharges) > 0)
-    .sort((a, b) => {
-      const chargeA = Number(a.freightCharges) + (cod === 1 ? Number(a.codCharges) || 0 : 0);
-      const chargeB = Number(b.freightCharges) + (cod === 1 ? Number(b.codCharges) || 0 : 0);
-
-      return chargeA - chargeB;
-    })[0];
+    .sort((a, b) => Number(a.freightCharges) - Number(b.freightCharges))[0];
 
   if (!cheapestCourier) {
     const error = new Error('No Shiprocket shipping charge available for this pincode');
@@ -59,9 +53,8 @@ const getShiprocketShippingCharge = async (shippingAddress, items, paymentMethod
   }
 
   const freightCharge = Number(cheapestCourier.freightCharges);
-  const codCharge = cod === 1 ? Number(cheapestCourier?.codCharges) || 0 : 0;
 
-  return Math.ceil(freightCharge + codCharge);
+  return Math.ceil(freightCharge);
 };
 
 // @route   POST /api/orders/create
@@ -129,7 +122,7 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     // Calculate pricing
     let shipping;
     try {
-      shipping = await getShiprocketShippingCharge(shippingAddress, items, paymentMethod);
+      shipping = await getShiprocketShippingCharge(shippingAddress, items);
     } catch (error) {
       return res.status(error.statusCode || 502).json({
         success: false,
@@ -138,7 +131,7 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
           : 'Unable to calculate Shiprocket shipping charges. Please try again.'
       });
     }
-    const discount = paymentMethod === 'PREPAID' ? 25 : 0;
+    const discount = 25;
     const total = subtotal + shipping - discount;
 
     const customerType = req.user ? 'registered' : 'guest';

@@ -34,7 +34,7 @@ const Checkout = () => {
     landmark: '',
     city: '',
     state: '',
-    paymentMethod: 'COD'
+    paymentMethod: 'PREPAID'
   });
 
   const shipping = shippingQuote;
@@ -56,11 +56,10 @@ const Checkout = () => {
     return Math.max(weight, 0.5);
   };
 
-  const getCourierCharge = (courier, paymentMethod = formData.paymentMethod) => {
+  const getCourierCharge = (courier) => {
     const freight = Number(courier.freightCharges);
-    const codCharge = paymentMethod === 'COD' ? Number(courier.codCharges) || 0 : 0;
 
-    return freight + codCharge;
+    return freight;
   };
 
   const getCourierDeliveryEstimate = (courier, fallbackEstimate) => {
@@ -85,17 +84,17 @@ const Checkout = () => {
     return String(estimate).replace(/business days/i, 'days');
   };
 
-  const applyShippingQuoteForPayment = (couriers, paymentMethod, fallbackEstimate = '') => {
+  const applyShippingQuoteForPayment = (couriers, fallbackEstimate = '') => {
     const cheapestCourier = couriers
-      ?.filter(courier => Number.isFinite(Number(courier.freightCharges)) && getCourierCharge(courier, paymentMethod) > 0)
-      .sort((a, b) => getCourierCharge(a, paymentMethod) - getCourierCharge(b, paymentMethod))[0];
+      ?.filter(courier => Number.isFinite(Number(courier.freightCharges)) && getCourierCharge(courier) > 0)
+      .sort((a, b) => getCourierCharge(a) - getCourierCharge(b))[0];
     const isServiceable = Boolean(cheapestCourier);
 
     setServiceable(isServiceable);
     setSelectedCourier(cheapestCourier || null);
     setShippingQuote(
       isServiceable && cheapestCourier
-        ? Math.ceil(getCourierCharge(cheapestCourier, paymentMethod))
+        ? Math.ceil(getCourierCharge(cheapestCourier))
         : null
     );
     setDeliveryEstimate(
@@ -145,13 +144,6 @@ const Checkout = () => {
       setDeliveryEstimate('');
     }
 
-    if (name === 'paymentMethod' && serviceabilityQuote?.couriers?.length) {
-      applyShippingQuoteForPayment(
-        serviceabilityQuote.couriers,
-        nextValue,
-        serviceabilityQuote.estimatedDays
-      );
-    }
   };
 
   const checkPincode = async () => {
@@ -167,14 +159,13 @@ const Checkout = () => {
           pickup_postcode: '413005',
           delivery_postcode: formData.pincode,
           weight: getCartWeight(),
-          cod: 1
+          cod: 0
         }
       });
 
       setServiceabilityQuote(data);
       const { isServiceable, cheapestCourier } = applyShippingQuoteForPayment(
         data.couriers,
-        formData.paymentMethod,
         data.estimatedDays
       );
 
@@ -545,31 +536,10 @@ const Checkout = () => {
                 
                 <div className="payment-options">
                   <label className="payment-option">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="PREPAID"
-                      checked={formData.paymentMethod === 'PREPAID'}
-                      onChange={handleChange}
-                    />
                     <div className="payment-details">
                       <strong>Pay Online (UPI/Card/Wallet)</strong>
                       <span className="discount-badge">💰 Save ₹25</span>
                       <small>🔒 100% Secure Payment</small>
-                    </div>
-                  </label>
-
-                  <label className="payment-option">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="COD"
-                      checked={formData.paymentMethod === 'COD'}
-                      onChange={handleChange}
-                    />
-                    <div className="payment-details">
-                      <strong>Cash on Delivery</strong>
-                      <small>📱 Phone verification required</small>
                     </div>
                   </label>
                 </div>

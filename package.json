@@ -4,7 +4,7 @@
   "description": "Ecommerce website for Shriyash Foods - Health Powders",
   "main": "server/server.js",
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "scripts": {
     "server": "nodemon server/server.js",

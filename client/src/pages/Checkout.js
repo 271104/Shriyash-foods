@@ -18,7 +18,6 @@ const Checkout = () => {
   const [serviceable, setServiceable] = useState(null);
   const [shippingQuote, setShippingQuote] = useState(null);
   const [selectedCourier, setSelectedCourier] = useState(null);
-  const [serviceabilityQuote, setServiceabilityQuote] = useState(null);
   const [deliveryEstimate, setDeliveryEstimate] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isGuestCheckout, setIsGuestCheckout] = useState(false);
@@ -139,7 +138,6 @@ const Checkout = () => {
       setServiceable(null);
       setShippingQuote(null);
       setSelectedCourier(null);
-      setServiceabilityQuote(null);
       setDeliveryEstimate('');
     }
 
@@ -162,7 +160,6 @@ const Checkout = () => {
         }
       });
 
-      setServiceabilityQuote(data);
       const { isServiceable, cheapestCourier } = applyShippingQuoteForPayment(
         data.couriers,
         data.estimatedDays

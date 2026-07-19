@@ -9,7 +9,6 @@ const { optional, protect } = require('../middleware/auth');
 const { validateOrderData } = require('../middleware/validation');
 const { getClientInfo, logUserActivity } = require('../utils/activityLogger');
 const { findOrCreateGuestUser } = require('../utils/guestUserService');
-const { sendOrderConfirmationNotifications } = require('../services/orderNotification.service');
 
 const PICKUP_POSTCODE = '413005';
 
@@ -105,8 +104,15 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
         message: 'Please verify your phone number with OTP before placing this order.'
       });
     }
+
+    if (paymentMethod !== 'PREPAID') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cash on Delivery is no longer available. Please choose prepaid payment.',
+        suggestPrepaid: true
+      });
+    }
     
-    // Validate order value for COD
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     console.log('💰 Order subtotal:', subtotal);
     
@@ -114,27 +120,6 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     if (req.user) {
       const previousOrders = await Order.countDocuments({ user: req.user._id });
       isFirstOrder = previousOrders === 0;
-    }
-    
-    // COD fraud prevention
-    if (paymentMethod === 'COD') {
-      const codLimit = isFirstOrder ? 1500 : 3000;
-      
-      if (subtotal > codLimit) {
-        return res.status(400).json({
-          success: false,
-          message: `COD not available for orders above ₹${codLimit}. Please choose prepaid.`,
-          suggestPrepaid: true
-        });
-      }
-      
-      // Check if user is blocked
-      if (req.user && req.user.isBlocked) {
-        return res.status(403).json({
-          success: false,
-          message: 'COD not available. Please choose prepaid payment.'
-        });
-      }
     }
     
     // Generate order ID
@@ -264,17 +249,10 @@ router.post('/create', optional, validateOrderData, async (req, res) => {
     
     console.log('✅ Order created successfully:', orderId);
 
-    // COD: send WhatsApp + email confirmation immediately
-    if (paymentMethod === 'COD') {
-      sendOrderConfirmationNotifications(orderId).catch((err) => {
-        console.error('COD order notification error:', err.message);
-      });
-    }
-    
     res.status(201).json({
       success: true,
       order,
-      requiresOTP: paymentMethod === 'COD' && (subtotal > 500 || isFirstOrder)
+      requiresOTP: false
     });
   } catch (error) {
     console.error('❌ Order creation error:', error);
